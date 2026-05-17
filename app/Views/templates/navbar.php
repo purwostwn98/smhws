@@ -1,6 +1,7 @@
 <aside id="layout-menu" class="layout-menu menu-vertical menu">
     <div class="app-brand demo ">
-        <a href="<?= base_url() ?>" class="app-brand-link"> <span class="app-brand-logo demo">
+        <a href="<?= base_url() ?>" class="app-brand-link">
+            <span class="app-brand-logo demo">
                 <span class="text-primary">
                     <svg width="32" height="22" viewBox="0 0 32 22" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <path
@@ -27,20 +28,66 @@
                             fill="currentColor" />
                     </svg>
                 </span>
-            </span> <span class="app-brand-text demo menu-text fw-bold ms-3">SMHWS</span> </a>
+            </span> 
+            <span class="app-brand-text demo menu-text fw-bold ms-3">SMHWS</span> </a>
         <a href="javascript:void(0);" class="layout-menu-toggle menu-link text-large ms-auto"> <i class="icon-base ti menu-toggle-icon d-none d-xl-block"></i> <i class="icon-base ti tabler-x d-block d-xl-none"></i> </a>
     </div>
     <div class="menu-inner-shadow"></div>
     <ul class="menu-inner py-1">
         <li class="menu-item <?= ($title == 'Dashboard') ? 'active' : '' ?>">
-            <a href="#" class="menu-link"> <i class="menu-icon icon-base ti tabler-smart-home"></i>
+            <a href="<?php if (session()->get('userdata')['role'] == 'admin') {
+                echo route_to('admin.dashboard');
+            } else if (session()->get('userdata')['role'] == 'leader') {
+                echo route_to('leader.dashboard');
+            } else if (session()->get('userdata')['role'] == 'counselor') {
+                echo route_to('counselor.dashboard');
+            } else if (session()->get('userdata')['role'] == 'student') {
+                echo route_to('student.dashboard');
+            } ?>" class="menu-link"> <i class="menu-icon icon-base ti tabler-smart-home"></i>
                 <div data-i18n="Dashboard">Dashboard</div>
             </a>
         </li>
-        <li class="menu-item">
-            <a href="#" class="menu-link"> <i class="menu-icon icon-base ti tabler-users"></i>
-                <div data-i18n="Pengguna">Pengguna</div>
-            </a>
-        </li>
+
+        <?php if (session()->get('userdata')['role'] == 'admin') : ?>
+            <li class="menu-item <?= ($title == 'Validasi Konseling') ? 'active' : '' ?>">
+                <a href="#" class="menu-link"> <i class="menu-icon icon-base ti tabler-circle-check"></i>
+                    <div data-i18n="Validasi Konseling">Validasi Konseling</div>
+                </a>
+            </li>
+            <li class="menu-item <?= ($title == 'Manajemen Jadwal') ? 'active' : '' ?>">
+                <a href="#" class="menu-link"> <i class="menu-icon icon-base ti tabler-calendar-event"></i>
+                    <div data-i18n="Manajemen Jadwal">Manajemen Jadwal</div>
+                </a>
+            </li>
+            <li class="menu-item <?= ($title == 'Manajemen Pengguna') ? 'active' : '' ?>">
+                <a href="#" class="menu-link"> <i class="menu-icon icon-base ti tabler-users"></i>
+                    <div data-i18n="Manajemen Pengguna">Manajemen Pengguna</div>
+                </a>
+            </li>
+        <?php endif; ?>
+
+        <?php if (session()->get('userdata')['role'] == 'leader') : ?>
+            <li class="menu-item <?= ($title == 'Riwayat Konseling') ? 'active' : '' ?>">
+                <a href="#" class="menu-link"> <i class="menu-icon icon-base ti tabler-history"></i>
+                    <div data-i18n="Riwayat Konseling">Riwayat Konseling</div>
+                </a>
+            </li>
+        <?php endif; ?>
+
+        <?php if (session()->get('userdata')['role'] == 'counselor') : ?>
+            <li class="menu-item <?= ($title == 'Jadwal Konseling') ? 'active' : '' ?>">
+                <a href="#" class="menu-link"> <i class="menu-icon icon-base ti tabler-calendar-event"></i>
+                    <div data-i18n="Jadwal Konseling">Jadwal Konseling</div>
+                </a>
+            </li>
+        <?php endif; ?>
+
+        <?php if (session()->get('userdata')['role'] == 'student') : ?>
+            <li class="menu-item <?= ($title == 'Riwayat Konseling') ? 'active' : '' ?>">
+                <a href="#" class="menu-link"> <i class="menu-icon icon-base ti tabler-history"></i>
+                    <div data-i18n="Riwayat Konseling">Riwayat Konseling</div>
+                </a>
+            </li>
+        <?php endif; ?>
     </ul>
 </aside>
