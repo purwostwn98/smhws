@@ -1,0 +1,80 @@
+/* SMHWS - Student Mental Health & Wellbeing Support
+   Color palette inspired by UMS health services page
+   Primary: deep teal-blue  |  Secondary: wellness green  |  Accent: warm teal */
+
+:root {
+  --smhws-primary:     #1a5f7a;
+  --smhws-primary-rgb: 26, 95, 122;
+  --smhws-secondary:   #2d9b6e;
+  --smhws-accent:      #57c5b6;
+  --smhws-accent-warm: #f0a500;
+  --smhws-bg:          #eaf4f8;
+  --smhws-dark:        #1a2b40;
+  --smhws-light:       #f4fafc;
+}
+
+/* Override Vuexy primary to SMHWS teal-blue */
+:root,
+[data-bs-theme="light"] {
+  --bs-primary:        var(--smhws-primary) !important;
+  --bs-primary-rgb:    var(--smhws-primary-rgb) !important;
+}
+
+.text-primary        { color: var(--smhws-primary) !important; }
+.bg-primary          { background-color: var(--smhws-primary) !important; }
+.btn-primary         { background-color: var(--smhws-primary) !important; border-color: var(--smhws-primary) !important; }
+.btn-primary:hover   { background-color: #15485d !important; border-color: #15485d !important; }
+.btn-label-primary   { color: var(--smhws-primary) !important; background-color: rgba(26,95,122,.15) !important; border-color: transparent !important; }
+.btn-label-primary:hover { background-color: rgba(26,95,122,.25) !important; }
+.border-primary      { border-color: var(--smhws-primary) !important; }
+.bg-label-primary    { background-color: rgba(26,95,122,.15) !important; color: var(--smhws-primary) !important; }
+.badge.bg-label-primary { background-color: rgba(26,95,122,.15) !important; color: var(--smhws-primary) !important; }
+.badge.bg-primary    { background-color: var(--smhws-primary) !important; }
+
+/* Navbar */
+.landing-navbar .btn-primary { background-color: var(--smhws-primary) !important; border-color: var(--smhws-primary) !important; }
+
+/* Hero */
+#landingHero { background: linear-gradient(135deg, var(--smhws-bg) 0%, #d0eaf4 100%); }
+.hero-title   { color: var(--smhws-dark) !important; }
+
+/* Section accent line */
+.section-title-line {
+  display: inline-block;
+  width: 60px;
+  height: 4px;
+  background: var(--smhws-secondary);
+  border-radius: 2px;
+  margin-bottom: 1rem;
+}
+
+/* Service cards */
+.smhws-service-card {
+  border: none;
+  border-top: 4px solid var(--smhws-primary);
+  transition: transform .25s ease, box-shadow .25s ease;
+}
+.smhws-service-card:hover {
+  transform: translateY(-6px);
+  box-shadow: 0 12px 32px rgba(26,95,122,.15) !important;
+}
+
+/* Stat badge */
+.smhws-stat { background: linear-gradient(135deg, var(--smhws-primary), var(--smhws-secondary)); color: #fff; }
+
+/* Emergency banner */
+.smhws-emergency {
+  background: #fff3cd;
+  border-left: 5px solid var(--smhws-accent-warm);
+  border-radius: 8px;
+}
+
+/* Footer */
+.landing-footer       { background-color: var(--smhws-dark) !important; }
+.footer-bottom        { background-color: #111d2b !important; }
+
+/* Smooth scrolling */
+html { scroll-behavior: smooth; }
+
+/* Section spacing */
+.section-py { padding-top: 80px; padding-bottom: 80px; }
