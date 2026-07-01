@@ -32,12 +32,76 @@ $noJanji = '#' . str_pad($janji['id'], 5, '0', STR_PAD_LEFT);
   </a>
   <div class="flex-grow-1">
     <div class="d-flex align-items-center gap-2 flex-wrap">
-      <h4 class="fw-bold mb-0" style="color:#1a2b40;">Janji <?= $noJanji ?></h4>
+      <h4 class="fw-bold mb-0" style="color:#1a2b40;">Konseling <?= $noJanji ?></h4>
       <span class="badge <?= $statusClass ?>"><?= $statusLabel ?></span>
     </div>
     <p class="text-muted mb-0" style="font-size:.85rem;">
       Didaftarkan <?= date('d M Y, H:i', strtotime($janji['created_at'])) ?> WIB
     </p>
+  </div>
+</div>
+
+<?php
+$steps = [
+    'menunggu'     => ['label' => 'Menunggu',      'icon' => 'tabler-clock-hour-4',   'desc' => 'Pendaftaran diterima'],
+    'dikonfirmasi' => ['label' => 'Jadwal Dibuat', 'icon' => 'tabler-calendar-plus',  'desc' => 'Admin menetapkan jadwal'],
+    'terjadwal'    => ['label' => 'Terkonfirmasi', 'icon' => 'tabler-circle-check',   'desc' => 'Kehadiran dikonfirmasi'],
+    'berlangsung'  => ['label' => 'Berlangsung',   'icon' => 'tabler-activity',       'desc' => 'Sesi sedang berjalan'],
+    'selesai'      => ['label' => 'Selesai',       'icon' => 'tabler-rosette-check',  'desc' => 'Sesi selesai'],
+];
+$stepKeys    = array_keys($steps);
+$currentStep = $janji['status'] === 'dibatalkan' ? -1 : array_search($janji['status'], $stepKeys);
+?>
+<!-- Progress Timeline -->
+<div class="col-12 mb-4">
+  <div class="card shadow-sm" style="border-radius:.75rem;overflow:hidden;">
+    <div class="card-body py-4 px-3 px-md-4">
+      <?php if ($janji['status'] === 'dibatalkan'): ?>
+        <div class="d-flex align-items-center gap-3 py-2">
+          <div style="width:2.8rem;height:2.8rem;border-radius:50%;background:#dc3545;display:flex;align-items:center;justify-content:center;flex-shrink:0;">
+            <i class="ti tabler-x" style="color:#fff;font-size:1.3rem;"></i>
+          </div>
+          <div>
+            <div class="fw-bold" style="color:#dc3545;">Konseling Dibatalkan</div>
+            <div class="text-muted" style="font-size:.8rem;">Sesi ini telah dibatalkan dan tidak dapat dilanjutkan.</div>
+          </div>
+        </div>
+      <?php else: ?>
+      <div class="d-flex align-items-start justify-content-between position-relative" style="gap:0;">
+        <!-- Garis penghubung -->
+        <div style="position:absolute;top:1.35rem;left:calc(10% + 1.4rem);right:calc(10% + 1.4rem);height:2px;background:#e0e0e0;z-index:0;">
+          <?php $pct = $currentStep > 0 ? min(100, round($currentStep / (count($steps) - 1) * 100)) : 0; ?>
+          <div style="height:100%;width:<?= $pct ?>%;background:linear-gradient(90deg,#28c76f,#1a5f7a);transition:width .4s;"></div>
+        </div>
+
+        <?php foreach ($steps as $key => $step):
+            $idx   = array_search($key, $stepKeys);
+            $done  = $idx < $currentStep;
+            $active = $idx === $currentStep;
+        ?>
+        <div class="d-flex flex-column align-items-center text-center position-relative" style="flex:1;z-index:1;">
+          <div style="
+            width:2.8rem;height:2.8rem;border-radius:50%;
+            background:<?= $done ? '#28c76f' : ($active ? '#1a5f7a' : '#e0e0e0') ?>;
+            display:flex;align-items:center;justify-content:center;
+            box-shadow:<?= $active ? '0 0 0 4px rgba(26,95,122,.2)' : 'none' ?>;
+            transition:.3s;
+          ">
+            <i class="ti <?= $done ? 'tabler-check' : $step['icon'] ?>"
+               style="color:<?= ($done || $active) ? '#fff' : '#aaa' ?>;font-size:<?= $active ? '1.15rem' : '1rem' ?>;"></i>
+          </div>
+          <div class="mt-2" style="font-size:.73rem;font-weight:<?= $active ? '700' : '500' ?>;color:<?= $done ? '#28c76f' : ($active ? '#1a2b40' : '#aaa') ?>;">
+            <?= $step['label'] ?>
+          </div>
+          <div class="d-none d-md-block" style="font-size:.68rem;color:#bbb;line-height:1.3;margin-top:.15rem;">
+            <?= $step['desc'] ?>
+          </div>
+        </div>
+        <?php endforeach ?>
+      </div>
+
+      <?php endif ?>
+    </div>
   </div>
 </div>
 
@@ -146,6 +210,23 @@ $noJanji = '#' . str_pad($janji['id'], 5, '0', STR_PAD_LEFT);
             <?= nl2br(esc($janji['keluhan_utama'])) ?>
           </div>
         </div>
+        <?php if (! empty($janji['urgensi'])):
+            $urgensiMeta = [
+                'biasa'        => ['label' => 'Biasa',        'color' => '#2d9b6e', 'bg' => 'bg-label-success', 'icon' => 'tabler-circle'],
+                'cukup_urgen'  => ['label' => 'Cukup Urgen',  'color' => '#f0a500', 'bg' => 'bg-label-warning', 'icon' => 'tabler-alert-circle'],
+                'sangat_urgen' => ['label' => 'Sangat Urgen', 'color' => '#dc3545', 'bg' => 'bg-label-danger',  'icon' => 'tabler-alert-triangle'],
+            ];
+            $urg = $urgensiMeta[$janji['urgensi']] ?? ['label' => $janji['urgensi'], 'bg' => 'bg-label-secondary', 'icon' => 'tabler-circle'];
+        ?>
+        <div class="mb-4">
+          <div class="text-muted mb-1" style="font-size:.78rem;">Tingkat Urgensi</div>
+          <span class="badge <?= $urg['bg'] ?> d-inline-flex align-items-center gap-1" style="font-size:.82rem;padding:.35em .7em;">
+            <i class="ti <?= $urg['icon'] ?>"></i>
+            <?= $urg['label'] ?>
+          </span>
+        </div>
+        <?php endif ?>
+
         <?php if (! empty($janji['mulai_keluhan'])): ?>
           <div class="mb-4">
             <div class="text-muted mb-1" style="font-size:.78rem;">Mulai Muncul</div>
@@ -181,11 +262,26 @@ $noJanji = '#' . str_pad($janji['id'], 5, '0', STR_PAD_LEFT);
           ?>
           <?php if (! empty($jadwal)): ?>
             <div class="d-flex flex-wrap gap-2">
-              <?php foreach ($jadwal as $j2): ?>
-                <span class="badge bg-label-primary px-3 py-2" style="font-size:.82rem;">
-                  <i class="ti tabler-calendar-week me-1"></i>
-                  <?= ucfirst($j2['hari']) ?> — <?= esc($j2['waktu']) ?>
-                </span>
+              <?php foreach ($jadwal as $j2):
+                $metode = $j2['metode'] ?? null;
+                [$mc, $mi, $ml] = match ($metode) {
+                  'online'   => ['bg-label-info',      'tabler-video',           'Online'],
+                  'offline'  => ['bg-label-success',   'tabler-map-pin',         'Offline'],
+                  'keduanya' => ['bg-label-primary',   'tabler-arrows-exchange', 'Online & Offline'],
+                  default    => ['', '', ''],
+                };
+              ?>
+                <div class="d-flex align-items-center gap-2">
+                  <span class="badge bg-label-primary px-3 py-2" style="font-size:.82rem;">
+                    <i class="ti tabler-calendar-week me-1"></i>
+                    <?= ucfirst($j2['hari']) ?> — <?= esc($j2['waktu']) ?>
+                  </span>
+                  <?php if ($mc): ?>
+                    <span class="badge <?= $mc ?> px-3 py-2" style="font-size:.82rem;">
+                      <i class="ti <?= $mi ?> me-1"></i><?= $ml ?>
+                    </span>
+                  <?php endif ?>
+                </div>
               <?php endforeach ?>
             </div>
           <?php else: ?>
@@ -225,7 +321,7 @@ $noJanji = '#' . str_pad($janji['id'], 5, '0', STR_PAD_LEFT);
       <div class="card mb-4">
         <div class="card-header d-flex align-items-center justify-content-between">
           <h5 class="card-title mb-0">
-            <i class="ti tabler-brain me-2" style="color:#f0a500;"></i>Hasil DASS-21
+            <i class="ti tabler-brain me-2" style="color:#f0a500;"></i>Hasil Asesmen Awal
           </h5>
           <span class="text-muted" style="font-size:.78rem;">
             <?= date('d M Y', strtotime($dass['tanggal_pengisian'])) ?>
@@ -297,30 +393,67 @@ $noJanji = '#' . str_pad($janji['id'], 5, '0', STR_PAD_LEFT);
 
     <!-- Aksi Mahasiswa -->
     <?php if ($janji['status'] === 'dikonfirmasi'): ?>
-    <div class="card mb-4 border-primary" style="border-left:4px solid #696cff!important;">
-      <div class="card-body">
-        <div class="fw-bold mb-1"><i class="ti tabler-calendar-check text-primary me-1"></i>Jadwal Ditetapkan!</div>
-        <p class="text-muted mb-3" style="font-size:.82rem;">
-          Admin telah menetapkan jadwal konselingmu. Konfirmasi kehadiranmu agar sesi dapat berlangsung.
-        </p>
+    <div class="card mb-4" style="border:2px solid #696cff;border-radius:.75rem;box-shadow:0 4px 20px rgba(105,108,255,.18);">
+      <div class="card-header py-3" style="background:linear-gradient(135deg,#696cff 0%,#9155fd 100%);border-radius:.6rem .6rem 0 0;">
+        <div class="d-flex align-items-center gap-2">
+          <i class="ti tabler-calendar-check text-white" style="font-size:1.3rem;"></i>
+          <div>
+            <div class="fw-bold text-white" style="font-size:.95rem;">Jadwal Ditetapkan!</div>
+            <div class="text-white" style="font-size:.73rem;opacity:.85;">Konfirmasi kehadiranmu agar sesi dapat berlangsung</div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body pt-3">
+        <?php if ($konselorNama): ?>
+          <div class="d-flex align-items-center gap-2 mb-2 p-2 rounded-2" style="background:#f4f3ff;font-size:.85rem;">
+            <i class="ti tabler-user-check" style="color:#696cff;font-size:1rem;flex-shrink:0;"></i>
+            <div>
+              <div style="font-size:.7rem;color:#9155fd;">Konselor</div>
+              <div class="fw-semibold" style="color:#1a2b40;"><?= esc($konselorNama) ?></div>
+            </div>
+          </div>
+        <?php endif ?>
         <?php if ($janji['tanggal_konseling']): ?>
-          <div class="mb-2" style="font-size:.82rem;">
-            <i class="ti tabler-calendar me-1 text-muted"></i>
-            <?= date('l, d F Y', strtotime($janji['tanggal_konseling'])) ?>
-            <?php if ($janji['jam_konseling']): ?>· <?= date('H:i', strtotime($janji['jam_konseling'])) ?> WIB<?php endif ?>
+          <div class="d-flex align-items-center gap-2 mb-2 p-2 rounded-2" style="background:#f4f3ff;font-size:.85rem;">
+            <i class="ti tabler-calendar" style="color:#696cff;font-size:1rem;flex-shrink:0;"></i>
+            <span class="fw-semibold" style="color:#1a2b40;">
+              <?= date('l, d F Y', strtotime($janji['tanggal_konseling'])) ?>
+              <?php if ($janji['jam_konseling']): ?>
+                &nbsp;·&nbsp; <?= date('H:i', strtotime($janji['jam_konseling'])) ?> WIB
+              <?php endif ?>
+            </span>
           </div>
           <?php if (! empty($janji['lokasi_link'])): ?>
-            <div class="mb-3" style="font-size:.82rem;">
-              <i class="ti tabler-map-pin me-1 text-muted"></i><?= esc($janji['lokasi_link']) ?>
+            <div class="d-flex align-items-center gap-2 mb-2 p-2 rounded-2" style="background:#f4f3ff;font-size:.85rem;">
+              <i class="ti tabler-map-pin" style="color:#696cff;font-size:1rem;flex-shrink:0;"></i>
+              <span style="color:#1a2b40;"><?= esc($janji['lokasi_link']) ?></span>
             </div>
           <?php endif ?>
         <?php endif ?>
-        <form action="<?= base_url('janji/konfirmasi/' . $janji['id']) ?>" method="post">
-          <?= csrf_field() ?>
-          <button type="submit" class="btn btn-primary btn-sm w-100">
-            <i class="ti tabler-circle-check me-1"></i>Konfirmasi Kehadiran
-          </button>
-        </form>
+        <?php if (! empty($janji['catatan_admin'])): ?>
+          <div class="p-2 rounded-2 mb-2" style="background:#f4f3ff;font-size:.82rem;">
+            <div style="font-size:.7rem;color:#9155fd;margin-bottom:.25rem;">
+              <i class="ti tabler-message-2 me-1"></i>Catatan dari Admin
+            </div>
+            <div style="color:#1a2b40;line-height:1.5;"><?= nl2br(esc($janji['catatan_admin'])) ?></div>
+          </div>
+        <?php endif ?>
+        <div class="d-flex flex-column gap-2 mt-3">
+          <form action="<?= base_url('janji/konfirmasi/' . $janji['id']) ?>" method="post">
+            <?= csrf_field() ?>
+            <button type="submit" class="btn w-100 fw-semibold"
+                    style="background:linear-gradient(135deg,#696cff 0%,#9155fd 100%);color:#fff;padding:.6rem;font-size:.9rem;letter-spacing:.01em;">
+              <i class="ti tabler-circle-check me-1"></i>Konfirmasi Kehadiran
+            </button>
+          </form>
+          <form action="<?= base_url('janji/batal/' . $janji['id']) ?>" method="post"
+                onsubmit="return confirm('Yakin ingin membatalkan konseling ini?')">
+            <?= csrf_field() ?>
+            <button type="submit" class="btn btn-outline-danger w-100 btn-sm">
+              <i class="ti tabler-x me-1"></i>Batalkan Konseling
+            </button>
+          </form>
+        </div>
       </div>
     </div>
     <?php endif ?>

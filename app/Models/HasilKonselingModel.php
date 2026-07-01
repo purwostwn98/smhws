@@ -13,7 +13,7 @@ class HasilKonselingModel extends Model
 
     protected $allowedFields = [
         'janji_id', 'konselor_id',
-        'ada_rujukan', 'instansi_rujukan', 'alasan_rujukan',
+        'ada_rujukan', 'instansi_rujukan_id', 'instansi_rujukan', 'alasan_rujukan',
         'sesi_lanjutan', 'catatan_sesi',
     ];
 

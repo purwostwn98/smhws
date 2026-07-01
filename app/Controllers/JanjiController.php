@@ -29,14 +29,21 @@ class JanjiController extends BaseController
         $konselorModel = new KonselorModel();
         $dassItemModel = new DassItemModel();
 
-        $user     = $userModel->find(session()->get('user_id'));
-        $konselor = $konselorModel->withUser()->available()->findAll();
+        $userId    = session()->get('user_id');
+        $user      = $userModel->find($userId);
+        $konselor  = $konselorModel->withUser()->available()->findAll();
         $dassItems = $dassItemModel->orderBy('nomor')->findAll();
 
+        $janjiModel       = new JanjiModel();
+        $pernahSelesai    = $janjiModel->where('user_id', $userId)
+                                       ->where('status', 'selesai')
+                                       ->countAllResults() > 0;
+
         return view('janji/buat', [
-            'user'      => $user,
-            'konselor'  => $konselor,
-            'dassItems' => $dassItems,
+            'user'          => $user,
+            'konselor'      => $konselor,
+            'dassItems'     => $dassItems,
+            'pernahSelesai' => $pernahSelesai,
         ]);
     }
 
@@ -50,15 +57,19 @@ class JanjiController extends BaseController
 
         // ── 1. Simpan Janji dulu → dapat janji_id ───────────────────────────
         $jadwalPilihan = [];
-        foreach (['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'] as $hari) {
-            $waktu = $post['jadwal_' . $hari] ?? null;
-            if ($waktu) {
-                $jadwalPilihan[] = ['hari' => $hari, 'waktu' => $waktu];
+        $jadwalRaw = $post['jadwal_pilihan'] ?? null;
+        if ($jadwalRaw) {
+            // format: "senin_08:00"
+            $parts = explode('_', $jadwalRaw, 2);
+            if (count($parts) === 2) {
+                $jadwalPilihan[] = ['hari' => $parts[0], 'waktu' => $parts[1]];
             }
         }
 
-        $konselorPilihan = $post['konselor_pilihan'] ?? [];
-        if (! is_array($konselorPilihan)) $konselorPilihan = [];
+        $konselorPilihan = [];
+        if (! empty($post['konselor_pilihan'])) {
+            $konselorPilihan = [(int) $post['konselor_pilihan']];
+        }
 
         $janjiModel = new JanjiModel();
         $db         = \Config\Database::connect();
@@ -80,6 +91,7 @@ class JanjiController extends BaseController
             'konselor_pilihan'       => $konselorPilihan,
             'tema_konseling'         => $post['tema_konseling'] ?? null,
             'keluhan_utama'          => $post['keluhan_utama'],
+            'urgensi'                => $post['urgensi'] ?? null,
             'mulai_keluhan'          => $post['mulai_keluhan'] ?? null,
             'upaya_dilakukan'        => $post['upaya_dilakukan'] ?? null,
             'status'                 => 'menunggu',
@@ -238,6 +250,89 @@ class JanjiController extends BaseController
             ->with('success', 'Kehadiran berhasil dikonfirmasi. Sampai jumpa di sesi konselingmu!');
     }
 
+    /** POST /janji/batal/:id — mahasiswa membatalkan konseling */
+    public function batalKonseling(int $id): \CodeIgniter\HTTP\RedirectResponse
+    {
+        if ($r = $this->authCheck()) return $r;
+
+        $janjiModel = new JanjiModel();
+        $janji      = $janjiModel->find($id);
+
+        if (! $janji || $janji['user_id'] != session()->get('user_id')) {
+            return redirect()->to(base_url('janji'))
+                ->with('error', 'Konseling tidak ditemukan.');
+        }
+
+        if (! in_array($janji['status'], ['menunggu', 'dikonfirmasi'])) {
+            return redirect()->to(base_url('janji/' . $id))
+                ->with('error', 'Konseling ini tidak dapat dibatalkan.');
+        }
+
+        $janjiModel->update($id, ['status' => 'dibatalkan']);
+
+        return redirect()->to(base_url('janji/' . $id))
+            ->with('success', 'Konseling #' . str_pad($id, 5, '0', STR_PAD_LEFT) . ' telah dibatalkan.');
+    }
+
+    /** GET /janji/konselor-jadwal — API: jadwal tersedia berdasarkan konselor yang dipilih */
+    public function konselorJadwal(): \CodeIgniter\HTTP\ResponseInterface
+    {
+        if (! session()->get('is_logged_in')) {
+            return $this->response->setJSON(['error' => 'Unauthorized'])->setStatusCode(401);
+        }
+
+        $slots = [
+            's1' => ['jam' => '08:00:00', 'label' => '08.00–09.00'],
+            's2' => ['jam' => '09:30:00', 'label' => '09.30–10.30'],
+            's3' => ['jam' => '11:00:00', 'label' => '11.00–12.00'],
+            's4' => ['jam' => '12:30:00', 'label' => '12.30–13.30'],
+            's5' => ['jam' => '14:00:00', 'label' => '14.00–15.00'],
+        ];
+        $timeToSlot = array_combine(array_column($slots, 'jam'), array_keys($slots));
+
+        $ids = $this->request->getGet('ids') ?? [];
+        if (! is_array($ids)) $ids = [];
+        $ids = array_values(array_filter(array_map('intval', $ids)));
+
+        $db = \Config\Database::connect();
+
+        if (empty($ids)) {
+            // Tidak ada konselor dipilih → tampilkan semua slot semua hari
+            $jadwal = [];
+            foreach (['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'] as $hari) {
+                foreach ($slots as $key => $s) {
+                    $jadwal[$hari][$key] = ['jam' => substr($s['jam'], 0, 5), 'metode' => null];
+                }
+            }
+            return $this->response->setJSON(['jadwal' => $jadwal]);
+        }
+
+        $rows = $db->table('konselor_jadwal')
+            ->whereIn('konselor_id', $ids)
+            ->where('is_active', 1)
+            ->get()->getResultArray();
+
+        $jadwal = [];
+        foreach ($rows as $r) {
+            $slotKey = $timeToSlot[$r['jam_mulai']] ?? null;
+            if (! $slotKey) continue;
+            $hari = $r['hari'];
+            if (! isset($jadwal[$hari][$slotKey])) {
+                $jadwal[$hari][$slotKey] = [
+                    'jam'    => substr($r['jam_mulai'], 0, 5),
+                    'metode' => $r['metode'],
+                ];
+            } else {
+                // Gabungkan metode dari beberapa konselor yang berbeda
+                if ($jadwal[$hari][$slotKey]['metode'] !== $r['metode']) {
+                    $jadwal[$hari][$slotKey]['metode'] = 'keduanya';
+                }
+            }
+        }
+
+        return $this->response->setJSON(['jadwal' => $jadwal]);
+    }
+
     /** GET /janji — daftar janji milik mahasiswa */
     public function index(): string|\CodeIgniter\HTTP\RedirectResponse
     {
@@ -322,6 +417,34 @@ class JanjiController extends BaseController
         $safety = $db->table('janji_safety_screening')
             ->where('janji_id', $id)
             ->get()->getRowArray();
+
+        // Enrich jadwal_pilihan dengan metode dari konselor_jadwal
+        $jadwalPilihan = $janji['jadwal_pilihan'] ?? [];
+        if (! is_array($jadwalPilihan)) $jadwalPilihan = json_decode($jadwalPilihan, true) ?: [];
+        if (! empty($jadwalPilihan)) {
+            $lookupIds = array_map('intval', $pilihanIds);
+            if (! empty($janji['konselor_id'])) {
+                $lookupIds[] = (int) $janji['konselor_id'];
+            }
+            $lookupIds = array_values(array_unique(array_filter($lookupIds)));
+            if (! empty($lookupIds)) {
+                foreach ($jadwalPilihan as &$jSlot) {
+                    $rows = $db->table('konselor_jadwal')
+                        ->select('metode')
+                        ->whereIn('konselor_id', $lookupIds)
+                        ->where('hari', $jSlot['hari'])
+                        ->where("LEFT(jam_mulai, 5)", $jSlot['waktu'])
+                        ->where('is_active', 1)
+                        ->get()->getResultArray();
+                    if ($rows) {
+                        $metodes = array_unique(array_column($rows, 'metode'));
+                        $jSlot['metode'] = count($metodes) === 1 ? $metodes[0] : 'keduanya';
+                    }
+                }
+                unset($jSlot);
+            }
+            $janji['jadwal_pilihan'] = $jadwalPilihan;
+        }
 
         // Feedback (hanya untuk janji selesai)
         $feedback = null;

@@ -6,6 +6,7 @@ use App\Models\JanjiModel;
 use App\Models\KonselorModel;
 use App\Models\HasilKonselingModel;
 use App\Models\DassAssessmentModel;
+use App\Models\InstansiRujukanModel;
 
 class KonselorController extends BaseController
 {
@@ -143,12 +144,16 @@ class KonselorController extends BaseController
         $hasilModel = new HasilKonselingModel();
         $hasil = $hasilModel->byJanji($id);
 
+        $instansiModel   = new InstansiRujukanModel();
+        $instansiRujukan = $instansiModel->getAll();
+
         return view('konselor/janji/detail', [
-            'konselor' => $konselor,
-            'janji'    => $janji,
-            'safety'   => $safety,
-            'dass'     => $dass,
-            'hasil'    => $hasil,
+            'konselor'        => $konselor,
+            'janji'           => $janji,
+            'safety'          => $safety,
+            'dass'            => $dass,
+            'hasil'           => $hasil,
+            'instansiRujukan' => $instansiRujukan,
         ]);
     }
 
@@ -176,6 +181,17 @@ class KonselorController extends BaseController
         $post       = $this->request->getPost();
         $adaRujukan = isset($post['ada_rujukan']) ? 1 : 0;
 
+        $instansiRujukanId = null;
+        $instansiRujukan   = null;
+        if ($adaRujukan) {
+            $pilihan = $post['instansi_rujukan_id'] ?? null;
+            if ($pilihan === 'lainnya') {
+                $instansiRujukan = $post['instansi_rujukan'] ?? null;
+            } elseif ($pilihan) {
+                $instansiRujukanId = (int) $pilihan;
+            }
+        }
+
         $db = \Config\Database::connect();
         $db->transStart();
 
@@ -185,8 +201,9 @@ class KonselorController extends BaseController
         $hasilData = [
             'janji_id'         => $id,
             'konselor_id'      => $konselor['id'],
-            'ada_rujukan'      => $adaRujukan,
-            'instansi_rujukan' => $adaRujukan ? ($post['instansi_rujukan'] ?? null) : null,
+            'ada_rujukan'         => $adaRujukan,
+            'instansi_rujukan_id' => $instansiRujukanId,
+            'instansi_rujukan'    => $instansiRujukan,
             'alasan_rujukan'   => $adaRujukan ? ($post['alasan_rujukan'] ?? null) : null,
             'sesi_lanjutan'    => isset($post['sesi_lanjutan']) ? 1 : 0,
             'catatan_sesi'     => $post['catatan_sesi'] ?? null,

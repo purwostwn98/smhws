@@ -1,4 +1,5 @@
 <?= $this->extend('layouts/dashboard') ?>
+<?php /** @var array $janji */ $janji = $janji ?? []; ?>
 <?= $this->section('title') ?>Pendaftaran Berhasil<?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
@@ -21,7 +22,7 @@
 
         <div class="d-flex flex-column gap-2 text-start mb-4 mx-auto" style="max-width:360px;">
           <div class="d-flex justify-content-between py-2 border-bottom">
-            <span class="text-muted" style="font-size:.85rem;">Nomor Janji</span>
+            <span class="text-muted" style="font-size:.85rem;">Nomor Konseling</span>
             <strong>#<?= str_pad($janji['id'], 5, '0', STR_PAD_LEFT) ?></strong>
           </div>
           <div class="d-flex justify-content-between py-2 border-bottom">
@@ -50,7 +51,7 @@
 
         <div class="d-flex gap-3 justify-content-center flex-wrap">
           <a href="<?= base_url('janji') ?>" class="btn btn-primary">
-            <i class="ti tabler-list me-1"></i>Lihat Janji Saya
+            <i class="ti tabler-list me-1"></i>Lihat Konseling Saya
           </a>
           <a href="<?= base_url('dashboard') ?>" class="btn btn-label-primary">
             <i class="ti tabler-smart-home me-1"></i>Dashboard

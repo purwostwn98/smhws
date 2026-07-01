@@ -8,6 +8,17 @@ $isEdit       = $konselor !== null;
 $spesialisasi = $isEdit && is_array($konselor['spesialisasi']) ? implode(', ', $konselor['spesialisasi']) : '';
 $old          = fn(string $key, $default = '') => old($key, $default);
 $isDosen      = $isEdit && ! empty($konselor['uniid']);
+$jadwalSlots  = $jadwalSlots ?? [];
+$jadwalGrid   = $jadwalGrid ?? [];
+$jadwalCurrent = old('jadwal', $jadwalGrid);
+$hariList     = [
+    'senin'  => 'Senin',
+    'selasa' => 'Selasa',
+    'rabu'   => 'Rabu',
+    'kamis'  => 'Kamis',
+    'jumat'  => "Jum'at",
+    'sabtu'  => 'Sabtu',
+];
 ?>
 <?= $this->section('title') ?><?= $konselor ? 'Edit Konselor' : 'Tambah Konselor' ?><?= $this->endSection() ?>
 
@@ -225,6 +236,67 @@ $isDosen      = $isEdit && ! empty($konselor['uniid']);
       </div>
     </div>
 
+    <!-- Jadwal Preferensi Konseling -->
+    <div class="col-12">
+      <div class="card">
+        <div class="card-header py-3" style="border-bottom:1px solid #eee;">
+          <h6 class="fw-semibold mb-0" style="color:#1a2b40;">
+            <i class="ti tabler-calendar-time me-2 text-primary"></i>Jadwal Preferensi Konseling
+          </h6>
+          <div class="text-muted mt-1" style="font-size:.78rem;">
+            Centang sesi yang tersedia dan pilih modenya. Sabtu hanya tersedia mode Offline.
+          </div>
+        </div>
+        <div class="card-body p-0">
+          <div class="table-responsive">
+            <table class="table table-bordered align-middle mb-0" style="min-width:680px;">
+              <thead class="table-light">
+                <tr>
+                  <th class="text-center py-3" style="width:120px;font-size:.8rem;">Sesi</th>
+                  <?php foreach ($hariList as $hari => $label): ?>
+                  <th class="text-center py-3" style="font-size:.8rem;">
+                    <?= $label ?>
+                    <?php if ($hari === 'sabtu'): ?>
+                      <div class="mt-1">
+                        <span class="badge bg-label-secondary" style="font-size:.65rem;">offline only</span>
+                      </div>
+                    <?php endif ?>
+                  </th>
+                  <?php endforeach ?>
+                </tr>
+              </thead>
+              <tbody>
+                <?php foreach ($jadwalSlots as $slotKey => $slot): ?>
+                <tr>
+                  <td class="text-center fw-semibold py-3" style="font-size:.82rem;background:#f8f9fa;white-space:nowrap;">
+                    <?= $slot['label'] ?>
+                  </td>
+                  <?php foreach ($hariList as $hari => $hLabel):
+                    $val = $jadwalCurrent[$hari][$slotKey] ?? '';
+                  ?>
+                  <td class="text-center p-2">
+                    <select name="jadwal[<?= $hari ?>][<?= $slotKey ?>]"
+                            class="form-select form-select-sm jadwal-select"
+                            style="font-size:.78rem;text-align:center;"
+                            onchange="colorizeJadwal(this)">
+                      <option value="">—</option>
+                      <?php if ($hari !== 'sabtu'): ?>
+                        <option value="online"   <?= $val === 'online'   ? 'selected' : '' ?>>Online</option>
+                        <option value="keduanya" <?= $val === 'keduanya' ? 'selected' : '' ?>>Online & Offline</option>
+                      <?php endif ?>
+                      <option value="offline" <?= $val === 'offline' ? 'selected' : '' ?>>Offline</option>
+                    </select>
+                  </td>
+                  <?php endforeach ?>
+                </tr>
+                <?php endforeach ?>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
   </div>
 
   <!-- Submit -->
@@ -251,6 +323,18 @@ $isDosen      = $isEdit && ! empty($konselor['uniid']);
       icon.classList.replace('tabler-eye-off', 'tabler-eye');
     }
   });
+
+  // Jadwal select color coding
+  function colorizeJadwal(sel) {
+    const map = {
+      '':         '',
+      'online':   '#e3f2fd',
+      'offline':  '#e8f5e9',
+      'keduanya': '#f3e5f5',
+    };
+    sel.style.backgroundColor = map[sel.value] ?? '';
+  }
+  document.querySelectorAll('.jadwal-select').forEach(colorizeJadwal);
 
   // Preview spesialisasi badges
   function renderSpesialisasi(val) {

@@ -1,5 +1,5 @@
 <?= $this->extend('layouts/dashboard') ?>
-<?= $this->section('title') ?>Kelola Janji<?= $this->endSection() ?>
+<?= $this->section('title') ?>Kelola Konseling<?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
 <?php
@@ -22,7 +22,7 @@ $statusMeta = [
 <!-- Header -->
 <div class="d-flex align-items-start justify-content-between mb-4 flex-wrap gap-2">
   <div>
-    <h4 class="fw-bold mb-1" style="color:#1a2b40;">Kelola Janji</h4>
+    <h4 class="fw-bold mb-1" style="color:#1a2b40;">Kelola Konseling</h4>
     <p class="text-muted mb-0" style="font-size:.875rem;">Tinjau, tetapkan konselor, dan atur jadwal sesi konseling.</p>
   </div>
 </div>
@@ -78,7 +78,7 @@ $statusMeta = [
           <tr>
             <td colspan="8" class="text-center py-5 text-muted">
               <i class="ti tabler-calendar-off" style="font-size:2rem;display:block;margin-bottom:.5rem;"></i>
-              Tidak ada janji ditemukan.
+              Tidak ada konseling ditemukan.
             </td>
           </tr>
         <?php else: ?>

@@ -119,7 +119,7 @@ $totalJanji = $totalJanji ?? 0;
 <div class="card mb-4">
   <div class="card-header d-flex align-items-center justify-content-between">
     <div class="d-flex align-items-center gap-2">
-      <h5 class="card-title mb-0">Janji Menunggu Konfirmasi</h5>
+      <h5 class="card-title mb-0">Konseling Menunggu Konfirmasi</h5>
       <?php if ($stats['janji_menunggu'] > 0): ?>
         <span class="badge bg-warning text-dark"><?= $stats['janji_menunggu'] ?></span>
       <?php endif ?>
@@ -132,7 +132,7 @@ $totalJanji = $totalJanji ?? 0;
     <?php if (empty($janjiMenunggu)): ?>
       <div class="text-center py-5">
         <i class="ti tabler-calendar-check text-success" style="font-size:2.5rem;"></i>
-        <p class="text-muted mt-2 mb-0">Tidak ada janji yang menunggu konfirmasi</p>
+        <p class="text-muted mt-2 mb-0">Tidak ada konseling yang menunggu konfirmasi</p>
       </div>
     <?php else: ?>
       <div class="table-responsive">
@@ -223,7 +223,7 @@ $totalJanji = $totalJanji ?? 0;
   <div class="col-lg-5">
     <div class="card h-100">
       <div class="card-header">
-        <h5 class="card-title mb-0">Distribusi Status Janji</h5>
+        <h5 class="card-title mb-0">Distribusi Status Konseling</h5>
       </div>
       <div class="card-body">
         <?php
@@ -236,7 +236,7 @@ $totalJanji = $totalJanji ?? 0;
         ];
         ?>
         <?php if ($totalJanji === 0): ?>
-          <p class="text-muted text-center py-4 mb-0">Belum ada data janji.</p>
+          <p class="text-muted text-center py-4 mb-0">Belum ada data konseling.</p>
         <?php else: ?>
           <div class="d-flex flex-column gap-3">
             <?php foreach ($statusInfo as $key => $info): ?>
@@ -260,7 +260,7 @@ $totalJanji = $totalJanji ?? 0;
             <?php endforeach ?>
           </div>
           <div class="text-muted text-center mt-3" style="font-size:.78rem;">
-            Total <?= $totalJanji ?> janji terdaftar
+            Total <?= $totalJanji ?> konseling terdaftar
           </div>
         <?php endif ?>
       </div>

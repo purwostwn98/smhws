@@ -1,11 +1,14 @@
 <?= $this->extend('layouts/dashboard') ?>
-<?= $this->section('title') ?>Detail Janji #<?= str_pad($janji['id'], 5, '0', STR_PAD_LEFT) ?><?= $this->endSection() ?>
-
-<?= $this->section('content') ?>
 <?php
 use App\Models\KonselorModel;
 
+/** @var array $janji */
 $janji               = $janji ?? [];
+?>
+<?= $this->section('title') ?>Detail Konseling #<?= str_pad($janji['id'], 5, '0', STR_PAD_LEFT) ?><?= $this->endSection() ?>
+
+<?= $this->section('content') ?>
+<?php
 $konselorList        = $konselorList ?? [];
 $konselorNama        = $konselorNama ?? null;
 $konselorPilihanList = $konselorPilihanList ?? [];
@@ -27,7 +30,7 @@ $sm = $statusMeta[$janji['status']] ?? ['label' => $janji['status'], 'color' => 
 <!-- Breadcrumb -->
 <div class="d-flex align-items-center gap-2 mb-4 flex-wrap">
   <a href="<?= base_url('admin/janji') ?>" class="text-muted text-decoration-none" style="font-size:.875rem;">
-    <i class="ti tabler-arrow-left me-1"></i>Kelola Janji
+    <i class="ti tabler-arrow-left me-1"></i>Kelola Konseling
   </a>
   <span class="text-muted">/</span>
   <span class="fw-semibold" style="font-size:.875rem;">
@@ -135,6 +138,21 @@ $sm = $statusMeta[$janji['status']] ?? ['label' => $janji['status'], 'color' => 
             <div class="text-muted" style="font-size:.75rem;">Keluhan Utama</div>
             <div class="mt-1" style="font-size:.875rem;white-space:pre-wrap;"><?= esc($janji['keluhan_utama']) ?></div>
           </div>
+          <?php if (! empty($janji['urgensi'])):
+            $urgensiMeta = [
+                'biasa'        => ['label' => 'Biasa',        'bg' => 'bg-label-success', 'icon' => 'tabler-circle'],
+                'cukup_urgen'  => ['label' => 'Cukup Urgen',  'bg' => 'bg-label-warning', 'icon' => 'tabler-alert-circle'],
+                'sangat_urgen' => ['label' => 'Sangat Urgen', 'bg' => 'bg-label-danger',  'icon' => 'tabler-alert-triangle'],
+            ];
+            $urg = $urgensiMeta[$janji['urgensi']] ?? ['label' => $janji['urgensi'], 'bg' => 'bg-label-secondary', 'icon' => 'tabler-circle'];
+          ?>
+          <div class="col-12">
+            <div class="text-muted" style="font-size:.75rem;">Tingkat Urgensi</div>
+            <span class="badge <?= $urg['bg'] ?> d-inline-flex align-items-center gap-1 mt-1" style="font-size:.8rem;padding:.35em .7em;">
+              <i class="ti <?= $urg['icon'] ?>"></i><?= $urg['label'] ?>
+            </span>
+          </div>
+          <?php endif ?>
           <?php if (! empty($janji['mulai_keluhan'])): ?>
           <div class="col-sm-6">
             <div class="text-muted" style="font-size:.75rem;">Sejak Kapan</div>
@@ -295,38 +313,88 @@ $sm = $statusMeta[$janji['status']] ?? ['label' => $janji['status'], 'color' => 
     </div>
     <?php endif ?>
 
-    <!-- Konselor Pilihan Mahasiswa -->
-    <?php if (! empty($konselorPilihanList)): ?>
+    <!-- Preferensi Jadwal & Konselor Mahasiswa -->
+    <?php
+    $jadwalPilihan2 = $janji['jadwal_pilihan'] ?? [];
+    if (! is_array($jadwalPilihan2)) $jadwalPilihan2 = json_decode($jadwalPilihan2, true) ?: [];
+    $adaPreferensi = ! empty($jadwalPilihan2) || ! empty($konselorPilihanList);
+    ?>
+    <?php if ($adaPreferensi): ?>
     <div class="card shadow-sm mb-4">
       <div class="card-header py-3">
-        <h6 class="mb-0 fw-semibold" style="font-size:.85rem;"><i class="ti tabler-heart-handshake me-2 text-info"></i>Konselor Pilihan Mahasiswa</h6>
+        <h6 class="mb-0 fw-semibold" style="font-size:.85rem;">
+          <i class="ti tabler-adjustments-horizontal me-2 text-info"></i>Preferensi Mahasiswa
+        </h6>
       </div>
-      <div class="card-body py-2">
-        <?php foreach ($konselorPilihanList as $kNama): ?>
-          <div class="d-flex align-items-center gap-2 py-1">
-            <i class="ti tabler-user-check text-info"></i>
-            <span style="font-size:.875rem;"><?= esc($kNama) ?></span>
+      <div class="card-body py-3">
+
+        <?php if (! empty($jadwalPilihan2)): ?>
+          <div class="mb-3">
+            <div class="text-muted mb-2" style="font-size:.73rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">
+              <i class="ti tabler-clock me-1"></i>Jadwal yang Dipilih
+            </div>
+            <?php foreach ($jadwalPilihan2 as $jItem):
+              $jMetode = $jItem['metode'] ?? null;
+              [$jmc, $jmi, $jml] = match ($jMetode) {
+                'online'   => ['bg-label-info',    'tabler-video',           'Online'],
+                'offline'  => ['bg-label-success', 'tabler-map-pin',         'Offline'],
+                'keduanya' => ['bg-label-primary',  'tabler-arrows-exchange', 'Online & Offline'],
+                default    => ['', '', ''],
+              };
+            ?>
+              <div class="d-flex align-items-center gap-2 flex-wrap">
+                <span class="badge bg-label-primary px-3 py-2" style="font-size:.8rem;">
+                  <i class="ti tabler-calendar-week me-1"></i>
+                  <?= ucfirst($jItem['hari']) ?> — <?= esc($jItem['waktu']) ?>
+                </span>
+                <?php if ($jmc): ?>
+                  <span class="badge <?= $jmc ?> px-3 py-2" style="font-size:.8rem;">
+                    <i class="ti <?= $jmi ?> me-1"></i><?= $jml ?>
+                  </span>
+                <?php endif ?>
+              </div>
+            <?php endforeach ?>
           </div>
-        <?php endforeach ?>
+        <?php endif ?>
+
+        <?php if (! empty($konselorPilihanList)): ?>
+          <?php if (! empty($jadwalPilihan2)): ?>
+            <hr class="my-2">
+          <?php endif ?>
+          <div>
+            <div class="text-muted mb-2" style="font-size:.73rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">
+              <i class="ti tabler-user-check me-1"></i>Konselor yang Dipilih
+            </div>
+            <?php foreach ($konselorPilihanList as $kNama): ?>
+              <div class="d-flex align-items-center gap-2 py-1">
+                <i class="ti tabler-user text-info"></i>
+                <span style="font-size:.875rem;"><?= esc($kNama) ?></span>
+              </div>
+            <?php endforeach ?>
+          </div>
+        <?php endif ?>
+
       </div>
     </div>
     <?php endif ?>
 
     <!-- Form Tetapkan Jadwal -->
     <?php if (in_array($janji['status'], ['menunggu', 'dikonfirmasi'])): ?>
-    <div class="card shadow-sm mb-4">
-      <div class="card-header py-3">
-        <h6 class="mb-0 fw-semibold"><i class="ti tabler-calendar-plus me-2 text-primary"></i>
-          <?= $janji['status'] === 'dikonfirmasi' ? 'Ubah Jadwal' : 'Tetapkan Jadwal & Konselor' ?>
+    <div class="card mb-4" style="border:2px solid #696cff;border-radius:.75rem;box-shadow:0 4px 20px rgba(105,108,255,.15);">
+      <div class="card-header py-3" style="background:linear-gradient(135deg,#696cff 0%,#9155fd 100%);border-radius:.6rem .6rem 0 0;">
+        <h6 class="mb-0 fw-bold text-white d-flex align-items-center gap-2">
+          <i class="ti tabler-calendar-plus" style="font-size:1.1rem;"></i>
+          <?= $janji['status'] === 'dikonfirmasi' ? 'Ubah Jadwal & Konselor' : 'Tetapkan Jadwal & Konselor' ?>
         </h6>
+        <div class="text-white mt-1" style="font-size:.75rem;opacity:.85;">Lengkapi form berikut lalu simpan</div>
       </div>
-      <div class="card-body">
+      <div class="card-body pt-4">
         <form action="<?= base_url('admin/janji/proses/' . $janji['id']) ?>" method="post">
           <?= csrf_field() ?>
 
           <div class="mb-3">
             <label class="form-label fw-semibold" style="font-size:.82rem;">Konselor <span class="text-danger">*</span></label>
-            <select name="konselor_id" class="form-select form-select-sm" required>
+            <select name="konselor_id" id="konselorSelect" class="form-select form-select-sm" required>
               <option value="">— Pilih Konselor —</option>
               <?php foreach ($konselorList as $k): ?>
                 <option value="<?= $k['id'] ?>" <?= ($janji['konselor_id'] ?? '') == $k['id'] ? 'selected' : '' ?>>
@@ -334,20 +402,27 @@ $sm = $statusMeta[$janji['status']] ?? ['label' => $janji['status'], 'color' => 
                 </option>
               <?php endforeach ?>
             </select>
+            <div id="jadwalHariInfo" class="mt-1" style="font-size:.73rem;color:#666;display:none;">
+              <i class="ti tabler-calendar-week me-1"></i>
+              Hari tersedia: <span id="hariTersedia" class="fw-semibold"></span>
+            </div>
           </div>
 
-          <div class="row g-2 mb-3">
-            <div class="col-7">
-              <label class="form-label fw-semibold" style="font-size:.82rem;">Tanggal <span class="text-danger">*</span></label>
-              <input type="date" name="tanggal_konseling" class="form-control form-control-sm"
-                     value="<?= esc($janji['tanggal_konseling'] ?? '') ?>" required
-                     min="<?= date('Y-m-d') ?>">
+          <div class="mb-3">
+            <label class="form-label fw-semibold" style="font-size:.82rem;">Tanggal <span class="text-danger">*</span></label>
+            <input type="date" name="tanggal_konseling" id="tanggalInput" class="form-control form-control-sm"
+                   value="<?= esc($janji['tanggal_konseling'] ?? '') ?>" required
+                   min="<?= date('Y-m-d') ?>">
+            <div id="tanggalWarning" class="form-text text-danger" style="display:none;">
+              <i class="ti tabler-alert-triangle me-1"></i>Konselor tidak tersedia pada hari yang dipilih.
             </div>
-            <div class="col-5">
-              <label class="form-label fw-semibold" style="font-size:.82rem;">Jam <span class="text-danger">*</span></label>
-              <input type="time" name="jam_konseling" class="form-control form-control-sm"
-                     value="<?= esc($janji['jam_konseling'] ?? '') ?>" required>
-            </div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label fw-semibold" style="font-size:.82rem;">Sesi / Jam <span class="text-danger">*</span></label>
+            <select name="jam_konseling" id="jamSelect" class="form-select form-select-sm" required>
+              <option value="">— Pilih konselor &amp; tanggal dulu —</option>
+            </select>
           </div>
 
           <div class="mb-3">
@@ -357,13 +432,14 @@ $sm = $statusMeta[$janji['status']] ?? ['label' => $janji['status'], 'color' => 
                    value="<?= esc($janji['lokasi_link'] ?? '') ?>">
           </div>
 
-          <div class="mb-3">
+          <div class="mb-4">
             <label class="form-label fw-semibold" style="font-size:.82rem;">Catatan untuk Mahasiswa</label>
             <textarea name="catatan_admin" class="form-control form-control-sm" rows="2"
                       placeholder="Informasi tambahan..."><?= esc($janji['catatan_admin'] ?? '') ?></textarea>
           </div>
 
-          <button type="submit" class="btn btn-primary btn-sm w-100">
+          <button type="submit" class="btn btn-sm w-100 fw-semibold"
+                  style="background:linear-gradient(135deg,#696cff 0%,#9155fd 100%);color:#fff;padding:.55rem;letter-spacing:.01em;">
             <i class="ti tabler-calendar-check me-1"></i>Tetapkan Jadwal
           </button>
         </form>
@@ -389,10 +465,10 @@ $sm = $statusMeta[$janji['status']] ?? ['label' => $janji['status'], 'color' => 
 
         <?php if (! in_array($janji['status'], ['selesai', 'dibatalkan'])): ?>
           <form action="<?= base_url('admin/janji/batal/' . $janji['id']) ?>" method="post"
-                onsubmit="return confirm('Batalkan janji ini?')">
+                onsubmit="return confirm('Batalkan konseling ini?')">
             <?= csrf_field() ?>
             <button type="submit" class="btn btn-outline-danger btn-sm w-100">
-              <i class="ti tabler-ban me-1"></i>Batalkan Janji
+              <i class="ti tabler-ban me-1"></i>Batalkan Konseling
             </button>
           </form>
         <?php endif ?>
@@ -406,4 +482,108 @@ $sm = $statusMeta[$janji['status']] ?? ['label' => $janji['status'], 'color' => 
   </div>
 </div>
 
+<?= $this->endSection() ?>
+
+<?= $this->section('extra_js') ?>
+<?php $konselorJadwalMap = $konselorJadwalMap ?? []; ?>
+<script>
+(function () {
+  'use strict';
+
+  // Data jadwal semua konselor sudah di-preload dari server (tidak perlu fetch)
+  const ALL_JADWAL = <?= json_encode($konselorJadwalMap) ?>;
+  const INIT_JAM   = '<?= esc($janji['jam_konseling'] ?? '') ?>';
+
+  const SLOTS = {
+    s1: { jam: '08:00:00', label: '08.00 – 09.00 WIB' },
+    s2: { jam: '09:30:00', label: '09.30 – 10.30 WIB' },
+    s3: { jam: '11:00:00', label: '11.00 – 12.00 WIB' },
+    s4: { jam: '12:30:00', label: '12.30 – 13.30 WIB' },
+    s5: { jam: '14:00:00', label: '14.00 – 15.00 WIB' },
+  };
+  const METODE_LABEL = { online: 'Online', offline: 'Offline', keduanya: 'Online & Offline' };
+  const DAY_KEYS     = ['minggu','senin','selasa','rabu','kamis','jumat','sabtu'];
+  const DAY_LABELS   = ['Minggu','Senin','Selasa','Rabu','Kamis',"Jum'at",'Sabtu'];
+
+  const konselorEl = document.getElementById('konselorSelect');
+  const tanggalEl  = document.getElementById('tanggalInput');
+  const jamEl      = document.getElementById('jamSelect');
+  const hariInfoEl = document.getElementById('jadwalHariInfo');
+  const hariTextEl = document.getElementById('hariTersedia');
+  const warnEl     = document.getElementById('tanggalWarning');
+
+  function getJadwalData() {
+    const id = parseInt(konselorEl.value);
+    return id ? (ALL_JADWAL[id] || {}) : {};
+  }
+
+  function getSelectedHari() {
+    if (!tanggalEl.value) return null;
+    const d = new Date(tanggalEl.value + 'T00:00:00');
+    return DAY_KEYS[d.getDay()];
+  }
+
+  function updateHariInfo() {
+    const jadwal   = getJadwalData();
+    const hariList = Object.keys(jadwal);
+    if (!hariList.length) { hariInfoEl.style.display = 'none'; return; }
+    const labels = hariList.map(h => DAY_LABELS[DAY_KEYS.indexOf(h)] || h);
+    hariTextEl.textContent = labels.join(', ');
+    hariInfoEl.style.display = '';
+  }
+
+  function renderJamOptions() {
+    const jadwal    = getJadwalData();
+    const hari      = getSelectedHari();
+    const hasData   = Object.keys(jadwal).length > 0;
+    const hariSlots = hari ? (jadwal[hari] || null) : null;
+
+    // Peringatan jika hari yang dipilih tidak ada di jadwal konselor
+    if (konselorEl.value && hasData && hari && hari !== 'minggu' && !jadwal[hari]) {
+      warnEl.style.display = '';
+    } else {
+      warnEl.style.display = 'none';
+    }
+
+    jamEl.innerHTML = '';
+
+    if (!konselorEl.value || !hari) {
+      jamEl.add(new Option('— Pilih konselor & tanggal dulu —', ''));
+      return;
+    }
+
+    if (!hariSlots) {
+      jamEl.add(new Option('— Konselor tidak tersedia di hari ini —', ''));
+      return;
+    }
+
+    jamEl.add(new Option('— Pilih sesi —', ''));
+
+    let hasSlot = false;
+    Object.entries(SLOTS).forEach(([key, slot]) => {
+      if (!hariSlots[key] && hariSlots[key] !== 0) return;
+      hasSlot = true;
+      const metode    = hariSlots[key];
+      const metodeStr = metode ? ` · ${METODE_LABEL[metode] || metode}` : '';
+      const opt       = new Option(slot.label + metodeStr, slot.jam);
+      if (INIT_JAM && (INIT_JAM === slot.jam || INIT_JAM.startsWith(slot.jam.substring(0, 5)))) {
+        opt.selected = true;
+      }
+      jamEl.add(opt);
+    });
+
+    if (!hasSlot) {
+      jamEl.innerHTML = '';
+      jamEl.add(new Option('— Tidak ada sesi di hari ini —', ''));
+    }
+  }
+
+  konselorEl.addEventListener('change', () => { updateHariInfo(); renderJamOptions(); });
+  tanggalEl.addEventListener('change', renderJamOptions);
+
+  // Inisialisasi saat halaman dibuka
+  updateHariInfo();
+  renderJamOptions();
+})();
+</script>
 <?= $this->endSection() ?>

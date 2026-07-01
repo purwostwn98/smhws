@@ -32,8 +32,10 @@ $routes->post('admin/janji/proses/(:num)',   'AdminController::prosesJanji/$1');
 $routes->post('admin/janji/batal/(:num)',    'AdminController::batalJanji/$1');
 $routes->post('admin/janji/mulai/(:num)',    'AdminController::mulaiJanji/$1');
 
-// Mahasiswa: konfirmasi kehadiran
+// Mahasiswa: konfirmasi kehadiran & pembatalan
 $routes->post('janji/konfirmasi/(:num)',     'JanjiController::konfirmasiKehadiran/$1');
+$routes->post('janji/batal/(:num)',          'JanjiController::batalKonseling/$1');
+$routes->get('janji/konselor-jadwal',        'JanjiController::konselorJadwal');
 
 // Konselor
 $routes->get('konselor/dashboard',           'KonselorController::dashboard');

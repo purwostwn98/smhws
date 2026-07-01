@@ -17,7 +17,7 @@ class JanjiModel extends Model
         'dosen_pa', 'domisili', 'status_pernikahan',
         'pernah_konseling_smhws', 'metode',
         'jadwal_pilihan', 'konselor_pilihan',
-        'tema_konseling', 'keluhan_utama', 'mulai_keluhan', 'upaya_dilakukan',
+        'tema_konseling', 'keluhan_utama', 'urgensi', 'mulai_keluhan', 'upaya_dilakukan',
         'status', 'tanggal_konseling', 'jam_konseling',
         'lokasi_link', 'catatan_admin',
     ];

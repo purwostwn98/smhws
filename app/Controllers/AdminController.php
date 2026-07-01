@@ -186,6 +186,34 @@ class AdminController extends BaseController
             }
         }
 
+        // Enrich jadwal_pilihan dengan metode dari konselor_jadwal
+        $jadwalPilihan = $janji['jadwal_pilihan'] ?? [];
+        if (! is_array($jadwalPilihan)) $jadwalPilihan = json_decode($jadwalPilihan, true) ?: [];
+        if (! empty($jadwalPilihan)) {
+            $lookupIds = array_map('intval', $pilihanIds);
+            if (! empty($janji['konselor_id'])) {
+                $lookupIds[] = (int) $janji['konselor_id'];
+            }
+            $lookupIds = array_values(array_unique(array_filter($lookupIds)));
+            if (! empty($lookupIds)) {
+                foreach ($jadwalPilihan as &$jSlot) {
+                    $rows = $db->table('konselor_jadwal')
+                        ->select('metode')
+                        ->whereIn('konselor_id', $lookupIds)
+                        ->where('hari', $jSlot['hari'])
+                        ->where("LEFT(jam_mulai, 5)", $jSlot['waktu'])
+                        ->where('is_active', 1)
+                        ->get()->getResultArray();
+                    if ($rows) {
+                        $metodes = array_unique(array_column($rows, 'metode'));
+                        $jSlot['metode'] = count($metodes) === 1 ? $metodes[0] : 'keduanya';
+                    }
+                }
+                unset($jSlot);
+            }
+            $janji['jadwal_pilihan'] = $jadwalPilihan;
+        }
+
         // Konselor ditetapkan admin
         $konselorNama = null;
         if (! empty($janji['konselor_id'])) {
@@ -208,6 +236,26 @@ class AdminController extends BaseController
         $hasilModel = new HasilKonselingModel();
         $hasil = $hasilModel->byJanji($id);
 
+        // Preload jadwal semua konselor → dipakai JS form tetapkan jadwal
+        $timeToSlot = [
+            '08:00:00' => 's1', '09:30:00' => 's2', '11:00:00' => 's3',
+            '12:30:00' => 's4', '14:00:00' => 's5',
+        ];
+        $konselorJadwalMap = [];
+        if (! empty($konselorList)) {
+            $kIds = array_column($konselorList, 'id');
+            $jRows = $db->table('konselor_jadwal')
+                ->select('konselor_id, hari, jam_mulai, metode')
+                ->whereIn('konselor_id', $kIds)
+                ->where('is_active', 1)
+                ->get()->getResultArray();
+            foreach ($jRows as $r) {
+                $slotKey = $timeToSlot[$r['jam_mulai']] ?? null;
+                if (! $slotKey) continue;
+                $konselorJadwalMap[$r['konselor_id']][$r['hari']][$slotKey] = $r['metode'] ?? null;
+            }
+        }
+
         return view('admin/janji/detail', [
             'janji'               => $janji,
             'konselorList'        => $konselorList,
@@ -216,6 +264,7 @@ class AdminController extends BaseController
             'dass'                => $dass,
             'safety'              => $safety,
             'hasil'               => $hasil,
+            'konselorJadwalMap'   => $konselorJadwalMap,
         ]);
     }
 
@@ -307,7 +356,12 @@ class AdminController extends BaseController
     /** GET /admin/konselor/buat */
     public function konselorBuat(): string
     {
-        return view('admin/konselor/form', ['konselor' => null, 'user' => null]);
+        return view('admin/konselor/form', [
+            'konselor'    => null,
+            'user'        => null,
+            'jadwalSlots' => self::jadwalSlots(),
+            'jadwalGrid'  => [],
+        ]);
     }
 
     /** POST /admin/konselor/simpan */
@@ -345,7 +399,7 @@ class AdminController extends BaseController
 
         $spesialisasi = $this->parseSpesialisasi($post['spesialisasi'] ?? '');
 
-        $konselorModel->insert([
+        $konselorId = $konselorModel->insert([
             'user_id'             => $userId,
             'nip'                 => $post['nim_nip'] ?? null,
             'uniid'               => ! empty($post['is_dosen']) ? ($post['uniid'] ?? null) : null,
@@ -357,7 +411,11 @@ class AdminController extends BaseController
             'tahun_pengalaman'    => (int) ($post['tahun_pengalaman'] ?? 0),
             'max_pasien_per_hari' => (int) ($post['max_pasien_per_hari'] ?? 5),
             'is_available'        => isset($post['is_available']) ? 1 : 0,
-        ]);
+        ], true);
+
+        if ($konselorId) {
+            $this->saveJadwal($konselorId, $post['jadwal'] ?? []);
+        }
 
         $db->transComplete();
 
@@ -385,8 +443,10 @@ class AdminController extends BaseController
         $user = $userModel->find($konselor['user_id']);
 
         return view('admin/konselor/form', [
-            'konselor' => $konselor,
-            'user'     => $user,
+            'konselor'    => $konselor,
+            'user'        => $user,
+            'jadwalSlots' => self::jadwalSlots(),
+            'jadwalGrid'  => $this->loadJadwalGrid($id),
         ]);
     }
 
@@ -439,6 +499,8 @@ class AdminController extends BaseController
             'max_pasien_per_hari' => (int) ($post['max_pasien_per_hari'] ?? 5),
             'is_available'        => isset($post['is_available']) ? 1 : 0,
         ]);
+
+        $this->saveJadwal($id, $post['jadwal'] ?? []);
 
         $db->transComplete();
 
@@ -503,5 +565,75 @@ class AdminController extends BaseController
     {
         if (empty(trim($raw))) return [];
         return array_values(array_filter(array_map('trim', explode(',', $raw))));
+    }
+
+    private static function jadwalSlots(): array
+    {
+        return [
+            's1' => ['mulai' => '08:00:00', 'selesai' => '09:00:00', 'label' => '08.00–09.00'],
+            's2' => ['mulai' => '09:30:00', 'selesai' => '10:30:00', 'label' => '09.30–10.30'],
+            's3' => ['mulai' => '11:00:00', 'selesai' => '12:00:00', 'label' => '11.00–12.00'],
+            's4' => ['mulai' => '12:30:00', 'selesai' => '13:30:00', 'label' => '12.30–13.30'],
+            's5' => ['mulai' => '14:00:00', 'selesai' => '15:00:00', 'label' => '14.00–15.00'],
+        ];
+    }
+
+    private function loadJadwalGrid(int $konselorId): array
+    {
+        $db   = \Config\Database::connect();
+        $rows = $db->table('konselor_jadwal')
+                   ->where('konselor_id', $konselorId)
+                   ->where('is_active', 1)
+                   ->get()->getResultArray();
+
+        $timeToKey = [];
+        foreach (self::jadwalSlots() as $key => $slot) {
+            $timeToKey[$slot['mulai']] = $key;
+        }
+
+        $grid = [];
+        foreach ($rows as $r) {
+            $slotKey = $timeToKey[$r['jam_mulai']] ?? null;
+            if ($slotKey) {
+                $grid[$r['hari']][$slotKey] = $r['metode'] ?? 'offline';
+            }
+        }
+        return $grid;
+    }
+
+    private function saveJadwal(int $konselorId, array $jadwalPost): void
+    {
+        $db  = \Config\Database::connect();
+        $now = date('Y-m-d H:i:s');
+
+        $db->table('konselor_jadwal')->where('konselor_id', $konselorId)->delete();
+
+        $inserts = [];
+        $hariValid = ['senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'];
+
+        foreach ($jadwalPost as $hari => $slotData) {
+            if (! in_array($hari, $hariValid) || ! is_array($slotData)) continue;
+            foreach ($slotData as $slotKey => $metode) {
+                if (empty($metode) || ! isset(self::jadwalSlots()[$slotKey])) continue;
+                $slot   = self::jadwalSlots()[$slotKey];
+                // Sabtu hanya boleh offline
+                if ($hari === 'sabtu') $metode = 'offline';
+                $inserts[] = [
+                    'konselor_id' => $konselorId,
+                    'hari'        => $hari,
+                    'jam_mulai'   => $slot['mulai'],
+                    'jam_selesai' => $slot['selesai'],
+                    'metode'      => $metode,
+                    'kuota'       => 4,
+                    'is_active'   => 1,
+                    'created_at'  => $now,
+                    'updated_at'  => $now,
+                ];
+            }
+        }
+
+        if (! empty($inserts)) {
+            $db->table('konselor_jadwal')->insertBatch($inserts);
+        }
     }
 }

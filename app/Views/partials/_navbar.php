@@ -85,7 +85,7 @@
                 </a></li>
               <?php endif ?>
               <li><a class="dropdown-item" href="<?= base_url('/#konsultasi') ?>">
-                <i class="icon-base ti tabler-calendar-event me-2"></i>Buat Janji
+                <i class="icon-base ti tabler-calendar-event me-2"></i>Daftar Konseling
               </a></li>
               <li><hr class="dropdown-divider m-0"></li>
               <li><a class="dropdown-item text-danger" href="<?= base_url('logout') ?>">
@@ -97,7 +97,7 @@
           <li>
             <a href="<?= base_url('login?redirect=janji') ?>" class="btn btn-primary">
               <span class="tf-icons icon-base ti tabler-calendar-event me-md-1"></span>
-              <span class="d-none d-md-block">Buat Janji</span>
+              <span class="d-none d-md-block">Daftar Konseling</span>
             </a>
           </li>
         <?php endif ?>

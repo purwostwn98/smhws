@@ -1,5 +1,5 @@
 <?= $this->extend('layouts/dashboard') ?>
-<?= $this->section('title') ?>Janji Saya<?= $this->endSection() ?>
+<?= $this->section('title') ?>Konseling Saya<?= $this->endSection() ?>
 <?php
 
 $daftarJanji = $daftarJanji ?? [];
@@ -11,11 +11,11 @@ $daftarJanji = $daftarJanji ?? [];
 <!-- Header -->
 <div class="d-flex align-items-center justify-content-between mb-4">
   <div>
-    <h4 class="fw-bold mb-1" style="color:#1a2b40;">Janji Saya</h4>
+    <h4 class="fw-bold mb-1" style="color:#1a2b40;">Konseling Saya</h4>
     <p class="text-muted mb-0" style="font-size:.875rem;">Riwayat dan status seluruh pendaftaran konselingmu.</p>
   </div>
   <a href="<?= base_url('janji/buat') ?>" class="btn btn-primary d-none d-sm-flex align-items-center gap-2">
-    <i class="ti tabler-calendar-plus"></i>Buat Janji Baru
+    <i class="ti tabler-calendar-plus"></i>Daftar Konseling Baru
   </a>
 </div>
 
@@ -89,15 +89,15 @@ $counts['semua'] = count($daftarJanji);
         </div>
       </div>
       <?php if ($activeTab === 'semua'): ?>
-        <h6 class="text-muted">Belum ada janji konseling</h6>
+        <h6 class="text-muted">Belum ada konseling</h6>
         <p class="text-muted mb-4" style="font-size:.85rem;">
-          Mulai perjalanan kesehatanmu dengan membuat janji pertama.
+          Mulai perjalanan kesehatanmu dengan mendaftar konseling pertama.
         </p>
         <a href="<?= base_url('janji/buat') ?>" class="btn btn-primary">
-          <i class="ti tabler-calendar-plus me-1"></i>Buat Janji Sekarang
+          <i class="ti tabler-calendar-plus me-1"></i>Daftar Konseling
         </a>
       <?php else: ?>
-        <h6 class="text-muted">Tidak ada janji dengan status "<?= ucfirst($activeTab) ?>"</h6>
+        <h6 class="text-muted">Tidak ada konseling dengan status "<?= ucfirst($activeTab) ?>"</h6>
         <a href="?status=semua" class="btn btn-label-primary btn-sm mt-2">Lihat Semua</a>
       <?php endif ?>
     </div>
@@ -209,7 +209,7 @@ $counts['semua'] = count($daftarJanji);
                   class="btn btn-sm btn-label-danger btn-hapus-janji"
                   data-id="<?= $j['id'] ?>"
                   data-nomor="<?= $noJanji ?>"
-                  title="Hapus janji ini">
+                  title="Hapus konseling ini">
                   <i class="ti tabler-trash"></i>
                 </button>
               <?php endif ?>
@@ -240,9 +240,9 @@ $counts['semua'] = count($daftarJanji);
             <i class="ti tabler-trash"></i>
           </div>
         </div>
-        <h5 class="fw-bold mb-1" style="color:#1a2b40;">Hapus Janji?</h5>
+        <h5 class="fw-bold mb-1" style="color:#1a2b40;">Hapus Konseling?</h5>
         <p class="text-muted mb-4" style="font-size:.875rem;">
-          Janji <strong id="modalNomorJanji"></strong> akan dihapus permanen dan tidak dapat dikembalikan.
+          Konseling <strong id="modalNomorJanji"></strong> akan dihapus permanen dan tidak dapat dikembalikan.
         </p>
         <form id="formHapus" method="post" action="">
           <?= csrf_field() ?>

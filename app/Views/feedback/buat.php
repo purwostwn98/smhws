@@ -10,7 +10,7 @@ $konselorNama = $konselorNama ?? null;
 <!-- Header -->
 <div class="d-flex align-items-center gap-2 mb-4">
   <a href="<?= base_url('janji/' . $janji['id']) ?>" class="text-muted text-decoration-none" style="font-size:.875rem;">
-    <i class="ti tabler-arrow-left me-1"></i>Detail Janji
+    <i class="ti tabler-arrow-left me-1"></i>Detail Konseling
   </a>
   <span class="text-muted">/</span>
   <span class="fw-semibold" style="font-size:.875rem;">Feedback Sesi</span>

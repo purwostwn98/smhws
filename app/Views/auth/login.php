@@ -51,7 +51,7 @@
         </div>
 
         <h3 class="mb-1 fw-bold" style="color:#1a2b40;">Selamat Datang! 👋</h3>
-        <p class="mb-4 text-muted">Masuk untuk membuat janji konseling atau mengakses layanan SMHWS.</p>
+        <p class="mb-4 text-muted">Masuk untuk mendaftar konseling atau mengakses layanan SMHWS.</p>
 
         <!-- Flash messages -->
         <?php if (session()->getFlashdata('error')): ?>

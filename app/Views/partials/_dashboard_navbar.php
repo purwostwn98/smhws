@@ -43,7 +43,7 @@
                     </div>
                   </div>
                   <div class="flex-grow-1">
-                    <h6 class="small mb-0 fw-semibold">Pengingat Janji</h6>
+                    <h6 class="small mb-0 fw-semibold">Pengingat Konseling</h6>
                     <small class="mb-1 d-block text-body">Sesi konseling besok jam 09.00</small>
                     <small class="text-muted">1 jam lalu</small>
                   </div>
@@ -59,8 +59,8 @@
                     </div>
                   </div>
                   <div class="flex-grow-1">
-                    <h6 class="small mb-0 fw-semibold">Janji Dikonfirmasi</h6>
-                    <small class="mb-1 d-block text-body">Janji konseling Anda telah dikonfirmasi</small>
+                    <h6 class="small mb-0 fw-semibold">Konseling Dikonfirmasi</h6>
+                    <small class="mb-1 d-block text-body">Sesi konseling Anda telah dikonfirmasi</small>
                     <small class="text-muted">2 jam lalu</small>
                   </div>
                 </div>
@@ -112,7 +112,7 @@
           </li>
           <li>
             <a class="dropdown-item" href="<?= base_url('janji/buat') ?>">
-              <i class="ti tabler-calendar-plus me-2 ti-sm"></i>Buat Janji
+              <i class="ti tabler-calendar-plus me-2 ti-sm"></i>Daftar Konseling
             </a>
           </li>
           <li>

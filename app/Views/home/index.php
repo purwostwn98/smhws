@@ -32,7 +32,7 @@
           </p>
           <div class="d-flex flex-wrap gap-3">
             <a href="#konsultasi" class="btn btn-primary btn-lg px-5">
-              <i class="ti tabler-calendar-event me-2"></i>Buat Janji Konseling
+              <i class="ti tabler-calendar-event me-2"></i>Daftar Konseling
             </a>
             <a href="#layanan" class="btn btn-outline-secondary btn-lg px-4">
               <i class="ti tabler-info-circle me-2"></i>Pelajari Layanan
@@ -443,7 +443,7 @@
             </h2>
             <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
               <div class="accordion-body text-muted">
-                Kamu bisa mendaftar dengan: (1) mengisi formulir pendaftaran online di bagian Buat Janji halaman ini,
+                Kamu bisa mendaftar dengan: (1) mengisi formulir pendaftaran online di bagian Daftar Konseling halaman ini,
                 (2) menghubungi kami via WhatsApp di nomor yang tertera, atau (3) datang langsung ke
                 Gedung Siti Walidah Lantai 2 UMS pada jam kerja Senin–Jumat pukul 08.00–16.00 WIB.
               </div>
@@ -543,7 +543,7 @@
       <div class="col-lg-7" id="konsultasi">
         <div class="card border-0 shadow-sm h-100">
           <div class="card-body p-6 p-md-8">
-            <h4 class="fw-bold mb-2">Buat Janji Konseling</h4>
+            <h4 class="fw-bold mb-2">Daftar Konseling</h4>
             <p class="text-muted mb-6">Isi formulir di bawah ini dan tim kami akan menghubungimu dalam 1×24 jam.</p>
             <form>
               <div class="row g-4">
@@ -597,7 +597,7 @@
                 </div>
                 <div class="col-12">
                   <button type="submit" class="btn btn-primary btn-lg w-100">
-                    <i class="ti tabler-send me-2"></i>Kirim Permintaan Janji
+                    <i class="ti tabler-send me-2"></i>Kirim Permintaan Konseling
                   </button>
                 </div>
               </div>

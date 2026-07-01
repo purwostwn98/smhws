@@ -46,7 +46,7 @@ $uri        = uri_string();
       <li class="menu-item <?= str_starts_with($uri, 'admin/janji') ? 'active' : '' ?>">
         <a href="<?= base_url('admin/janji') ?>" class="menu-link">
           <i class="menu-icon icon-base ti tabler-calendar-stats"></i>
-          <div>Kelola Janji</div>
+          <div>Kelola Konseling</div>
         </a>
       </li>
 
@@ -124,14 +124,14 @@ $uri        = uri_string();
       <li class="menu-item <?= $uri === 'janji/buat' ? 'active' : '' ?>">
         <a href="<?= base_url('janji/buat') ?>" class="menu-link">
           <i class="menu-icon icon-base ti tabler-calendar-plus"></i>
-          <div>Buat Janji</div>
+          <div>Daftar Konseling</div>
         </a>
       </li>
 
       <li class="menu-item <?= ($uri === 'janji' || preg_match('#^janji/\d+$#', $uri)) ? 'active' : '' ?>">
         <a href="<?= base_url('janji') ?>" class="menu-link">
           <i class="menu-icon icon-base ti tabler-calendar-event"></i>
-          <div>Janji Saya</div>
+          <div>Konseling Saya</div>
         </a>
       </li>
 

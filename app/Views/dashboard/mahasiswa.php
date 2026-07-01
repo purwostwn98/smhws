@@ -10,11 +10,11 @@
       Selamat datang, <?= esc(explode(' ', session()->get('user_name'))[0]) ?>! 👋
     </h4>
     <p class="text-muted mb-0" style="font-size:.875rem;">
-      Pantau janji konseling dan kesehatan mentalmu di sini.
+      Pantau konseling dan kesehatan mentalmu di sini.
     </p>
   </div>
   <a href="<?= base_url('janji/buat') ?>" class="btn btn-primary d-none d-sm-flex align-items-center gap-2">
-    <i class="ti tabler-calendar-plus"></i>Buat Janji Baru
+    <i class="ti tabler-calendar-plus"></i>Daftar Konseling Baru
   </a>
 </div>
 
@@ -31,7 +31,7 @@
         </div>
         <div>
           <div class="fw-bold" style="font-size:1.5rem;color:#1a2b40;"><?= $stats['janji_aktif'] ?? 0 ?></div>
-          <div class="text-muted" style="font-size:.8rem;">Janji Aktif</div>
+          <div class="text-muted" style="font-size:.8rem;">Konseling Aktif</div>
         </div>
       </div>
     </div>
@@ -94,7 +94,7 @@
   <div class="col-lg-8">
     <div class="card h-100">
       <div class="card-header d-flex align-items-center justify-content-between">
-        <h5 class="card-title mb-0">Janji Mendatang</h5>
+        <h5 class="card-title mb-0">Konseling Mendatang</h5>
         <a href="<?= base_url('janji') ?>" class="btn btn-sm btn-label-primary">Lihat Semua</a>
       </div>
       <div class="card-body">
@@ -105,10 +105,10 @@
                 <i class="ti tabler-calendar-off"></i>
               </div>
             </div>
-            <h6 class="text-muted">Belum ada janji aktif</h6>
-            <p class="text-muted mb-3" style="font-size:.85rem;">Buat janji konseling pertamamu sekarang</p>
+            <h6 class="text-muted">Belum ada konseling aktif</h6>
+            <p class="text-muted mb-3" style="font-size:.85rem;">Daftar konseling pertamamu sekarang</p>
             <a href="<?= base_url('janji/buat') ?>" class="btn btn-primary btn-sm">
-              <i class="ti tabler-calendar-plus me-1"></i>Buat Janji
+              <i class="ti tabler-calendar-plus me-1"></i>Daftar Konseling
             </a>
           </div>
         <?php else: ?>
@@ -116,7 +116,7 @@
             <table class="table table-hover align-middle mb-0">
               <thead class="table-light">
                 <tr>
-                  <th>No. Janji</th>
+                  <th>No. Konseling</th>
                   <th>Tanggal & Waktu</th>
                   <th>Metode</th>
                   <th>Konselor</th>
@@ -198,7 +198,7 @@
             </div>
           </div>
           <div>
-            <div class="fw-semibold text-heading">Buat Janji Baru</div>
+            <div class="fw-semibold text-heading">Daftar Konseling Baru</div>
             <small class="text-muted">Jadwalkan sesi konseling</small>
           </div>
           <i class="ti tabler-chevron-right ms-auto text-muted"></i>

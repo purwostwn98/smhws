@@ -55,7 +55,7 @@ class AuthController extends BaseController
 
         $redirect = $this->request->getPost('redirect');
         if ($redirect === 'janji') {
-            return redirect()->to(base_url('/#konsultasi'));
+            return redirect()->to(base_url('dashboard'));
         }
 
         return redirect()->to($this->redirectAfterLogin($user));
@@ -68,9 +68,16 @@ class AuthController extends BaseController
             ->with('success', 'Anda telah berhasil keluar.');
     }
 
-    private function redirectAfterLogin(array $user): string
+    private function redirectAfterLogin(array $user = null): string
     {
-        if ($user['is_superadmin'] || $user['is_admin_fakultas']) {
+        if ($user === null) {
+            $user = [
+                'is_superadmin'     => (bool) session()->get('is_superadmin'),
+                'is_admin_fakultas' => (bool) session()->get('is_admin_fakultas'),
+            ];
+        }
+
+        if (! empty($user['is_superadmin']) || ! empty($user['is_admin_fakultas'])) {
             return base_url('admin/dashboard');
         }
         return base_url('dashboard');

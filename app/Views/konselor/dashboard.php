@@ -95,8 +95,10 @@ $menungguHasil = $menungguHasil ?? [];
                     <div class="text-muted" style="font-size:.75rem;"><?= date('H:i', strtotime($s['jam_konseling'])) ?> WIB</div>
                   <?php endif ?>
                 <?php endif ?>
-                <a href="<?= base_url('konselor/janji/' . $s['id']) ?>" class="btn btn-sm btn-outline-secondary mt-1 px-2 py-0">
-                  Detail
+                <a href="<?= base_url('konselor/janji/' . $s['id']) ?>"
+                   class="btn btn-sm mt-1 px-3"
+                   style="background:<?= $isToday ? 'linear-gradient(135deg,#28c76f,#1a9e5a)' : 'linear-gradient(135deg,#1a5f7a,#0d3f52)' ?>;color:#fff;font-weight:600;letter-spacing:.01em;">
+                  <i class="ti tabler-eye me-1"></i>Detail
                 </a>
               </div>
             </li>
