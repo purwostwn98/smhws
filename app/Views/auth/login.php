@@ -1,139 +1,182 @@
-<!doctype html>
-<html lang="en" class=" layout-wide  customizer-hide" dir="ltr" data-skin="default" data-bs-theme="light" data-assets-path="<?= base_url('assets/') ?>" data-template="vertical-menu-template">
+<?= $this->extend('layouts/auth') ?>
 
-<head>
-    <meta charset="utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
-    <meta name="robots" content="noindex, nofollow" />
-    <title>SMHWS - Login</title>
-    <meta name="description" content="" />
-    <link rel="icon" type="image/x-icon" href="<?= base_url('assets/img/favicon/favicon.ico') ?>" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link href="https://fonts.googleapis.com/css2?family=Public+Sans:ital,wght@0,300;0,400;0,500;0,600;0,700;1,300;1,400;1,500;1,600;1,700&ampdisplay=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="<?= base_url('assets/vendor/fonts/iconify-icons.css') ?>" />
-    <script src="<?= base_url('assets/vendor/libs/@algolia/autocomplete-js.js') ?>"></script>
-    <link rel="stylesheet" href="<?= base_url('assets/vendor/libs/node-waves/node-waves.css') ?>" />
-    <link rel="stylesheet" href="<?= base_url('assets/vendor/libs/pickr/pickr-themes.css') ?>" />
-    <link rel="stylesheet" href="<?= base_url('assets/vendor/css/core.css') ?>" />
-    <link rel="stylesheet" href="<?= base_url('assets/css/demo.css') ?>" />
-    <link rel="stylesheet" href="<?= base_url('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.css') ?>" />
-    <link rel="stylesheet" href="<?= base_url('assets/vendor/libs/@form-validation/form-validation.css') ?>" />
-    <link rel="stylesheet" href="<?= base_url('assets/vendor/css/pages/page-auth.css') ?>" />
-    <script src="<?= base_url('assets/vendor/js/helpers.js') ?>"></script>
-    <script src="<?= base_url('assets/vendor/js/template-customizer.js') ?>"></script>
-    <script src="<?= base_url('assets/js/config.js') ?>"></script>
-</head>
+<?= $this->section('title') ?>Masuk<?= $this->endSection() ?>
 
-<body>
-    <div class="container-xxl">
-        <div class="authentication-wrapper authentication-basic container-p-y">
-            <div class="authentication-inner py-6">
-                <div class="card">
-                    <div class="card-body">
-                        <div class="app-brand justify-content-center mb-6">
-                            <a href="index.html" class="app-brand-link"> <span class="app-brand-logo demo">
-                                    <span class="text-primary">
-                                        <svg width="32" height="22" viewBox="0 0 32 22" fill="none" xmlns="http://www.w3.org/2000/svg">
-                                            <path
-                                                fill-rule="evenodd"
-                                                clip-rule="evenodd"
-                                                d="M0.00172773 0V6.85398C0.00172773 6.85398 -0.133178 9.01207 1.98092 10.8388L13.6912 21.9964L19.7809 21.9181L18.8042 9.88248L16.4951 7.17289L9.23799 0H0.00172773Z"
-                                                fill="currentColor" />
-                                            <path
-                                                opacity="0.06"
-                                                fill-rule="evenodd"
-                                                clip-rule="evenodd"
-                                                d="M7.69824 16.4364L12.5199 3.23696L16.5541 7.25596L7.69824 16.4364Z"
-                                                fill="#161616" />
-                                            <path
-                                                opacity="0.06"
-                                                fill-rule="evenodd"
-                                                clip-rule="evenodd"
-                                                d="M8.07751 15.9175L13.9419 4.63989L16.5849 7.28475L8.07751 15.9175Z"
-                                                fill="#161616" />
-                                            <path
-                                                fill-rule="evenodd"
-                                                clip-rule="evenodd"
-                                                d="M7.77295 16.3566L23.6563 0H32V6.88383C32 6.88383 31.8262 9.17836 30.6591 10.4057L19.7824 22H13.6938L7.77295 16.3566Z"
-                                                fill="currentColor" />
-                                        </svg>
-                                    </span> </span> <span class="app-brand-text demo text-heading fw-bold">SMHWS</span> </a>
-                        </div>
-                        <h4 class="mb-1">Selamat Datang di <span class="text-primary fw-bolder">SMHWS</span>! 👋</h4>
-                        <p class="mb-6">Student Mental Health and Wellbeing Support (SMHWS) adalah Sub Unit Bidang Kemahasiswaan yang melayani bidang kesehatan mental dan dukungan kesehatan mental yang ditujukan untuk khusus seluruh mahasiswa UMS.</p>
+<?= $this->section('content') ?>
+<div class="authentication-wrapper authentication-cover authentication-bg">
+  <div class="authentication-inner row">
 
-                        <?php if (session()->getFlashdata('error')) : ?>
-                            <div class="alert alert-danger alert-dismissible" role="alert">
-                                <?= session()->getFlashdata('error') ?>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        <?php endif; ?>
+    <!-- Left: Illustration -->
+    <div class="d-none d-lg-flex col-lg-7 p-0">
+      <div class="auth-cover-bg auth-cover-bg-color d-flex justify-content-center align-items-center" style="background: linear-gradient(135deg, #eaf4f8 0%, #d0eaf4 100%);">
+        <img src="<?= base_url('assets/img/illustrations/auth-login-illustration-light.png') ?>"
+          alt="Login" class="img-fluid" style="max-width: 380px;" />
 
-                        <?php if (session()->getFlashdata('success')) : ?>
-                            <div class="alert alert-success alert-dismissible" role="alert">
-                                <?= session()->getFlashdata('success') ?>
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        <?php endif; ?>
-
-                        <form id="formAuthentication" class="mb-4" action="<?= base_url('login') ?>" method="POST">
-                            <div class="mb-6 form-control-validation">
-                                <label for="email" class="form-label">Email atau Username</label>
-                                <input type="text" class="form-control" id="email" name="email-username" placeholder="Enter your email or username" autofocus />
-                            </div>
-                            <div class="mb-6 form-password-toggle form-control-validation">
-                                <label class="form-label" for="password">Kata Sandi</label>
-                                <div class="input-group input-group-merge">
-                                    <input type="password" id="password" class="form-control" name="password" placeholder="&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;&#xb7;" aria-describedby="password" /> <span class="input-group-text cursor-pointer"><i class="icon-base ti tabler-eye-off"></i></span>
-                                </div>
-                            </div>
-                            <!-- <div class="my-8">
-                                <div class="d-flex justify-content-between">
-                                    <div class="form-check mb-0 ms-2">
-                                        <input class="form-check-input" type="checkbox" id="remember-me" />
-                                        <label class="form-check-label" for="remember-me"> Remember Me </label>
-                                    </div>
-                                    <a href="auth-forgot-password-basic.html">
-                                        <p class="mb-0">Forgot Password?</p>
-                                    </a>
-                                </div>
-                            </div> -->
-                            <div class="d-flex justify-content-between align-items-center gap-2">
-                                <button type="submit" class="btn btn-warning w-50">Login</button>
-                                <a href="#" class="btn btn-primary w-50">Login CAS</a>
-                            </div>
-                        </form>
-                        <div class="alert alert-info alert-dismissible" role="alert">
-                            <strong>Informasi Login</strong> <br>
-                            <ul>
-                                <li><b>Admin:</b> admin@ums.ac.id / admin</li>
-                                <li><b>Pimpinan:</b> leader@ums.ac.id / leader</li>
-                                <li><b>Konselor:</b> counselor@ums.ac.id / counselor</li>
-                                <li><b>Mahasiswa:</b> student@ums.ac.id / student</li>
-                            </ul>
-                            <p>Untuk password gunakan <span class="fw-bold">password123</span></p>
-                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                        </div>
-                    </div>
-                </div>
+        <!-- Floating brand card -->
+        <div class="d-none d-xl-flex flex-column gap-2 auth-cover-brand">
+          <div class="d-flex align-items-center gap-3 bg-white rounded-3 shadow-sm px-4 py-3">
+            <span class="text-primary">
+              <svg width="36" height="36" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M16 28s-12-7.2-12-14.4C4 9.16 7.16 6 11.2 6c2.16 0 4.12 1.04 5.4 2.68A6.8 6.8 0 0 1 22 6c3.76 0 6 2.96 6 7.6C28 20.8 16 28 16 28z" fill="currentColor" fill-opacity=".25"/>
+                <path d="M16 26s-11-6.8-11-13.4C5 8.72 7.92 6 11.6 6c2.08 0 3.92 1.04 5.12 2.64A6.44 6.44 0 0 1 21.76 6C25.2 6 27 8.72 27 12.6 27 19.2 16 26 16 26z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                <circle cx="16" cy="14" r="3" fill="currentColor"/>
+              </svg>
+            </span>
+            <div>
+              <div class="fw-bold text-heading" style="font-size:.95rem;color:#1a5f7a;">SMHWS</div>
+              <div class="text-muted" style="font-size:.75rem;">Student Mental Health &amp; Wellbeing Support</div>
             </div>
+          </div>
+          <p class="text-muted text-center mt-2" style="font-size:.82rem;">
+            Universitas Muhammadiyah Surakarta
+          </p>
         </div>
+      </div>
     </div>
-    <script src="<?= base_url('assets/vendor/libs/jquery/jquery.js') ?>"></script>
-    <script src="<?= base_url('assets/vendor/libs/popper/popper.js') ?>"></script>
-    <script src="<?= base_url('assets/vendor/js/bootstrap.js') ?>"></script>
-    <script src="<?= base_url('assets/vendor/libs/node-waves/node-waves.js') ?>"></script>
-    <script src="<?= base_url('assets/vendor/libs/pickr/pickr.js') ?>"></script>
-    <script src="<?= base_url('assets/vendor/libs/perfect-scrollbar/perfect-scrollbar.js') ?>"></script>
-    <script src="<?= base_url('assets/vendor/libs/hammer/hammer.js') ?>"></script>
-    <script src="<?= base_url('assets/vendor/libs/i18n/i18n.js') ?>"></script>
-    <script src="<?= base_url('assets/vendor/js/menu.js') ?>"></script>
-    <script src="<?= base_url('assets/vendor/libs/@form-validation/popular.js') ?>"></script>
-    <script src="<?= base_url('assets/vendor/libs/@form-validation/bootstrap5.js') ?>"></script>
-    <script src="<?= base_url('assets/vendor/libs/@form-validation/auto-focus.js') ?>"></script>
-    <script src="<?= base_url('assets/js/main.js') ?>"></script>
-    <script src="<?= base_url('assets/js/pages-auth.js') ?>"></script>
-</body>
 
-</html>
+    <!-- Right: Form -->
+    <div class="d-flex col-12 col-lg-5 align-items-center p-sm-5 p-4">
+      <div class="w-px-400 mx-auto">
+
+        <!-- Mobile logo -->
+        <div class="d-lg-none d-flex align-items-center gap-2 mb-4">
+          <span class="text-primary">
+            <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M16 28s-12-7.2-12-14.4C4 9.16 7.16 6 11.2 6c2.16 0 4.12 1.04 5.4 2.68A6.8 6.8 0 0 1 22 6c3.76 0 6 2.96 6 7.6C28 20.8 16 28 16 28z" fill="currentColor" fill-opacity=".25"/>
+              <path d="M16 26s-11-6.8-11-13.4C5 8.72 7.92 6 11.6 6c2.08 0 3.92 1.04 5.12 2.64A6.44 6.44 0 0 1 21.76 6C25.2 6 27 8.72 27 12.6 27 19.2 16 26 16 26z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="16" cy="14" r="3" fill="currentColor"/>
+            </svg>
+          </span>
+          <span class="fw-bold text-heading" style="color:#1a5f7a;">SMHWS – UMS</span>
+        </div>
+
+        <h3 class="mb-1 fw-bold" style="color:#1a2b40;">Selamat Datang! 👋</h3>
+        <p class="mb-4 text-muted">Masuk untuk mendaftar konseling atau mengakses layanan SMHWS.</p>
+
+        <!-- Flash messages -->
+        <?php if (session()->getFlashdata('error')): ?>
+          <div class="alert alert-danger d-flex align-items-center gap-2 mb-4" role="alert">
+            <i class="icon-base ti tabler-alert-circle"></i>
+            <?= esc(session()->getFlashdata('error')) ?>
+          </div>
+        <?php endif ?>
+
+        <?php if (session()->getFlashdata('success')): ?>
+          <div class="alert alert-success d-flex align-items-center gap-2 mb-4" role="alert">
+            <i class="icon-base ti tabler-circle-check"></i>
+            <?= esc(session()->getFlashdata('success')) ?>
+          </div>
+        <?php endif ?>
+
+        <!-- Login Form -->
+        <?php $formErrors = session('errors') ?? []; ?>
+        <form action="<?= base_url('login') ?>" method="POST" id="formLogin" novalidate>
+          <?= csrf_field() ?>
+          <?php if (!empty($redirect)): ?>
+            <input type="hidden" name="redirect" value="<?= esc($redirect) ?>" />
+          <?php endif ?>
+
+          <!-- Email -->
+          <div class="mb-3">
+            <label class="form-label fw-medium" for="email">Email</label>
+            <input type="email" id="email" name="email"
+              class="form-control <?= !empty($formErrors['email']) ? 'is-invalid' : '' ?>"
+              placeholder="nama@student.ums.ac.id"
+              value="<?= esc(old('email')) ?>" autofocus required />
+            <?php if (!empty($formErrors['email'])): ?>
+              <div class="invalid-feedback"><?= esc($formErrors['email']) ?></div>
+            <?php endif ?>
+          </div>
+
+          <!-- Password -->
+          <div class="mb-3">
+            <div class="d-flex justify-content-between align-items-center">
+              <label class="form-label fw-medium" for="password">Password</label>
+              <a href="<?= base_url('lupa-password') ?>" class="float-end mb-1" style="font-size:.85rem;color:#1a5f7a;">
+                Lupa password?
+              </a>
+            </div>
+            <div class="input-group input-group-merge">
+              <input type="password" id="password" name="password"
+                class="form-control <?= !empty($formErrors['password']) ? 'is-invalid' : '' ?>"
+                placeholder="••••••••" required />
+              <span class="input-group-text cursor-pointer" id="togglePassword">
+                <i class="icon-base ti tabler-eye-off" id="eyeIcon"></i>
+              </span>
+            </div>
+            <?php if (!empty($formErrors['password'])): ?>
+              <div class="invalid-feedback d-block"><?= esc($formErrors['password']) ?></div>
+            <?php endif ?>
+          </div>
+
+          <!-- Remember me -->
+          <div class="mb-4">
+            <div class="form-check">
+              <input class="form-check-input" type="checkbox" id="rememberMe" name="remember" />
+              <label class="form-check-label" for="rememberMe">Ingat saya</label>
+            </div>
+          </div>
+
+          <button type="submit" class="btn btn-primary d-grid w-100">
+            <span class="d-flex align-items-center justify-content-center gap-2">
+              <i class="icon-base ti tabler-login"></i>
+              Masuk
+            </span>
+          </button>
+        </form>
+
+        <p class="text-center mt-4 mb-0">
+          Belum punya akun?
+          <a href="<?= base_url('daftar') ?>" style="color:#1a5f7a;" class="fw-medium">Daftar di sini</a>
+        </p>
+
+        <!-- Divider -->
+        <div class="d-flex align-items-center gap-3 my-4">
+          <hr class="flex-grow-1 m-0" />
+          <small class="text-muted">atau</small>
+          <hr class="flex-grow-1 m-0" />
+        </div>
+
+        <!-- Back to home -->
+        <a href="<?= base_url('/') ?>" class="btn btn-label-primary d-grid w-100">
+          <span class="d-flex align-items-center justify-content-center gap-2">
+            <i class="icon-base ti tabler-arrow-left"></i>
+            Kembali ke Beranda
+          </span>
+        </a>
+
+        <!-- Emergency notice -->
+        <div class="mt-4 p-3 rounded-3 smhws-emergency">
+          <div class="d-flex align-items-start gap-2">
+            <i class="icon-base ti tabler-phone-call text-warning mt-1"></i>
+            <div style="font-size:.8rem;">
+              <strong>Butuh bantuan segera?</strong><br />
+              Hubungi Hotline 24 Jam: <strong>119 ext 8</strong>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+    <!-- /Form -->
+
+  </div>
+</div>
+<?= $this->endSection() ?>
+
+<?= $this->section('extra_js') ?>
+<script>
+  // Toggle password visibility
+  document.getElementById('togglePassword').addEventListener('click', function () {
+    const input = document.getElementById('password');
+    const icon  = document.getElementById('eyeIcon');
+    if (input.type === 'password') {
+      input.type = 'text';
+      icon.classList.replace('tabler-eye-off', 'tabler-eye');
+    } else {
+      input.type = 'password';
+      icon.classList.replace('tabler-eye', 'tabler-eye-off');
+    }
+  });
+</script>
+<?= $this->endSection() ?>

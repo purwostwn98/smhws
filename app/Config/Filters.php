@@ -4,6 +4,11 @@ namespace Config;
 
 use CodeIgniter\Config\Filters as BaseFilters;
 use CodeIgniter\Filters\Cors;
+use App\Filters\AuthFilter;
+use App\Filters\RoleFilter;
+use App\Filters\MahasiswaFilter;
+use App\Filters\SuperadminFilter;
+use App\Filters\KonselorFilter;
 use CodeIgniter\Filters\CSRF;
 use CodeIgniter\Filters\DebugToolbar;
 use CodeIgniter\Filters\ForceHTTPS;
@@ -34,8 +39,11 @@ class Filters extends BaseFilters
         'forcehttps'    => ForceHTTPS::class,
         'pagecache'     => PageCache::class,
         'performance'   => PerformanceMetrics::class,
-        'auth'          => \App\Filters\AuthFilter::class,
-        'role'          => \App\Filters\RoleFilter::class,
+        'auth'          => AuthFilter::class,
+        'role'          => RoleFilter::class,
+        'mahasiswa'     => MahasiswaFilter::class,
+        'superadmin'    => SuperadminFilter::class,
+        'konselor'      => KonselorFilter::class,
     ];
 
     /**
@@ -75,7 +83,7 @@ class Filters extends BaseFilters
     public array $globals = [
         'before' => [
             // 'honeypot',
-            // 'csrf',
+            'csrf',
             // 'invalidchars',
         ],
         'after' => [
@@ -108,5 +116,25 @@ class Filters extends BaseFilters
      *
      * @var array<string, array<string, list<string>>>
      */
-    public array $filters = [];
+    public array $filters = [
+        'mahasiswa' => [
+            'before' => [
+                'dashboard/mahasiswa',
+                'janji',
+                'janji/*',
+            ],
+        ],
+        'superadmin' => [
+            'before' => [
+                'admin',
+                'admin/*',
+            ],
+        ],
+        'konselor' => [
+            'before' => [
+                'konselor',
+                'konselor/*',
+            ],
+        ],
+    ];
 }
