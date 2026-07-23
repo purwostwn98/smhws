@@ -47,7 +47,7 @@ $staff       = $staff       ?? [];
 
           <!-- Crisis Support -->
           <div class="rounded-3 p-4 d-flex align-items-start gap-3"
-               style="background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.3);">
+            style="background:rgba(240,165,0,.1);border:1px solid rgba(240,165,0,.3);">
             <i class="ti tabler-alert-triangle text-warning mt-1" style="font-size:1.3rem;flex-shrink:0;"></i>
             <div>
               <div class="fw-semibold mb-1" style="color:#1a2b40;font-size:.9rem;">Dukungan Krisis</div>
@@ -62,9 +62,9 @@ $staff       = $staff       ?? [];
         <!-- Gambar -->
         <div class="col-lg-6 text-center">
           <div class="position-relative d-inline-block">
-            <img src="<?= base_url('myimg/landing1.jpg') ?>" alt="Layanan SMHWS UMS"
-                 class="img-fluid rounded-4 shadow-lg"
-                 style="max-height:460px;width:100%;object-fit:cover;">
+            <img src="<?= base_url('myimg/hero_landing.jpg') ?>" alt="Layanan SMHWS UMS"
+              class="img-fluid rounded-4 shadow-lg"
+              style="max-height:460px;width:100%;object-fit:cover;">
             <!-- floating badge -->
             <div class="position-absolute bottom-0 start-0 translate-middle-y ms-4 bg-white shadow rounded-3 px-4 py-3 d-flex align-items-center gap-2">
               <i class="ti tabler-shield-check text-primary fs-4"></i>
@@ -249,51 +249,51 @@ $staff       = $staff       ?? [];
 
     <!-- Ketua & Staff -->
     <?php if (!empty($ketua) || !empty($staff)): ?>
-    <div class="mb-4">
-      <p class="text-center fw-semibold mb-6" style="font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;color:#aaa;">Pimpinan</p>
-      <div class="row justify-content-center g-5">
+      <div class="mb-4">
+        <p class="text-center fw-semibold mb-6" style="font-size:.8rem;text-transform:uppercase;letter-spacing:.08em;color:#aaa;">Pimpinan</p>
+        <div class="row justify-content-center g-5">
 
-        <?php foreach ($ketua as $p): ?>
-        <div class="col-auto">
-          <div class="tim-card text-center" style="width:200px;">
-            <div class="position-relative mx-auto mb-4" style="width:180px;height:240px;">
-              <div class="position-absolute bottom-0 start-50 translate-middle-x rounded-4"
-                   style="width:130px;height:195px;background:#3ecfca;z-index:0;"></div>
-              <img src="<?= $p['url'] ?>" alt="<?= esc($p['nama']) ?>"
-                   class="position-absolute bottom-0 start-50 translate-middle-x"
-                   style="z-index:1;width:160px;height:220px;object-fit:cover;object-position:top center;">
+          <?php foreach ($ketua as $p): ?>
+            <div class="col-auto">
+              <div class="tim-card text-center" style="width:200px;">
+                <div class="position-relative mx-auto mb-4" style="width:180px;height:240px;">
+                  <div class="position-absolute bottom-0 start-50 translate-middle-x rounded-4"
+                    style="width:130px;height:195px;background:#3ecfca;z-index:0;"></div>
+                  <img src="<?= $p['url'] ?>" alt="<?= esc($p['nama']) ?>"
+                    class="position-absolute bottom-0 start-50 translate-middle-x"
+                    style="z-index:1;width:160px;height:220px;object-fit:cover;object-position:top center;">
+                </div>
+                <h6 class="fw-bold mb-1 px-1" style="font-size:.88rem;color:#1a2b40;line-height:1.4;"><?= esc($p['nama']) ?></h6>
+                <span class="badge bg-label-warning px-3 py-2 mt-1" style="font-size:.72rem;">Ketua SMHWS</span>
+              </div>
             </div>
-            <h6 class="fw-bold mb-1 px-1" style="font-size:.88rem;color:#1a2b40;line-height:1.4;"><?= esc($p['nama']) ?></h6>
-            <span class="badge bg-label-warning px-3 py-2 mt-1" style="font-size:.72rem;">Ketua SMHWS</span>
-          </div>
-        </div>
-        <?php endforeach ?>
+          <?php endforeach ?>
 
-        <?php foreach ($staff as $p): ?>
-        <div class="col-auto">
-          <div class="tim-card text-center" style="width:200px;">
-            <div class="position-relative mx-auto mb-4" style="width:180px;height:240px;">
-              <div class="position-absolute bottom-0 start-50 translate-middle-x rounded-4"
-                   style="width:130px;height:195px;background:#3ecfca;z-index:0;"></div>
-              <img src="<?= $p['url'] ?>" alt="<?= esc($p['nama']) ?>"
-                   class="position-absolute bottom-0 start-50 translate-middle-x"
-                   style="z-index:1;width:160px;height:220px;object-fit:cover;object-position:top center;">
+          <?php foreach ($staff as $p): ?>
+            <div class="col-auto">
+              <div class="tim-card text-center" style="width:200px;">
+                <div class="position-relative mx-auto mb-4" style="width:180px;height:240px;">
+                  <div class="position-absolute bottom-0 start-50 translate-middle-x rounded-4"
+                    style="width:130px;height:195px;background:#3ecfca;z-index:0;"></div>
+                  <img src="<?= $p['url'] ?>" alt="<?= esc($p['nama']) ?>"
+                    class="position-absolute bottom-0 start-50 translate-middle-x"
+                    style="z-index:1;width:160px;height:220px;object-fit:cover;object-position:top center;">
+                </div>
+                <h6 class="fw-bold mb-1 px-1" style="font-size:.88rem;color:#1a2b40;line-height:1.4;"><?= esc($p['nama']) ?></h6>
+                <span class="badge bg-label-info px-3 py-2 mt-1" style="font-size:.72rem;">Staf SMHWS</span>
+              </div>
             </div>
-            <h6 class="fw-bold mb-1 px-1" style="font-size:.88rem;color:#1a2b40;line-height:1.4;"><?= esc($p['nama']) ?></h6>
-            <span class="badge bg-label-info px-3 py-2 mt-1" style="font-size:.72rem;">Staf SMHWS</span>
-          </div>
-        </div>
-        <?php endforeach ?>
+          <?php endforeach ?>
 
+        </div>
       </div>
-    </div>
 
-    <!-- Divider -->
-    <div class="d-flex align-items-center gap-4 mb-10">
-      <hr class="flex-grow-1" style="border-color:#e8e8e8;">
-      <span class="text-muted fw-semibold" style="font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;">Tim Psikolog</span>
-      <hr class="flex-grow-1" style="border-color:#e8e8e8;">
-    </div>
+      <!-- Divider -->
+      <div class="d-flex align-items-center gap-4 mb-10">
+        <hr class="flex-grow-1" style="border-color:#e8e8e8;">
+        <span class="text-muted fw-semibold" style="font-size:.78rem;text-transform:uppercase;letter-spacing:.08em;white-space:nowrap;">Tim Psikolog</span>
+        <hr class="flex-grow-1" style="border-color:#e8e8e8;">
+      </div>
     <?php endif ?>
 
     <?php if (empty($timPsikolog)): ?>
@@ -302,110 +302,110 @@ $staff       = $staff       ?? [];
         <p class="mt-3">Data psikolog belum tersedia</p>
       </div>
     <?php else: ?>
-    <?php
-    $pastelBg = [
-      '#e8e4f8', /* lavender */
-      '#d4eff0', /* mint     */
-      '#fde4e8', /* pink     */
-      '#d4f0e4', /* green    */
-      '#fef0d4', /* peach    */
-      '#d4e4f8', /* sky blue */
-      '#f8e4f4', /* lilac    */
-      '#e4f8e8', /* sage     */
-    ];
-    $gradients = [
-      'linear-gradient(135deg,#6c5ce7,#a29bfe)',
-      'linear-gradient(135deg,#1a5f7a,#57c5b6)',
-      'linear-gradient(135deg,#e17055,#fab1a0)',
-      'linear-gradient(135deg,#2d9b6e,#55efc4)',
-      'linear-gradient(135deg,#f0a500,#fdcb6e)',
-      'linear-gradient(135deg,#0984e3,#74b9ff)',
-      'linear-gradient(135deg,#e84393,#fd79a8)',
-      'linear-gradient(135deg,#00b894,#00cec9)',
-    ];
-    ?>
+      <?php
+      $pastelBg = [
+        '#e8e4f8', /* lavender */
+        '#d4eff0', /* mint     */
+        '#fde4e8', /* pink     */
+        '#d4f0e4', /* green    */
+        '#fef0d4', /* peach    */
+        '#d4e4f8', /* sky blue */
+        '#f8e4f4', /* lilac    */
+        '#e4f8e8', /* sage     */
+      ];
+      $gradients = [
+        'linear-gradient(135deg,#6c5ce7,#a29bfe)',
+        'linear-gradient(135deg,#1a5f7a,#57c5b6)',
+        'linear-gradient(135deg,#e17055,#fab1a0)',
+        'linear-gradient(135deg,#2d9b6e,#55efc4)',
+        'linear-gradient(135deg,#f0a500,#fdcb6e)',
+        'linear-gradient(135deg,#0984e3,#74b9ff)',
+        'linear-gradient(135deg,#e84393,#fd79a8)',
+        'linear-gradient(135deg,#00b894,#00cec9)',
+      ];
+      ?>
 
-    <!-- Swiper carousel -->
-    <div class="position-relative">
-      <!-- Prev/Next buttons -->
-      <button class="tim-prev d-none d-md-flex align-items-center justify-content-center position-absolute top-50 translate-middle-y"
-              style="left:-24px;z-index:10;width:48px;height:48px;border-radius:50%;border:none;
+      <!-- Swiper carousel -->
+      <div class="position-relative">
+        <!-- Prev/Next buttons -->
+        <button class="tim-prev d-none d-md-flex align-items-center justify-content-center position-absolute top-50 translate-middle-y"
+          style="left:-24px;z-index:10;width:48px;height:48px;border-radius:50%;border:none;
                      background:#fff;box-shadow:0 4px 16px rgba(0,0,0,.12);cursor:pointer;color:var(--smhws-primary);">
-        <i class="ti tabler-chevron-left fs-4"></i>
-      </button>
-      <button class="tim-next d-none d-md-flex align-items-center justify-content-center position-absolute top-50 translate-middle-y"
-              style="right:-24px;z-index:10;width:48px;height:48px;border-radius:50%;border:none;
+          <i class="ti tabler-chevron-left fs-4"></i>
+        </button>
+        <button class="tim-next d-none d-md-flex align-items-center justify-content-center position-absolute top-50 translate-middle-y"
+          style="right:-24px;z-index:10;width:48px;height:48px;border-radius:50%;border:none;
                      background:#fff;box-shadow:0 4px 16px rgba(0,0,0,.12);cursor:pointer;color:var(--smhws-primary);">
-        <i class="ti tabler-chevron-right fs-4"></i>
-      </button>
+          <i class="ti tabler-chevron-right fs-4"></i>
+        </button>
 
-      <div class="swiper tim-psikolog-swiper" style="padding-bottom:48px;">
-        <div class="swiper-wrapper">
-          <?php foreach ($timPsikolog as $idx => $k):
-            $namaLengkap = \App\Models\KonselorModel::namaLengkap($k);
-            $inisial = strtoupper(implode('', array_map(
-              fn($w) => $w[0],
-              array_filter(explode(' ', $k['name'] ?? ''), fn($w) => ctype_upper($w[0] ?? ''))
-            )));
-            if (strlen($inisial) > 2) $inisial = substr($inisial, 0, 2);
-            if (!$inisial) $inisial = strtoupper(substr($k['name'] ?? 'P', 0, 1));
-            $bg   = $pastelBg[$idx % count($pastelBg)];
-            $grad = $gradients[$idx % count($gradients)];
-            $spList = is_array($k['spesialisasi']) ? $k['spesialisasi'] : [];
-          ?>
-          <div class="swiper-slide">
-            <div class="tim-card text-center" style="transition:transform .25s;">
+        <div class="swiper tim-psikolog-swiper" style="padding-bottom:48px;">
+          <div class="swiper-wrapper">
+            <?php foreach ($timPsikolog as $idx => $k):
+              $namaLengkap = \App\Models\KonselorModel::namaLengkap($k);
+              $inisial = strtoupper(implode('', array_map(
+                fn($w) => $w[0],
+                array_filter(explode(' ', $k['name'] ?? ''), fn($w) => ctype_upper($w[0] ?? ''))
+              )));
+              if (strlen($inisial) > 2) $inisial = substr($inisial, 0, 2);
+              if (!$inisial) $inisial = strtoupper(substr($k['name'] ?? 'P', 0, 1));
+              $bg   = $pastelBg[$idx % count($pastelBg)];
+              $grad = $gradients[$idx % count($gradients)];
+              $spList = is_array($k['spesialisasi']) ? $k['spesialisasi'] : [];
+            ?>
+              <div class="swiper-slide">
+                <div class="tim-card text-center" style="transition:transform .25s;">
 
-              <!-- Foto + blok teal di belakang -->
-              <div class="position-relative mx-auto mb-4" style="width:180px;height:240px;">
-                <!-- Blok teal -->
-                <div class="position-absolute bottom-0 start-50 translate-middle-x rounded-4"
-                     style="width:130px;height:195px;background:#3ecfca;z-index:0;"></div>
-                <!-- Foto / Avatar -->
-                <?php if (!empty($k['foto'])): ?>
-                  <img src="<?= base_url($k['foto']) ?>" alt="<?= esc($k['name']) ?>"
-                       class="position-absolute bottom-0 start-50 translate-middle-x"
-                       style="z-index:1;width:160px;height:220px;object-fit:cover;object-position:top center;display:block;">
-                <?php else: ?>
-                  <div class="position-absolute bottom-0 start-50 translate-middle-x d-flex align-items-end justify-content-center"
-                       style="z-index:1;width:160px;height:220px;padding-bottom:16px;">
-                    <span class="d-flex align-items-center justify-content-center rounded-circle fw-bold"
+                  <!-- Foto + blok teal di belakang -->
+                  <div class="position-relative mx-auto mb-4" style="width:180px;height:240px;">
+                    <!-- Blok teal -->
+                    <div class="position-absolute bottom-0 start-50 translate-middle-x rounded-4"
+                      style="width:130px;height:195px;background:#3ecfca;z-index:0;"></div>
+                    <!-- Foto / Avatar -->
+                    <?php if (!empty($k['foto'])): ?>
+                      <img src="<?= base_url($k['foto']) ?>" alt="<?= esc($k['name']) ?>"
+                        class="position-absolute bottom-0 start-50 translate-middle-x"
+                        style="z-index:1;width:160px;height:220px;object-fit:cover;object-position:top center;display:block;">
+                    <?php else: ?>
+                      <div class="position-absolute bottom-0 start-50 translate-middle-x d-flex align-items-end justify-content-center"
+                        style="z-index:1;width:160px;height:220px;padding-bottom:16px;">
+                        <span class="d-flex align-items-center justify-content-center rounded-circle fw-bold"
                           style="width:96px;height:96px;background:<?= $grad ?>;color:#fff;font-size:1.8rem;
                                  box-shadow:0 6px 20px rgba(0,0,0,.18);">
-                      <?= $inisial ?>
-                    </span>
+                          <?= $inisial ?>
+                        </span>
+                      </div>
+                    <?php endif ?>
                   </div>
-                <?php endif ?>
-              </div>
 
-              <!-- Info -->
-              <h6 class="fw-bold mb-2 px-2" style="font-size:.92rem;color:#1a2b40;line-height:1.4;"><?= esc($namaLengkap) ?></h6>
-              <?php if (!empty($spList)): ?>
-                <div class="d-flex flex-wrap justify-content-center gap-1 mb-3 px-2">
-                  <?php foreach ($spList as $sp): ?>
-                    <span class="badge bg-label-primary" style="font-size:.7rem;font-weight:500;"><?= esc($sp) ?></span>
-                  <?php endforeach ?>
-                </div>
-              <?php else: ?>
-                <p class="text-muted mb-3" style="font-size:.8rem;">Psikolog</p>
-              <?php endif ?>
-              <div class="d-flex align-items-center justify-content-center gap-3">
-                <div class="d-flex align-items-center gap-1">
-                  <i class="ti tabler-star-filled" style="color:#f0a500;font-size:.85rem;"></i>
-                  <span class="fw-semibold" style="font-size:.82rem;"><?= number_format((float)$k['rating'], 1) ?></span>
-                </div>
-                <span style="color:#ddd;">|</span>
-                <span style="font-size:.78rem;color:#888;"><?= number_format($k['total_sesi']) ?> sesi</span>
-              </div>
+                  <!-- Info -->
+                  <h6 class="fw-bold mb-2 px-2" style="font-size:.92rem;color:#1a2b40;line-height:1.4;"><?= esc($namaLengkap) ?></h6>
+                  <?php if (!empty($spList)): ?>
+                    <div class="d-flex flex-wrap justify-content-center gap-1 mb-3 px-2">
+                      <?php foreach ($spList as $sp): ?>
+                        <span class="badge bg-label-primary" style="font-size:.7rem;font-weight:500;"><?= esc($sp) ?></span>
+                      <?php endforeach ?>
+                    </div>
+                  <?php else: ?>
+                    <p class="text-muted mb-3" style="font-size:.8rem;">Psikolog</p>
+                  <?php endif ?>
+                  <div class="d-flex align-items-center justify-content-center gap-3">
+                    <div class="d-flex align-items-center gap-1">
+                      <i class="ti tabler-star-filled" style="color:#f0a500;font-size:.85rem;"></i>
+                      <span class="fw-semibold" style="font-size:.82rem;"><?= number_format((float)$k['rating'], 1) ?></span>
+                    </div>
+                    <span style="color:#ddd;">|</span>
+                    <span style="font-size:.78rem;color:#888;"><?= number_format($k['total_sesi']) ?> sesi</span>
+                  </div>
 
-            </div>
+                </div>
+              </div>
+            <?php endforeach ?>
           </div>
-          <?php endforeach ?>
+          <!-- Pagination dots -->
+          <div class="swiper-pagination tim-pagination" style="bottom:0;"></div>
         </div>
-        <!-- Pagination dots -->
-        <div class="swiper-pagination tim-pagination" style="bottom:0;"></div>
       </div>
-    </div>
     <?php endif ?>
   </div>
 </section>
@@ -613,14 +613,14 @@ $staff       = $staff       ?? [];
       <!-- CTA Daftar Konseling -->
       <div class="col-lg-8 mt-2">
         <div class="rounded-4 p-5 text-center"
-             style="background:linear-gradient(135deg,var(--smhws-primary),var(--smhws-secondary));">
+          style="background:linear-gradient(135deg,var(--smhws-primary),var(--smhws-secondary));">
           <i class="ti tabler-calendar-event text-white mb-3" style="font-size:2.5rem;opacity:.85;"></i>
           <h4 class="fw-bold text-white mb-2">Siap Mulai Perjalananmu?</h4>
           <p class="mb-4" style="color:rgba(255,255,255,.8);">
             Login untuk membuat janji konseling dengan psikolog SMHWS. Gratis, rahasia, dan mudah.
           </p>
           <a href="<?= base_url('login') ?>" class="btn btn-lg px-6 fw-semibold"
-             style="background:#fff;color:var(--smhws-primary);">
+            style="background:#fff;color:var(--smhws-primary);">
             <i class="ti tabler-login me-2"></i>Login &amp; Daftar Konseling
           </a>
         </div>
@@ -636,19 +636,24 @@ $staff       = $staff       ?? [];
   .tim-card:hover {
     transform: translateY(-8px);
   }
+
   .tim-card:hover .rounded-4 {
     background: #2bb8b3 !important;
   }
+
   .tim-psikolog-swiper .swiper-pagination-bullet {
     background: var(--smhws-primary);
     opacity: .35;
   }
+
   .tim-psikolog-swiper .swiper-pagination-bullet-active {
     opacity: 1;
     width: 24px;
     border-radius: 4px;
   }
-  .tim-prev:hover, .tim-next:hover {
+
+  .tim-prev:hover,
+  .tim-next:hover {
     background: var(--smhws-primary) !important;
     color: #fff !important;
   }
@@ -657,19 +662,34 @@ $staff       = $staff       ?? [];
 
 <?= $this->section('extra_js') ?>
 <script>
-  (function () {
+  (function() {
     if (typeof Swiper === 'undefined') return;
     new Swiper('.tim-psikolog-swiper', {
       slidesPerView: 1,
       spaceBetween: 20,
       loop: true,
-      autoplay: { delay: 4000, disableOnInteraction: false },
-      pagination: { el: '.tim-pagination', clickable: true },
-      navigation: { prevEl: '.tim-prev', nextEl: '.tim-next' },
+      autoplay: {
+        delay: 4000,
+        disableOnInteraction: false
+      },
+      pagination: {
+        el: '.tim-pagination',
+        clickable: true
+      },
+      navigation: {
+        prevEl: '.tim-prev',
+        nextEl: '.tim-next'
+      },
       breakpoints: {
-        576:  { slidesPerView: 2 },
-        768:  { slidesPerView: 3 },
-        1024: { slidesPerView: 4 },
+        576: {
+          slidesPerView: 2
+        },
+        768: {
+          slidesPerView: 3
+        },
+        1024: {
+          slidesPerView: 4
+        },
       },
     });
   })();

@@ -7,8 +7,8 @@
   /* Panel kiri: foto sebagai background dengan overlay gelap */
   .auth-cover-bg {
     background-image:
-      linear-gradient(145deg, rgba(13,74,97,.82) 0%, rgba(26,95,122,.75) 60%, rgba(87,197,182,.6) 100%),
-      url('<?= base_url('myimg/landing1.jpg') ?>') !important;
+      linear-gradient(145deg, rgba(13, 74, 97, .82) 0%, rgba(26, 95, 122, .75) 60%, rgba(87, 197, 182, .6) 100%),
+      url('<?= base_url('myimg/bg_login.jpg') ?>') !important;
     background-size: cover !important;
     background-position: center !important;
     flex-direction: column;
@@ -28,8 +28,8 @@
     display: inline-flex;
     align-items: center;
     gap: .4rem;
-    background: rgba(255,255,255,.15);
-    border: 1px solid rgba(255,255,255,.28);
+    background: rgba(255, 255, 255, .15);
+    border: 1px solid rgba(255, 255, 255, .28);
     color: #fff;
     border-radius: 100px;
     padding: .3rem .85rem;
@@ -58,7 +58,7 @@
 
           <!-- Logo putih -->
           <img src="<?= base_url('myimg/logo_with_text.png') ?>" alt="SMHWS UMS"
-               style="height:56px;width:auto;filter:brightness(0) invert(1);opacity:.95;margin-bottom:2rem;display:block;">
+            style="height:56px;width:auto;filter:brightness(0) invert(1);opacity:.95;margin-bottom:2rem;display:block;">
 
           <!-- Tagline -->
           <h1 class="fw-extrabold text-white mb-3" style="font-size:2rem;line-height:1.25;">
@@ -101,15 +101,17 @@
 
         <!-- SSO UMS -->
         <a href="<?= base_url('cas') ?><?= !empty($redirect) ? '?redirect=' . esc($redirect) : '' ?>"
-           class="btn d-flex align-items-center justify-content-center gap-2 w-100 mb-2 fw-semibold"
-           style="background:#1a5f7a;color:#fff;border-radius:8px;padding:.65rem 1rem;">
+          class="btn d-flex align-items-center justify-content-center gap-2 w-100 mb-2 fw-semibold"
+          style="background:#1a5f7a;color:#fff;border-radius:8px;padding:.65rem 1rem;">
           <img src="<?= base_url('myimg/logo_ums.png') ?>" alt="UMS"
-               style="height:20px;width:auto;filter:brightness(0) invert(1);"
-               onerror="this.style.display='none'">
+            style="height:20px;width:auto;filter:brightness(0) invert(1);"
+            onerror="this.style.display='none'">
           <span>Masuk dengan SSO UMS</span>
         </a>
 
-        <div class="divider my-4"><div class="divider-text text-muted" style="font-size:.78rem;">atau masuk dengan email</div></div>
+        <div class="divider my-4">
+          <div class="divider-text text-muted" style="font-size:.78rem;">atau masuk dengan email</div>
+        </div>
 
         <!-- Flash messages -->
         <?php if (session()->getFlashdata('error')): ?>
@@ -181,7 +183,9 @@
           <a href="<?= base_url('daftar') ?>" class="fw-medium" style="color:#1a5f7a;">Daftar di sini</a>
         </p>
 
-        <div class="divider my-5"><div class="divider-text">atau</div></div>
+        <div class="divider my-5">
+          <div class="divider-text">atau</div>
+        </div>
 
         <a href="<?= base_url('/') ?>" class="btn btn-outline-secondary d-grid w-100">
           <span class="d-flex align-items-center justify-content-center gap-2">
@@ -191,7 +195,7 @@
 
         <!-- Darurat -->
         <div class="mt-5 rounded-3 p-3 d-flex align-items-start gap-2"
-             style="background:rgba(240,165,0,.08);border:1px solid rgba(240,165,0,.25);">
+          style="background:rgba(240,165,0,.08);border:1px solid rgba(240,165,0,.25);">
           <i class="ti tabler-phone-call text-warning mt-1 flex-shrink-0"></i>
           <p class="mb-0" style="font-size:.78rem;color:#666;">
             <strong style="color:#1a2b40;">Butuh bantuan segera?</strong><br>
@@ -210,9 +214,9 @@
 
 <?= $this->section('extra_js') ?>
 <script>
-  document.getElementById('togglePassword').addEventListener('click', function () {
+  document.getElementById('togglePassword').addEventListener('click', function() {
     const input = document.getElementById('password');
-    const icon  = document.getElementById('eyeIcon');
+    const icon = document.getElementById('eyeIcon');
     if (input.type === 'password') {
       input.type = 'text';
       icon.classList.replace('tabler-eye-off', 'tabler-eye');
