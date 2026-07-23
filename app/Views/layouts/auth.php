@@ -6,7 +6,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
   <title><?= $this->renderSection('title') ?> | SMHWS - UMS</title>
 
-  <link rel="icon" type="image/x-icon" href="<?= base_url('assets/img/favicon/favicon.ico') ?>" />
+  <link rel="icon" type="image/x-icon" href="<?= base_url('favicon.ico') ?>" />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -29,6 +29,8 @@
 
   <script src="<?= base_url('assets/vendor/js/helpers.js') ?>"></script>
   <script src="<?= base_url('assets/js/config.js') ?>"></script>
+
+  <?= $this->renderSection('extra_css') ?>
 </head>
 
 <body>

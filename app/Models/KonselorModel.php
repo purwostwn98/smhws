@@ -73,8 +73,25 @@ class KonselorModel extends Model
     /** Ambil profil konselor beserta data user (nama, email, foto user). */
     public function withUser(): static
     {
-        return $this->select('konselor.*, users.name, users.email, users.phone, users.fakultas')
-                    ->join('users', 'users.id = konselor.user_id');
+        return $this
+            ->select('
+                konselor.id, konselor.user_id, konselor.nip, konselor.uniid,
+                konselor.gelar_depan, konselor.gelar_belakang, konselor.spesialisasi,
+                konselor.bio, konselor.foto, konselor.no_str, konselor.tahun_pengalaman,
+                konselor.max_pasien_per_hari, konselor.is_available,
+                konselor.created_at, konselor.updated_at, konselor.deleted_at,
+                users.name, users.email, users.phone, users.fakultas,
+                (SELECT COUNT(*)
+                 FROM janji
+                 WHERE janji.konselor_id = konselor.id
+                   AND janji.status = "selesai"
+                   AND janji.deleted_at IS NULL) AS total_sesi,
+                (SELECT ROUND(AVG(fk.rating), 2)
+                 FROM feedback_konseling fk
+                 JOIN janji j ON j.id = fk.janji_id
+                 WHERE j.konselor_id = konselor.id) AS rating
+            ')
+            ->join('users', 'users.id = konselor.user_id');
     }
 
     /** Nama lengkap dengan gelar: "Dr. Siti Rahayu, M.Psi." */

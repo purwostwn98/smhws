@@ -20,7 +20,7 @@ $hariList     = [
     'sabtu'  => 'Sabtu',
 ];
 ?>
-<?= $this->section('title') ?><?= $konselor ? 'Edit Konselor' : 'Tambah Konselor' ?><?= $this->endSection() ?>
+<?= $this->section('title') ?><?= $konselor ? 'Edit Psikolog' : 'Tambah Psikolog' ?><?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
 
@@ -31,10 +31,10 @@ $hariList     = [
   </a>
   <div>
     <h4 class="fw-bold mb-0" style="color:#1a2b40;">
-      <?= $isEdit ? 'Edit Konselor' : 'Tambah Konselor Baru' ?>
+      <?= $isEdit ? 'Edit Psikolog' : 'Tambah Psikolog Baru' ?>
     </h4>
     <p class="text-muted mb-0" style="font-size:.8rem;">
-      <?= $isEdit ? 'Perbarui data profil dan akun konselor.' : 'Isi data untuk menambahkan konselor baru.' ?>
+      <?= $isEdit ? 'Perbarui data profil dan akun psikolog.' : 'Isi data untuk menambahkan psikolog baru.' ?>
     </p>
   </div>
 </div>
@@ -46,7 +46,7 @@ $hariList     = [
   </div>
 <?php endif ?>
 
-<form method="post"
+<form method="post" enctype="multipart/form-data"
   action="<?= $isEdit ? base_url('admin/konselor/update/' . $konselor['id']) : base_url('admin/konselor/simpan') ?>">
   <?= csrf_field() ?>
 
@@ -104,9 +104,9 @@ $hariList     = [
           <!-- NIP -->
           <div class="mb-3">
             <label class="form-label fw-semibold" style="font-size:.85rem;">NIP</label>
-            <input type="text" name="nim_nip" class="form-control"
+            <input type="text" name="uniid" class="form-control"
               placeholder="cth. 197801012005012001"
-              value="<?= esc($old('nim_nip', $user['nim_nip'] ?? '')) ?>">
+              value="<?= esc($old('uniid', $user['uniid'] ?? '')) ?>">
           </div>
 
           <!-- Phone -->
@@ -122,7 +122,7 @@ $hariList     = [
             style="background:#f8f9fa;">
             <div>
               <div class="fw-semibold" style="font-size:.875rem;color:#1a2b40;">Dosen UMS</div>
-              <div class="text-muted" style="font-size:.78rem;">Aktifkan jika konselor merupakan dosen UMS.</div>
+              <div class="text-muted" style="font-size:.78rem;">Aktifkan jika psikolog merupakan dosen UMS.</div>
             </div>
             <div class="form-check form-switch mb-0">
               <input class="form-check-input" type="checkbox" name="is_dosen" id="isDosen"
@@ -148,15 +148,45 @@ $hariList     = [
       </div>
     </div>
 
-    <!-- Kolom kanan: Profil Konselor -->
+    <!-- Kolom kanan: Profil Psikolog -->
     <div class="col-lg-7">
       <div class="card">
         <div class="card-header py-3" style="border-bottom:1px solid #eee;">
           <h6 class="fw-semibold mb-0" style="color:#1a2b40;">
-            <i class="ti tabler-heart-handshake me-2 text-primary"></i>Profil Konselor
+            <i class="ti tabler-heart-handshake me-2 text-primary"></i>Profil Psikolog
           </h6>
         </div>
         <div class="card-body">
+
+          <!-- Foto Profil -->
+          <div class="mb-4 pb-3" style="border-bottom:1px solid #eee;">
+            <label class="form-label fw-semibold d-block" style="font-size:.85rem;">Foto Profil</label>
+            <div class="d-flex align-items-center gap-3">
+              <div style="width:80px;height:80px;border-radius:50%;overflow:hidden;background:#f0f0f0;
+                   flex-shrink:0;display:flex;align-items:center;justify-content:center;border:2px solid #e0e0e0;">
+                <?php if ($isEdit && ! empty($konselor['foto'])): ?>
+                  <img id="fotoPreview" src="<?= base_url($konselor['foto']) ?>"
+                       style="width:100%;height:100%;object-fit:cover;" alt="Foto">
+                <?php else: ?>
+                  <i id="fotoPlaceholder" class="ti tabler-user" style="font-size:2rem;color:#bbb;"></i>
+                  <img id="fotoPreview" src="" style="width:100%;height:100%;object-fit:cover;display:none;" alt="Foto">
+                <?php endif ?>
+              </div>
+              <div class="flex-grow-1">
+                <input type="file" name="foto" id="inputFoto"
+                       accept="image/jpeg,image/png,image/webp"
+                       class="form-control form-control-sm" style="max-width:300px;"
+                       onchange="previewFoto(this)">
+                <div class="form-text">JPG, PNG, atau WebP. Maks. 2 MB.</div>
+                <?php if ($isEdit && ! empty($konselor['foto'])): ?>
+                  <div class="form-check mt-1">
+                    <input class="form-check-input" type="checkbox" name="hapus_foto" id="hapusFoto" value="1">
+                    <label class="form-check-label text-danger" for="hapusFoto" style="font-size:.8rem;">Hapus foto saat ini</label>
+                  </div>
+                <?php endif ?>
+              </div>
+            </div>
+          </div>
 
           <!-- Gelar -->
           <div class="row g-3 mb-3">
@@ -213,7 +243,7 @@ $hariList     = [
           <div class="mb-3">
             <label class="form-label fw-semibold" style="font-size:.85rem;">Bio / Deskripsi Singkat</label>
             <textarea name="bio" class="form-control" rows="4"
-              placeholder="Deskripsi singkat tentang konselor..."><?= esc($old('bio', $konselor['bio'] ?? '')) ?></textarea>
+              placeholder="Deskripsi singkat tentang psikolog..."><?= esc($old('bio', $konselor['bio'] ?? '')) ?></textarea>
           </div>
 
           <!-- Ketersediaan -->
@@ -222,7 +252,7 @@ $hariList     = [
             <div>
               <div class="fw-semibold" style="font-size:.875rem;color:#1a2b40;">Tersedia untuk Sesi</div>
               <div class="text-muted" style="font-size:.78rem;">
-                Jika dinonaktifkan, konselor tidak akan muncul di pilihan mahasiswa.
+                Jika dinonaktifkan, psikolog tidak akan muncul di pilihan mahasiswa.
               </div>
             </div>
             <div class="form-check form-switch mb-0">
@@ -244,7 +274,7 @@ $hariList     = [
             <i class="ti tabler-calendar-time me-2 text-primary"></i>Jadwal Preferensi Konseling
           </h6>
           <div class="text-muted mt-1" style="font-size:.78rem;">
-            Centang sesi yang tersedia dan pilih modenya. Sabtu hanya tersedia mode Offline.
+            Centang sesi yang tersedia dan pilih modenya. Sabtu hanya tersedia mode Online.
           </div>
         </div>
         <div class="card-body p-0">
@@ -258,7 +288,7 @@ $hariList     = [
                     <?= $label ?>
                     <?php if ($hari === 'sabtu'): ?>
                       <div class="mt-1">
-                        <span class="badge bg-label-secondary" style="font-size:.65rem;">offline only</span>
+                        <span class="badge bg-label-info" style="font-size:.65rem;">online only</span>
                       </div>
                     <?php endif ?>
                   </th>
@@ -280,11 +310,11 @@ $hariList     = [
                             style="font-size:.78rem;text-align:center;"
                             onchange="colorizeJadwal(this)">
                       <option value="">—</option>
+                      <option value="online" <?= $val === 'online' ? 'selected' : '' ?>>Online</option>
                       <?php if ($hari !== 'sabtu'): ?>
-                        <option value="online"   <?= $val === 'online'   ? 'selected' : '' ?>>Online</option>
+                        <option value="offline"  <?= $val === 'offline'  ? 'selected' : '' ?>>Offline</option>
                         <option value="keduanya" <?= $val === 'keduanya' ? 'selected' : '' ?>>Online & Offline</option>
                       <?php endif ?>
-                      <option value="offline" <?= $val === 'offline' ? 'selected' : '' ?>>Offline</option>
                     </select>
                   </td>
                   <?php endforeach ?>
@@ -304,13 +334,26 @@ $hariList     = [
     <a href="<?= base_url('admin/konselor') ?>" class="btn btn-label-secondary">Batal</a>
     <button type="submit" class="btn btn-primary px-4">
       <i class="ti <?= $isEdit ? 'tabler-device-floppy' : 'tabler-user-plus' ?> me-2"></i>
-      <?= $isEdit ? 'Simpan Perubahan' : 'Tambah Konselor' ?>
+      <?= $isEdit ? 'Simpan Perubahan' : 'Tambah Psikolog' ?>
     </button>
   </div>
 
 </form>
 
 <script>
+  function previewFoto(input) {
+    if (! input.files || ! input.files[0]) return;
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var preview     = document.getElementById('fotoPreview');
+      var placeholder = document.getElementById('fotoPlaceholder');
+      preview.src = e.target.result;
+      preview.style.display = 'block';
+      if (placeholder) placeholder.style.display = 'none';
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+
   // Toggle password visibility
   document.getElementById('togglePassword').addEventListener('click', function() {
     var input = document.getElementById('inputPassword');

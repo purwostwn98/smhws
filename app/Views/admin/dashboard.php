@@ -106,7 +106,7 @@ $totalJanji = $totalJanji ?? 0;
         </div>
         <div>
           <div class="fw-bold" style="font-size:1.75rem;color:#1a2b40;line-height:1;"><?= $stats['konselor_aktif'] ?></div>
-          <div class="text-muted" style="font-size:.8rem;">Konselor Aktif</div>
+          <div class="text-muted" style="font-size:.8rem;">Psikolog Aktif</div>
           <div style="font-size:.72rem;color:#2d9b6e;" class="mt-1">Tersedia saat ini</div>
         </div>
       </div>
@@ -174,8 +174,8 @@ $totalJanji = $totalJanji ?? 0;
                     </div>
                     <div>
                       <div class="fw-semibold" style="font-size:.83rem;"><?= esc($j['name']) ?></div>
-                      <?php if (! empty($j['nim_nip'])): ?>
-                        <small class="text-muted"><?= esc($j['nim_nip']) ?></small>
+                      <?php if (! empty($j['uniid'])): ?>
+                        <small class="text-muted"><?= esc($j['uniid']) ?></small>
                       <?php endif ?>
                     </div>
                   </div>
@@ -216,7 +216,7 @@ $totalJanji = $totalJanji ?? 0;
   </div>
 </div>
 
-<!-- ===== ROW 3: Status Distribution + Konselor ===== -->
+<!-- ===== ROW 3: Status Distribution + Psikolog ===== -->
 <div class="row g-4 mb-4">
 
   <!-- Distribusi Status -->
@@ -267,25 +267,25 @@ $totalJanji = $totalJanji ?? 0;
     </div>
   </div>
 
-  <!-- Daftar Konselor -->
+  <!-- Daftar Psikolog -->
   <div class="col-lg-7">
     <div class="card h-100">
       <div class="card-header d-flex align-items-center justify-content-between">
-        <h5 class="card-title mb-0">Daftar Konselor</h5>
+        <h5 class="card-title mb-0">Daftar Psikolog</h5>
         <a href="<?= base_url('admin/konselor') ?>" class="btn btn-sm btn-label-primary">Kelola</a>
       </div>
       <div class="card-body p-0">
         <?php if (empty($konselorList)): ?>
           <div class="text-center py-5">
             <i class="ti tabler-user-off text-muted" style="font-size:2rem;"></i>
-            <p class="text-muted mt-2 mb-0" style="font-size:.85rem;">Belum ada konselor terdaftar</p>
+            <p class="text-muted mt-2 mb-0" style="font-size:.85rem;">Belum ada psikolog terdaftar</p>
           </div>
         <?php else: ?>
           <div class="table-responsive">
             <table class="table table-hover align-middle mb-0">
               <thead class="table-light">
                 <tr>
-                  <th class="px-4">Konselor</th>
+                  <th class="px-4">Psikolog</th>
                   <th class="text-center">Status</th>
                   <th class="text-center">Total Sesi</th>
                   <th class="text-center">Rating</th>

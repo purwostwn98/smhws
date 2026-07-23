@@ -12,19 +12,8 @@
         </button>
 
         <a href="<?= base_url('/') ?>" class="app-brand-link">
-          <span class="app-brand-logo demo">
-            <!-- Heart + Brain icon representing mental health -->
-            <span class="text-primary">
-              <svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M16 28s-12-7.2-12-14.4C4 9.16 7.16 6 11.2 6c2.16 0 4.12 1.04 5.4 2.68A6.8 6.8 0 0 1 22 6c3.76 0 6 2.96 6 7.6C28 20.8 16 28 16 28z" fill="currentColor" fill-opacity=".25"/>
-                <path d="M16 26s-11-6.8-11-13.4C5 8.72 7.92 6 11.6 6c2.08 0 3.92 1.04 5.12 2.64A6.44 6.44 0 0 1 21.76 6C25.2 6 27 8.72 27 12.6 27 19.2 16 26 16 26z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                <circle cx="16" cy="14" r="3" fill="currentColor"/>
-              </svg>
-            </span>
-          </span>
-          <span class="app-brand-text demo menu-text fw-bold ms-2 ps-1" style="font-size:.9rem;line-height:1.2;">
-            SMHWS<br><small class="fw-normal text-muted" style="font-size:.65rem;">UMS</small>
-          </span>
+          <img src="<?= base_url('myimg/logo_with_text.png') ?>" alt="SMHWS UMS"
+            style="height:47px;width:auto;object-fit:contain;">
         </a>
       </div>
 
@@ -44,9 +33,6 @@
           </li>
           <li class="nav-item">
             <a class="nav-link fw-medium" href="#tentang">Tentang Kami</a>
-          </li>
-          <li class="nav-item">
-            <a class="nav-link fw-medium" href="#tim">Tim Konselor</a>
           </li>
           <li class="nav-item">
             <a class="nav-link fw-medium" href="#faq">FAQ</a>
@@ -78,22 +64,33 @@
                   <strong class="text-heading" style="font-size:.85rem;"><?= esc(ucfirst(session()->get('user_role'))) ?></strong>
                 </div>
               </li>
-              <li><hr class="dropdown-divider m-0"></li>
+              <li>
+                <hr class="dropdown-divider m-0">
+              </li>
               <?php if (session()->get('is_superadmin') || session()->get('is_admin_fakultas') || session()->get('user_role') === 'konselor'): ?>
                 <li><a class="dropdown-item" href="<?= base_url('dashboard') ?>">
-                  <i class="icon-base ti tabler-layout-dashboard me-2"></i>Dashboard
-                </a></li>
+                    <i class="icon-base ti tabler-layout-dashboard me-2"></i>Dashboard
+                  </a></li>
               <?php endif ?>
               <li><a class="dropdown-item" href="<?= base_url('/#konsultasi') ?>">
-                <i class="icon-base ti tabler-calendar-event me-2"></i>Daftar Konseling
-              </a></li>
-              <li><hr class="dropdown-divider m-0"></li>
+                  <i class="icon-base ti tabler-calendar-event me-2"></i>Daftar Konseling
+                </a></li>
+              <li>
+                <hr class="dropdown-divider m-0">
+              </li>
               <li><a class="dropdown-item text-danger" href="<?= base_url('logout') ?>">
-                <i class="icon-base ti tabler-logout me-2"></i>Keluar
-              </a></li>
+                  <i class="icon-base ti tabler-logout me-2"></i>Keluar
+                </a></li>
             </ul>
           </li>
         <?php else: ?>
+          <li>
+            <a href="<?= base_url('login') ?>" class="btn"
+               style="background:var(--smhws-accent-warm);color:#fff;">
+              <span class="tf-icons icon-base ti tabler-login me-md-1"></span>
+              <span class="d-none d-md-block">Login</span>
+            </a>
+          </li>
           <li>
             <a href="<?= base_url('login?redirect=janji') ?>" class="btn btn-primary">
               <span class="tf-icons icon-base ti tabler-calendar-event me-md-1"></span>

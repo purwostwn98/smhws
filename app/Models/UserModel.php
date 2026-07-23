@@ -17,7 +17,7 @@ class UserModel extends Model
         'email',
         'password',
         'role',
-        'nim_nip',
+        'uniid',
         'fakultas',
         'prodi',
         'phone',
@@ -38,7 +38,7 @@ class UserModel extends Model
         'name'     => 'required|min_length[3]|max_length[150]',
         'email'    => 'required|valid_email|max_length[150]|is_unique[users.email,id,{id}]',
         'password' => 'required|min_length[8]',
-        'role'     => 'required|in_list[mahasiswa,konselor]',
+        'role'     => 'required|in_list[mahasiswa,konselor,dosen]',
     ];
 
     protected $validationMessages = [
@@ -46,7 +46,7 @@ class UserModel extends Model
             'is_unique' => 'Email sudah terdaftar.',
         ],
         'role' => [
-            'in_list' => 'Role hanya boleh mahasiswa atau konselor.',
+            'in_list' => 'Role hanya boleh mahasiswa, konselor, atau dosen.',
         ],
     ];
 

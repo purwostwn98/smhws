@@ -42,7 +42,7 @@ $konselorNama = $konselorNama ?? null;
               <?php endif ?>
             </div>
             <?php if ($konselorNama): ?>
-              <div class="text-muted" style="font-size:.82rem;">Konselor: <?= esc($konselorNama) ?></div>
+              <div class="text-muted" style="font-size:.82rem;">Psikolog: <?= esc($konselorNama) ?></div>
             <?php endif ?>
           </div>
         </div>
@@ -79,7 +79,7 @@ $konselorNama = $konselorNama ?? null;
           <div class="mb-4">
             <label class="form-label fw-semibold" style="font-size:.875rem;">Komentar <span class="text-muted fw-normal">(opsional)</span></label>
             <textarea name="komentar" class="form-control" rows="4"
-                      placeholder="Ceritakan pengalamanmu, saran untuk konselor, atau hal yang bisa kami tingkatkan..."></textarea>
+                      placeholder="Ceritakan pengalamanmu, saran untuk psikolog, atau hal yang bisa kami tingkatkan..."></textarea>
           </div>
 
           <button type="submit" class="btn btn-primary w-100" id="btnSubmit" disabled>

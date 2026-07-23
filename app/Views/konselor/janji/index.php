@@ -78,7 +78,7 @@ $statusMeta = [
             <td><span class="text-muted" style="font-size:.75rem;">#<?= str_pad($j['id'], 5, '0', STR_PAD_LEFT) ?></span></td>
             <td>
               <div class="fw-semibold" style="font-size:.875rem;"><?= esc($j['name'] ?? '—') ?></div>
-              <div class="text-muted" style="font-size:.75rem;"><?= esc($j['nim_nip'] ?? '') ?></div>
+              <div class="text-muted" style="font-size:.75rem;"><?= esc($j['uniid'] ?? '') ?></div>
             </td>
             <td style="font-size:.82rem;">
               <?php if ($j['tanggal_konseling']): ?>

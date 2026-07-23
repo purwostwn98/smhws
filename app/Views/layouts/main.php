@@ -8,7 +8,7 @@
   <meta name="description" content="<?= $this->renderSection('meta_description') ?>" />
 
   <!-- Favicon -->
-  <link rel="icon" type="image/x-icon" href="<?= base_url('assets/img/favicon/favicon.ico') ?>" />
+  <link rel="icon" type="image/x-icon" href="<?= base_url('favicon.ico') ?>" />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />

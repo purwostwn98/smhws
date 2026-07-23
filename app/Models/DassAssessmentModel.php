@@ -131,7 +131,7 @@ class DassAssessmentModel extends Model
 
     public function withUser(): static
     {
-        return $this->select('dass_assessments.*, users.name, users.nim_nip, users.fakultas, users.prodi')
+        return $this->select('dass_assessments.*, users.name, users.uniid, users.fakultas, users.prodi')
                     ->join('users', 'users.id = dass_assessments.user_id');
     }
 

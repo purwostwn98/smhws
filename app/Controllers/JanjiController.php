@@ -62,7 +62,11 @@ class JanjiController extends BaseController
             // format: "senin_08:00"
             $parts = explode('_', $jadwalRaw, 2);
             if (count($parts) === 2) {
-                $jadwalPilihan[] = ['hari' => $parts[0], 'waktu' => $parts[1]];
+                $entry = ['hari' => $parts[0], 'waktu' => $parts[1]];
+                if (! empty($post['jadwal_tanggal'])) {
+                    $entry['tanggal'] = $post['jadwal_tanggal'];
+                }
+                $jadwalPilihan[] = $entry;
             }
         }
 
@@ -84,6 +88,7 @@ class JanjiController extends BaseController
             'semester'               => (int) $post['semester'],
             'dosen_pa'               => $post['dosen_pa'] ?? null,
             'domisili'               => $post['domisili'] ?? null,
+            'pekerjaan'              => $post['pekerjaan'] ?? null,
             'status_pernikahan'      => $post['status_pernikahan'] ?? 'belum_menikah',
             'pernah_konseling_smhws' => isset($post['pernah_konseling_smhws']) ? 1 : 0,
             'metode'                 => $post['metode'],
@@ -331,6 +336,58 @@ class JanjiController extends BaseController
         }
 
         return $this->response->setJSON(['jadwal' => $jadwal]);
+    }
+
+    /** GET /janji/slot-booked — API: slot yang sudah terpakai untuk konselor+tanggal tertentu */
+    public function slotBooked(): \CodeIgniter\HTTP\ResponseInterface
+    {
+        if (! session()->get('is_logged_in')) {
+            return $this->response->setJSON(['error' => 'Unauthorized'])->setStatusCode(401);
+        }
+
+        $konselorId = (int)($this->request->getGet('konselor_id') ?? 0);
+        $tanggal    = $this->request->getGet('tanggal') ?? '';
+
+        if (! $konselorId || ! $tanggal) {
+            return $this->response->setJSON(['booked' => []]);
+        }
+
+        $db = \Config\Database::connect();
+
+        // Confirmed/ongoing bookings (admin already set tanggal_konseling + jam_konseling)
+        $rows = $db->table('janji')
+            ->select('jam_konseling')
+            ->where('konselor_id', $konselorId)
+            ->where('tanggal_konseling', $tanggal)
+            ->whereNotIn('status', ['dibatalkan', 'selesai'])
+            ->where('jam_konseling IS NOT NULL')
+            ->get()->getResultArray();
+
+        $booked = array_values(array_filter(array_map(
+            fn($r) => $r['jam_konseling'] ? substr($r['jam_konseling'], 0, 5) : null,
+            $rows
+        )));
+
+        // Pending (menunggu) requests: preferred konselor is in konselor_pilihan JSON and
+        // preferred date+time is in jadwal_pilihan JSON — neither is set by admin yet.
+        // Load through the model so afterFind decodes JSON fields automatically.
+        $pending = (new JanjiModel())->where('status', 'menunggu')->findAll();
+        foreach ($pending as $record) {
+            $kIds = array_map('intval', (array) ($record['konselor_pilihan'] ?? []));
+            if (! in_array($konselorId, $kIds, true)) continue;
+            foreach ((array) ($record['jadwal_pilihan'] ?? []) as $slot) {
+                if (
+                    isset($slot['tanggal'], $slot['waktu']) &&
+                    $slot['tanggal'] === $tanggal
+                ) {
+                    $booked[] = $slot['waktu'];
+                }
+            }
+        }
+
+        $booked = array_values(array_unique($booked));
+
+        return $this->response->setJSON(['booked' => $booked]);
     }
 
     /** GET /janji — daftar janji milik mahasiswa */

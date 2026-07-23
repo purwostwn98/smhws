@@ -150,7 +150,7 @@ $counts['semua'] = count($daftarJanji);
               <span class="badge <?= $statusClass ?> ms-2"><?= $statusLabel ?></span>
             </div>
 
-            <!-- Metode + Konselor -->
+            <!-- Metode + Psikolog -->
             <div class="d-flex flex-column gap-2 mb-3">
 
               <div class="d-flex align-items-center gap-2">
@@ -167,7 +167,7 @@ $counts['semua'] = count($daftarJanji);
               <?php else: ?>
                 <div class="d-flex align-items-center gap-1 text-muted" style="font-size:.82rem;">
                   <i class="ti tabler-user-question flex-shrink-0"></i>
-                  <span>Konselor belum ditetapkan</span>
+                  <span>Psikolog belum ditetapkan</span>
                 </div>
               <?php endif ?>
 

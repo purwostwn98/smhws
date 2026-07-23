@@ -43,7 +43,7 @@
           <h6 class="footer-title mb-4 text-white">Informasi</h6>
           <ul class="list-unstyled">
             <li class="mb-3"><a href="#tentang" class="footer-link">Tentang Kami</a></li>
-            <li class="mb-3"><a href="#tim" class="footer-link">Tim Konselor</a></li>
+            <li class="mb-3"><a href="#tim" class="footer-link">Tim Psikolog</a></li>
             <li class="mb-3"><a href="#faq" class="footer-link">FAQ</a></li>
             <li class="mb-3"><a href="#kontak" class="footer-link">Hubungi Kami</a></li>
             <li class="mb-3"><a href="https://www.ums.ac.id" target="_blank" class="footer-link">Website UMS</a></li>

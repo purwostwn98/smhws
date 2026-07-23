@@ -19,6 +19,7 @@ class JanjiModel extends Model
         'jadwal_pilihan', 'konselor_pilihan',
         'tema_konseling', 'keluhan_utama', 'urgensi', 'mulai_keluhan', 'upaya_dilakukan',
         'status', 'tanggal_konseling', 'jam_konseling',
+        'mahasiswa_konfirmasi_at',
         'lokasi_link', 'catatan_admin',
     ];
 
@@ -98,7 +99,7 @@ class JanjiModel extends Model
 
     public function withDetail(): static
     {
-        return $this->select('janji.*, users.name, users.nim_nip, users.email, users.phone, users.fakultas, users.prodi')
+        return $this->select('janji.*, users.name, users.uniid, users.email, users.phone, users.fakultas, users.prodi')
                     ->join('users', 'users.id = janji.user_id');
     }
 

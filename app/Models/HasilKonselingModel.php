@@ -12,9 +12,11 @@ class HasilKonselingModel extends Model
     protected $useSoftDeletes = true;
 
     protected $allowedFields = [
-        'janji_id', 'konselor_id',
+        'janji_id', 'konselor_id', 'jam_mulai', 'jam_selesai',
         'ada_rujukan', 'instansi_rujukan_id', 'instansi_rujukan', 'alasan_rujukan',
         'sesi_lanjutan', 'catatan_sesi',
+        'stressor', 'faktor_kerentanan', 'faktor_protektif', 'strategi_koping',
+        'diagnosis', 'intervensi', 'rekomendasi', 'prognosis',
     ];
 
     protected $useTimestamps = true;

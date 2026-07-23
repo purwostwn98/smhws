@@ -1,5 +1,5 @@
 <?= $this->extend('layouts/dashboard') ?>
-<?= $this->section('title') ?>Kelola Konselor<?= $this->endSection() ?>
+<?= $this->section('title') ?>Kelola Psikolog<?= $this->endSection() ?>
 <?php
 $konselorList = $konselorList ?? [];
 $stats        = $stats ?? ['total' => 0, 'tersedia' => 0, 'total_sesi' => 0];
@@ -10,11 +10,11 @@ $stats        = $stats ?? ['total' => 0, 'tersedia' => 0, 'total_sesi' => 0];
 <!-- Header -->
 <div class="d-flex align-items-center justify-content-between mb-4">
   <div>
-    <h4 class="fw-bold mb-1" style="color:#1a2b40;">Kelola Konselor</h4>
-    <p class="text-muted mb-0" style="font-size:.875rem;">Manajemen data konselor dan ketersediaan sesi.</p>
+    <h4 class="fw-bold mb-1" style="color:#1a2b40;">Kelola Psikolog</h4>
+    <p class="text-muted mb-0" style="font-size:.875rem;">Manajemen data psikolog dan ketersediaan sesi.</p>
   </div>
   <a href="<?= base_url('admin/konselor/buat') ?>" class="btn btn-primary d-flex align-items-center gap-2">
-    <i class="ti tabler-user-plus"></i>Tambah Konselor
+    <i class="ti tabler-user-plus"></i>Tambah Psikolog
   </a>
 </div>
 
@@ -43,7 +43,7 @@ $stats        = $stats ?? ['total' => 0, 'tersedia' => 0, 'total_sesi' => 0];
         </div>
         <div>
           <div class="fw-bold fs-4" style="color:#1a2b40;"><?= $stats['total'] ?></div>
-          <div class="text-muted" style="font-size:.8rem;">Total Konselor</div>
+          <div class="text-muted" style="font-size:.8rem;">Total Psikolog</div>
         </div>
       </div>
     </div>
@@ -58,7 +58,7 @@ $stats        = $stats ?? ['total' => 0, 'tersedia' => 0, 'total_sesi' => 0];
         </div>
         <div>
           <div class="fw-bold fs-4" style="color:#1a2b40;"><?= $stats['tersedia'] ?></div>
-          <div class="text-muted" style="font-size:.8rem;">Konselor Tersedia</div>
+          <div class="text-muted" style="font-size:.8rem;">Psikolog Tersedia</div>
         </div>
       </div>
     </div>
@@ -80,7 +80,7 @@ $stats        = $stats ?? ['total' => 0, 'tersedia' => 0, 'total_sesi' => 0];
   </div>
 </div>
 
-<!-- Tabel Konselor -->
+<!-- Tabel Psikolog -->
 <?php if (empty($konselorList)): ?>
   <div class="card">
     <div class="card-body text-center py-5">
@@ -89,9 +89,9 @@ $stats        = $stats ?? ['total' => 0, 'tersedia' => 0, 'total_sesi' => 0];
           <i class="ti tabler-user-off"></i>
         </div>
       </div>
-      <h6 class="text-muted">Belum ada data konselor</h6>
+      <h6 class="text-muted">Belum ada data psikolog</h6>
       <a href="<?= base_url('admin/konselor/buat') ?>" class="btn btn-primary mt-3">
-        <i class="ti tabler-user-plus me-1"></i>Tambah Konselor Pertama
+        <i class="ti tabler-user-plus me-1"></i>Tambah Psikolog Pertama
       </a>
     </div>
   </div>
@@ -102,7 +102,7 @@ $stats        = $stats ?? ['total' => 0, 'tersedia' => 0, 'total_sesi' => 0];
         <table class="table table-hover align-middle mb-0">
           <thead>
             <tr style="background:#f8f9fa;font-size:.8rem;text-transform:uppercase;letter-spacing:.04em;color:#6c757d;">
-              <th class="px-4 py-3">Konselor</th>
+              <th class="px-4 py-3">Psikolog</th>
               <th class="py-3">NIP</th>
               <th class="py-3">Spesialisasi</th>
               <th class="py-3 text-center">Rating</th>
@@ -124,10 +124,15 @@ $stats        = $stats ?? ['total' => 0, 'tersedia' => 0, 'total_sesi' => 0];
                 <td class="px-4 py-3">
                   <div class="d-flex align-items-center gap-3">
                     <div class="avatar flex-shrink-0">
-                      <div class="avatar-initial rounded-circle fw-bold"
-                        style="background:rgba(26,95,122,.15);color:#1a5f7a;font-size:.9rem;">
-                        <?= $inisial ?>
-                      </div>
+                      <?php if (! empty($k['foto'])): ?>
+                        <img src="<?= base_url($k['foto']) ?>" alt="<?= esc($k['name']) ?>"
+                             style="width:38px;height:38px;border-radius:50%;object-fit:cover;border:1px solid #e0e0e0;">
+                      <?php else: ?>
+                        <div class="avatar-initial rounded-circle fw-bold"
+                          style="background:rgba(26,95,122,.15);color:#1a5f7a;font-size:.9rem;">
+                          <?= $inisial ?>
+                        </div>
+                      <?php endif ?>
                     </div>
                     <div>
                       <div class="fw-semibold" style="color:#1a2b40;font-size:.875rem;"><?= esc($namaLengkap) ?></div>
@@ -237,9 +242,9 @@ $stats        = $stats ?? ['total' => 0, 'tersedia' => 0, 'total_sesi' => 0];
             <i class="ti tabler-trash"></i>
           </div>
         </div>
-        <h5 class="fw-bold mb-1" style="color:#1a2b40;">Hapus Konselor?</h5>
+        <h5 class="fw-bold mb-1" style="color:#1a2b40;">Hapus Psikolog?</h5>
         <p class="text-muted mb-4" style="font-size:.875rem;">
-          <strong id="hapusNama"></strong> akan dihapus. Akun login konselor juga akan dinonaktifkan.
+          <strong id="hapusNama"></strong> akan dihapus. Akun login psikolog juga akan dinonaktifkan.
         </p>
         <form id="formHapus" method="post" action="">
           <?= csrf_field() ?>

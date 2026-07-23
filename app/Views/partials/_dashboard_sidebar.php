@@ -1,6 +1,9 @@
 <?php
 $isAdmin    = session()->get('is_superadmin') || session()->get('is_admin_fakultas');
 $isKonselor = session()->get('user_role') === 'konselor';
+$isDosen    = session()->get('user_role') === 'dosen';
+$isKaprodi  = (bool) session()->get('is_kaprodi'); // berlaku untuk dosen maupun psikolog
+$isDekan    = (bool) session()->get('is_dekan');   // berlaku untuk dosen maupun psikolog
 $uri        = uri_string();
 ?>
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
@@ -8,16 +11,7 @@ $uri        = uri_string();
   <!-- Brand -->
   <div class="app-brand demo">
     <a href="<?= base_url('/') ?>" class="app-brand-link">
-      <span class="app-brand-logo demo text-primary">
-        <svg width="28" height="28" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M16 28s-12-7.2-12-14.4C4 9.16 7.16 6 11.2 6c2.16 0 4.12 1.04 5.4 2.68A6.8 6.8 0 0 1 22 6c3.76 0 6 2.96 6 7.6C28 20.8 16 28 16 28z" fill="currentColor" fill-opacity=".25"/>
-          <path d="M16 26s-11-6.8-11-13.4C5 8.72 7.92 6 11.6 6c2.08 0 3.92 1.04 5.12 2.64A6.44 6.44 0 0 1 21.76 6C25.2 6 27 8.72 27 12.6 27 19.2 16 26 16 26z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-          <circle cx="16" cy="14" r="3" fill="currentColor"/>
-        </svg>
-      </span>
-      <span class="app-brand-text demo menu-text fw-bold ms-2" style="font-size:.85rem;line-height:1.2;">
-        SMHWS<br><small class="fw-normal text-muted" style="font-size:.62rem;">UMS</small>
-      </span>
+      <img src="<?= base_url('myimg/logo_with_text.png') ?>" alt="SMHWS UMS" style="height:70px;width:auto;">
     </a>
 
     <a href="javascript:void(0)" class="layout-menu-toggle menu-link text-auto ms-auto d-block d-xl-none">
@@ -43,6 +37,13 @@ $uri        = uri_string();
         </a>
       </li>
 
+      <li class="menu-item <?= $uri === 'admin/dashboard-univ' ? 'active' : '' ?>">
+        <a href="<?= base_url('admin/dashboard-univ') ?>" class="menu-link">
+          <i class="menu-icon icon-base ti tabler-building-community"></i>
+          <div>Dashboard Universitas</div>
+        </a>
+      </li>
+
       <li class="menu-item <?= str_starts_with($uri, 'admin/janji') ? 'active' : '' ?>">
         <a href="<?= base_url('admin/janji') ?>" class="menu-link">
           <i class="menu-icon icon-base ti tabler-calendar-stats"></i>
@@ -50,10 +51,17 @@ $uri        = uri_string();
         </a>
       </li>
 
+      <li class="menu-item <?= str_starts_with($uri, 'admin/kalender') ? 'active' : '' ?>">
+        <a href="<?= base_url('admin/kalender') ?>" class="menu-link">
+          <i class="menu-icon icon-base ti tabler-calendar-month"></i>
+          <div>Kalender Konseling</div>
+        </a>
+      </li>
+
       <li class="menu-item <?= str_starts_with($uri, 'admin/konselor') ? 'active' : '' ?>">
         <a href="<?= base_url('admin/konselor') ?>" class="menu-link">
           <i class="menu-icon icon-base ti tabler-user-heart"></i>
-          <div>Kelola Konselor</div>
+          <div>Kelola Psikolog</div>
         </a>
       </li>
 
@@ -63,6 +71,63 @@ $uri        = uri_string();
           <div>Data Mahasiswa</div>
         </a>
       </li>
+
+      <li class="menu-item <?= str_starts_with($uri, 'admin/instansi-rujukan') ? 'active' : '' ?>">
+        <a href="<?= base_url('admin/instansi-rujukan') ?>" class="menu-link">
+          <i class="menu-icon icon-base ti tabler-building-hospital"></i>
+          <div>Instansi Rujukan</div>
+        </a>
+      </li>
+
+      <li class="menu-item <?= $uri === 'admin/rekap-konseling' ? 'active' : '' ?>">
+        <a href="<?= base_url('admin/rekap-konseling') ?>" class="menu-link">
+          <i class="menu-icon icon-base ti tabler-table"></i>
+          <div>Rekap Konseling</div>
+        </a>
+      </li>
+
+      <li class="menu-header small text-uppercase mt-1">
+        <span class="menu-header-text">Akun</span>
+      </li>
+
+      <li class="menu-item">
+        <a href="<?= base_url('logout') ?>" class="menu-link">
+          <i class="menu-icon icon-base ti tabler-logout text-danger"></i>
+          <div class="text-danger">Keluar</div>
+        </a>
+      </li>
+
+    <?php elseif ($isDosen): ?>
+
+      <!-- ===== DOSEN MENU ===== -->
+      <li class="menu-header small text-uppercase">
+        <span class="menu-header-text">Dosen</span>
+      </li>
+
+      <li class="menu-item <?= $uri === 'dosen/dashboard' ? 'active' : '' ?>">
+        <a href="<?= base_url('dosen/dashboard') ?>" class="menu-link">
+          <i class="menu-icon icon-base ti tabler-layout-dashboard"></i>
+          <div>Dashboard</div>
+        </a>
+      </li>
+
+      <?php if ($isKaprodi): ?>
+        <li class="menu-item <?= $uri === 'dosen/dashboard-prodi' ? 'active' : '' ?>">
+          <a href="<?= base_url('dosen/dashboard-prodi') ?>" class="menu-link">
+            <i class="menu-icon icon-base ti tabler-chart-bar"></i>
+            <div>Dashboard Prodi</div>
+          </a>
+        </li>
+      <?php endif ?>
+
+      <?php if ($isDekan): ?>
+        <li class="menu-item <?= $uri === 'dosen/dashboard-fakultas' ? 'active' : '' ?>">
+          <a href="<?= base_url('dosen/dashboard-fakultas') ?>" class="menu-link">
+            <i class="menu-icon icon-base ti tabler-building-community"></i>
+            <div>Dashboard Fakultas</div>
+          </a>
+        </li>
+      <?php endif ?>
 
       <li class="menu-header small text-uppercase mt-1">
         <span class="menu-header-text">Akun</span>
@@ -79,7 +144,7 @@ $uri        = uri_string();
 
       <!-- ===== KONSELOR MENU ===== -->
       <li class="menu-header small text-uppercase">
-        <span class="menu-header-text">Konselor</span>
+        <span class="menu-header-text">Psikolog</span>
       </li>
 
       <li class="menu-item <?= $uri === 'konselor/dashboard' ? 'active' : '' ?>">
@@ -96,8 +161,33 @@ $uri        = uri_string();
         </a>
       </li>
 
+      <?php if ($isKaprodi): ?>
+        <li class="menu-item <?= $uri === 'dosen/dashboard-prodi' ? 'active' : '' ?>">
+          <a href="<?= base_url('dosen/dashboard-prodi') ?>" class="menu-link">
+            <i class="menu-icon icon-base ti tabler-chart-bar"></i>
+            <div>Dashboard Prodi</div>
+          </a>
+        </li>
+      <?php endif ?>
+
+      <?php if ($isDekan): ?>
+        <li class="menu-item <?= $uri === 'dosen/dashboard-fakultas' ? 'active' : '' ?>">
+          <a href="<?= base_url('dosen/dashboard-fakultas') ?>" class="menu-link">
+            <i class="menu-icon icon-base ti tabler-building-community"></i>
+            <div>Dashboard Fakultas</div>
+          </a>
+        </li>
+      <?php endif ?>
+
       <li class="menu-header small text-uppercase mt-1">
         <span class="menu-header-text">Akun</span>
+      </li>
+
+      <li class="menu-item <?= str_starts_with($uri, 'konselor/profil') ? 'active' : '' ?>">
+        <a href="<?= base_url('konselor/profil') ?>" class="menu-link">
+          <i class="menu-icon icon-base ti tabler-user-edit"></i>
+          <div>Profil &amp; Jadwal</div>
+        </a>
       </li>
 
       <li class="menu-item">
@@ -182,7 +272,7 @@ $uri        = uri_string();
 
   </ul>
 
-  <?php if (! $isAdmin && ! $isKonselor): ?>
+  <?php if (! $isAdmin && ! $isKonselor && ! $isDosen): ?>
     <!-- Emergency Banner (hanya untuk mahasiswa) -->
     <div class="px-3 py-3 mt-auto">
       <div class="p-3 rounded-3" style="background:rgba(240,165,0,.12);border-left:3px solid #f0a500;">

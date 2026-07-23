@@ -75,9 +75,9 @@ $currentStep = $janji['status'] === 'dibatalkan' ? -1 : array_search($janji['sta
         </div>
 
         <?php foreach ($steps as $key => $step):
-            $idx   = array_search($key, $stepKeys);
-            $done  = $idx < $currentStep;
-            $active = $idx === $currentStep;
+            $idx    = array_search($key, $stepKeys);
+            $done   = $idx < $currentStep || ($idx === $currentStep && $janji['status'] === 'selesai');
+            $active = $idx === $currentStep && $janji['status'] !== 'selesai';
         ?>
         <div class="d-flex flex-column align-items-center text-center position-relative" style="flex:1;z-index:1;">
           <div style="
@@ -134,7 +134,7 @@ $currentStep = $janji['status'] === 'dibatalkan' ? -1 : array_search($janji['sta
           </div>
 
           <div class="col-sm-6">
-            <div class="text-muted mb-1" style="font-size:.78rem;">Konselor</div>
+            <div class="text-muted mb-1" style="font-size:.78rem;">Psikolog</div>
             <div class="fw-semibold" style="font-size:.9rem;">
               <?= $konselorNama ? esc($konselorNama) : '<span class="text-muted">Belum ditetapkan</span>' ?>
             </div>
@@ -270,8 +270,15 @@ $currentStep = $janji['status'] === 'dibatalkan' ? -1 : array_search($janji['sta
                   'keduanya' => ['bg-label-primary',   'tabler-arrows-exchange', 'Online & Offline'],
                   default    => ['', '', ''],
                 };
+                $tanggalPilihan = $j2['tanggal'] ?? null;
               ?>
-                <div class="d-flex align-items-center gap-2">
+                <div class="d-flex align-items-center gap-2 flex-wrap">
+                  <?php if ($tanggalPilihan): ?>
+                    <span class="badge bg-label-secondary px-3 py-2" style="font-size:.82rem;">
+                      <i class="ti tabler-calendar me-1"></i>
+                      <?= date('d M Y', strtotime($tanggalPilihan)) ?>
+                    </span>
+                  <?php endif ?>
                   <span class="badge bg-label-primary px-3 py-2" style="font-size:.82rem;">
                     <i class="ti tabler-calendar-week me-1"></i>
                     <?= ucfirst($j2['hari']) ?> — <?= esc($j2['waktu']) ?>
@@ -289,10 +296,10 @@ $currentStep = $janji['status'] === 'dibatalkan' ? -1 : array_search($janji['sta
           <?php endif ?>
         </div>
 
-        <!-- Konselor Pilihan -->
+        <!-- Psikolog Pilihan -->
         <div>
           <div class="text-muted mb-2" style="font-size:.78rem;font-weight:600;text-transform:uppercase;letter-spacing:.05em;">
-            <i class="ti tabler-user-check me-1"></i>Konselor yang Dipilih
+            <i class="ti tabler-user-check me-1"></i>Psikolog yang Dipilih
           </div>
           <?php if (! empty($konselorPilihanList)): ?>
             <div class="d-flex flex-column gap-2">
@@ -309,7 +316,7 @@ $currentStep = $janji['status'] === 'dibatalkan' ? -1 : array_search($janji['sta
               <?php endforeach ?>
             </div>
           <?php else: ?>
-            <p class="text-muted mb-0" style="font-size:.85rem;">Tidak ada preferensi konselor.</p>
+            <p class="text-muted mb-0" style="font-size:.85rem;">Tidak ada preferensi psikolog.</p>
           <?php endif ?>
         </div>
 
@@ -328,45 +335,101 @@ $currentStep = $janji['status'] === 'dibatalkan' ? -1 : array_search($janji['sta
           </span>
         </div>
         <div class="card-body">
+          <?php
+          $dassInterpretasi = [
+            'depresi' => [
+              'normal'       => 'Kamu mengalami perubahan suasana hati, namun masih dalam batas wajar.',
+              'ringan'       => 'Kamu tampaknya mulai mengalami sedikit penurunan suasana hati, namun masih tergolong ringan.',
+              'sedang'       => 'Kamu tampaknya cukup sering mengalami penurunan suasana hati, dan ini mulai mempengaruhi aktivitas harianmu.',
+              'berat'        => 'Kamu tampaknya sedang mengalami penurunan suasana hati yang lumayan besar, sehingga aktivitas harianmu agak terganggu.',
+              'sangat_berat' => 'Kamu tampaknya sedang mengalami penurunan suasana hati yang besar dan sudah mengganggu aktivitas harianmu.',
+            ],
+            'anxiety' => [
+              'normal'       => 'Kamu merasa cemas namun masih dalam batas wajar.',
+              'ringan'       => 'Kamu tampaknya mulai mengalami peningkatan rasa cemas, namun masih tergolong ringan.',
+              'sedang'       => 'Kamu tampaknya cukup sering mengalami kecemasan yang mulai mempengaruhi aktivitas harianmu.',
+              'berat'        => 'Kamu tampaknya sedang mengalami kecemasan yang cukup tinggi, dan mengganggu aktivitas harianmu.',
+              'sangat_berat' => 'Kamu tampaknya sedang mengalami rasa cemas yang tinggi, dan ini sudah mengganggu aktivitas harianmu.',
+            ],
+            'stress' => [
+              'normal'       => 'Kamu mengalami sedikit tekanan, namun masih berada dalam tahap wajar.',
+              'ringan'       => 'Kamu tampaknya mulai merasakan peningkatan tekanan dan ketegangan, namun masih tergolong ringan.',
+              'sedang'       => 'Kamu tampaknya cukup sering merasakan tekanan dan ketegangan yang mulai mempengaruhi aktivitas harianmu.',
+              'berat'        => 'Kamu tampaknya sedang mengalami tekanan dan ketegangan yang cukup tinggi, dan ini mengganggu aktivitas harianmu.',
+              'sangat_berat' => 'Kamu tampaknya dalam kondisi tertekan dan ketegangan yang tinggi, dan ini sudah mengganggu aktivitas harianmu.',
+            ],
+          ];
+
+          $dassSubscales = [
+            ['label' => 'Depresi',    'skor' => $dass['skor_depresi'], 'raw' => $dass['skor_depresi_raw'], 'kategori' => $dass['kategori_depresi'], 'icon' => 'tabler-mood-sad',           'color' => '#1a5f7a', 'key' => 'depresi'],
+            ['label' => 'Kecemasan',  'skor' => $dass['skor_anxiety'], 'raw' => $dass['skor_anxiety_raw'], 'kategori' => $dass['kategori_anxiety'], 'icon' => 'tabler-heart-rate-monitor', 'color' => '#f0a500', 'key' => 'anxiety'],
+            ['label' => 'Stres',      'skor' => $dass['skor_stress'],  'raw' => $dass['skor_stress_raw'],  'kategori' => $dass['kategori_stress'],  'icon' => 'tabler-bolt',               'color' => '#2d9b6e', 'key' => 'stress'],
+          ];
+
+          $dassBadge = [
+            'normal'       => ['class' => 'bg-label-success', 'label' => 'Normal'],
+            'ringan'       => ['class' => 'bg-label-info',    'label' => 'Ringan'],
+            'sedang'       => ['class' => 'bg-label-warning', 'label' => 'Sedang'],
+            'berat'        => ['class' => 'bg-label-danger',  'label' => 'Berat'],
+            'sangat_berat' => ['class' => 'bg-danger text-white', 'label' => 'Sangat Berat'],
+          ];
+          ?>
+
           <div class="row g-3">
-
-            <?php
-            $subscales = [
-              ['label' => 'Depresi', 'raw' => $dass['skor_depresi_raw'], 'skor' => $dass['skor_depresi'], 'kategori' => $dass['kategori_depresi'], 'icon' => 'tabler-mood-sad', 'color' => '#1a5f7a'],
-              ['label' => 'Anxietas', 'raw' => $dass['skor_anxiety_raw'], 'skor' => $dass['skor_anxiety'], 'kategori' => $dass['kategori_anxiety'], 'icon' => 'tabler-heart-rate-monitor', 'color' => '#f0a500'],
-              ['label' => 'Stres', 'raw' => $dass['skor_stress_raw'], 'skor' => $dass['skor_stress'], 'kategori' => $dass['kategori_stress'], 'icon' => 'tabler-bolt', 'color' => '#2d9b6e'],
-            ];
-
-            $badgeMap = [
-              'normal'       => 'bg-label-success',
-              'ringan'       => 'bg-label-info',
-              'sedang'       => 'bg-label-warning',
-              'berat'        => 'bg-label-danger',
-              'sangat_berat' => 'bg-danger text-white',
-            ];
-            $labelMap = [
-              'normal'       => 'Normal',
-              'ringan'       => 'Ringan',
-              'sedang'       => 'Sedang',
-              'berat'        => 'Berat',
-              'sangat_berat' => 'Sangat Berat',
-            ];
+            <?php foreach ($dassSubscales as $s):
+              $interp = $dassInterpretasi[$s['key']][$s['kategori']] ?? '';
             ?>
-
-            <?php foreach ($subscales as $s): ?>
-              <div class="col-sm-4">
-                <div class="p-3 rounded-3 text-center h-100" style="background:#f8f9fa;">
-                  <i class="ti <?= $s['icon'] ?> mb-2" style="font-size:1.5rem;color:<?= $s['color'] ?>;"></i>
-                  <div class="fw-semibold mb-1" style="font-size:.85rem;"><?= $s['label'] ?></div>
-                  <div class="fw-bold mb-1" style="font-size:1.4rem;color:<?= $s['color'] ?>;"><?= $s['skor'] ?></div>
-                  <div class="text-muted mb-2" style="font-size:.75rem;">Raw: <?= $s['raw'] ?></div>
-                  <span class="badge <?= $badgeMap[$s['kategori']] ?? 'bg-label-secondary' ?>">
-                    <?= $labelMap[$s['kategori']] ?? ucfirst($s['kategori']) ?>
-                  </span>
+              <div class="col-md-4">
+                <div class="h-100 rounded-3 p-3" style="background:#f8f9fa;border-top:3px solid <?= $s['color'] ?>;">
+                  <div class="d-flex align-items-center gap-2 mb-2">
+                    <i class="ti <?= $s['icon'] ?>" style="font-size:1.1rem;color:<?= $s['color'] ?>;"></i>
+                    <span class="fw-semibold" style="font-size:.88rem;"><?= $s['label'] ?></span>
+                  </div>
+                  <div class="d-flex align-items-end gap-1 mb-2">
+                    <span class="fw-bold" style="font-size:2rem;color:<?= $s['color'] ?>;line-height:1;"><?= $s['skor'] ?></span>
+                    <span class="text-muted mb-1" style="font-size:.73rem;">skor &nbsp;·&nbsp; raw <?= $s['raw'] ?></span>
+                  </div>
+                  <?php if ($interp): ?>
+                    <div class="rounded-2 px-2 py-2" style="background:rgba(0,0,0,.04);font-size:.78rem;line-height:1.55;color:#444;">
+                      <?= $interp ?>
+                    </div>
+                  <?php endif ?>
                 </div>
               </div>
             <?php endforeach ?>
+          </div>
 
+          <?php
+          // Rekomendasi berdasarkan kategori tertinggi
+          $katOrder = ['normal' => 0, 'ringan' => 1, 'sedang' => 2, 'berat' => 3, 'sangat_berat' => 4];
+          $maxLevel = max(
+            $katOrder[$dass['kategori_depresi']] ?? 0,
+            $katOrder[$dass['kategori_anxiety']]  ?? 0,
+            $katOrder[$dass['kategori_stress']]   ?? 0
+          );
+          $rekMap = [
+            0 => "Kondisimu saat ini tampaknya cukup baik. Usahakan untuk menjaganya, misalnya dengan pola hidup sehat, seperti tidur yang cukup, makan bergizi, berolahraga, menjaga hubungan baik dengan keluarga, teman, dosen, dll., dan meluangkan waktu untuk melakukan aktivitas positif yang kamu sukai. Jangan ragu untuk mencari bantuan jika suatu saat kamu merasa membutuhkan.",
+            1 => "Kondisimu saat ini mungkin sedikit kurang bagus. Cobalah untuk mengenali hal apa yang mungkin mempengaruhi suasana perasaanmu, luangkan waktu untuk beristirahat, lakukan aktivitas positif yang bisa membuatmu lebih nyaman, dan berbicaralah kepada orang-orang di sekitarmu yang bisa kamu percaya terkait hal-hal yang sedang mengganggu suasana perasaanmu.",
+            2 => "Kondisi yang kamu rasakan saat ini tampaknya mulai mempengaruhi aktivitas harianmu. Akan sangat baik jika kamu mencari bantuan dari teman, keluarga, dosen, atau psikolog untuk berbagi cerita dan memperoleh dukungan supaya kondisimu lebih baik.",
+            3 => "Kondisi yang kamu rasakan saat ini tampaknya sudah cukup mengganggu keseharianmu. Kamu sebaiknya tidak menghadapinya sendirian. Pertimbangkan untuk berbicara dengan psikolog atau mengunjungi layanan kesehatan mental agar kamu mendapatkan bantuan yang sesuai.",
+            4 => "Kondisi yang kamu rasakan tampaknya sudah mempengaruhi kesejahteraan psikologis dan aktivitas harianmu. Kamu sangat disarankan untuk segera berbicara dengan psikolog atau mengunjungi layanan kesehatan mental guna mendapatkan bantuan profesional. Kamu butuh bantuan agar tidak menghadapi kondisi ini sendirian.",
+          ];
+          $rekMeta = [
+            0 => ['icon' => 'tabler-mood-happy',   'color' => '#2d9b6e', 'bg' => 'rgba(45,155,110,.07)',  'border' => '#2d9b6e'],
+            1 => ['icon' => 'tabler-mood-smile',   'color' => '#1a5f7a', 'bg' => 'rgba(26,95,122,.07)',   'border' => '#1a5f7a'],
+            2 => ['icon' => 'tabler-mood-neutral', 'color' => '#d48f00', 'bg' => 'rgba(240,165,0,.09)',   'border' => '#f0a500'],
+            3 => ['icon' => 'tabler-mood-sad',     'color' => '#c8600a', 'bg' => 'rgba(200,96,10,.08)',   'border' => '#e07a20'],
+            4 => ['icon' => 'tabler-mood-cry',     'color' => '#dc3545', 'bg' => 'rgba(220,53,69,.08)',   'border' => '#dc3545'],
+          ];
+          $rm = $rekMeta[$maxLevel];
+          ?>
+          <div class="mt-3 p-3 rounded-3 d-flex gap-3 align-items-start"
+               style="background:<?= $rm['bg'] ?>;border-left:3px solid <?= $rm['border'] ?>;">
+            <i class="ti <?= $rm['icon'] ?> flex-shrink-0 mt-1" style="font-size:1.3rem;color:<?= $rm['color'] ?>;"></i>
+            <div>
+              <div class="fw-semibold mb-1" style="font-size:.83rem;color:<?= $rm['color'] ?>;">Rekomendasi</div>
+              <div style="font-size:.82rem;line-height:1.6;color:#444;"><?= $rekMap[$maxLevel] ?></div>
+            </div>
           </div>
 
           <?php if ($dass['is_reviewed']): ?>
@@ -374,9 +437,9 @@ $currentStep = $janji['status'] === 'dibatalkan' ? -1 : array_search($janji['sta
               <div class="d-flex gap-2 align-items-start">
                 <i class="ti tabler-check mt-1 flex-shrink-0" style="color:#2d9b6e;"></i>
                 <div style="font-size:.82rem;">
-                  <strong>Sudah ditinjau konselor</strong>
-                  <?php if (! empty($dass['catatan_konselor'])): ?>
-                    <div class="mt-1 text-muted"><?= nl2br(esc($dass['catatan_konselor'])) ?></div>
+                  <strong>Sudah ditinjau psikolog</strong>
+                  <?php if (! empty($dass['catatan_psikolog'])): ?>
+                    <div class="mt-1 text-muted"><?= nl2br(esc($dass['catatan_psikolog'])) ?></div>
                   <?php endif ?>
                 </div>
               </div>
@@ -408,7 +471,7 @@ $currentStep = $janji['status'] === 'dibatalkan' ? -1 : array_search($janji['sta
           <div class="d-flex align-items-center gap-2 mb-2 p-2 rounded-2" style="background:#f4f3ff;font-size:.85rem;">
             <i class="ti tabler-user-check" style="color:#696cff;font-size:1rem;flex-shrink:0;"></i>
             <div>
-              <div style="font-size:.7rem;color:#9155fd;">Konselor</div>
+              <div style="font-size:.7rem;color:#9155fd;">Psikolog</div>
               <div class="fw-semibold" style="color:#1a2b40;"><?= esc($konselorNama) ?></div>
             </div>
           </div>
@@ -535,6 +598,7 @@ $currentStep = $janji['status'] === 'dibatalkan' ? -1 : array_search($janji['sta
           ['Semester', 'Semester ' . $janji['semester']],
           ['Dosen PA', $janji['dosen_pa'] ?? '-'],
           ['Domisili', $janji['domisili'] ?? '-'],
+          ...(!empty($janji['pekerjaan']) ? [['Pekerjaan', $janji['pekerjaan']]] : []),
           ['Status Pernikahan', ucfirst(str_replace('_', ' ', $janji['status_pernikahan'] ?? '-'))],
           ['Pernah Konseling SMHWS', $janji['pernah_konseling_smhws'] ? 'Ya' : 'Belum pernah'],
         ];
@@ -607,7 +671,7 @@ $currentStep = $janji['status'] === 'dibatalkan' ? -1 : array_search($janji['sta
               <i class="ti tabler-phone me-1"></i>(0271) 2855 / Ext. 417
             </a>
             <a href="https://wa.me/6282145678900" class="btn btn-sm btn-success w-100">
-              <i class="ti tabler-brand-whatsapp me-1"></i>WhatsApp Konselor
+              <i class="ti tabler-brand-whatsapp me-1"></i>WhatsApp Psikolog
             </a>
           </div>
         </div>

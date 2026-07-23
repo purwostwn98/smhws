@@ -119,7 +119,7 @@
                   <th>No. Konseling</th>
                   <th>Tanggal & Waktu</th>
                   <th>Metode</th>
-                  <th>Konselor</th>
+                  <th>Psikolog</th>
                   <th>Status</th>
                   <th></th>
                 </tr>
@@ -282,10 +282,10 @@
             <small class="text-muted"><?= esc($user['fakultas']) ?></small>
           </div>
         <?php endif ?>
-        <?php if (!empty($user['nim_nip'])): ?>
+        <?php if (!empty($user['uniid'])): ?>
           <div class="d-flex align-items-center justify-content-center gap-1 mb-3">
             <i class="ti tabler-id-badge text-muted" style="font-size:.9rem;"></i>
-            <small class="text-muted"><?= esc($user['nim_nip']) ?></small>
+            <small class="text-muted"><?= esc($user['uniid']) ?></small>
           </div>
         <?php endif ?>
         <a href="<?= base_url('profil') ?>" class="btn btn-sm btn-label-primary w-100">

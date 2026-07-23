@@ -1,5 +1,5 @@
 <?= $this->extend('layouts/dashboard') ?>
-<?= $this->section('title') ?>Dashboard Konselor<?= $this->endSection() ?>
+<?= $this->section('title') ?>Dashboard Psikolog<?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
 <?php
@@ -12,7 +12,7 @@ $menungguHasil = $menungguHasil ?? [];
 <!-- Header -->
 <div class="d-flex align-items-start justify-content-between mb-4 flex-wrap gap-2">
   <div>
-    <h4 class="fw-bold mb-1" style="color:#1a2b40;">Dashboard Konselor</h4>
+    <h4 class="fw-bold mb-1" style="color:#1a2b40;">Dashboard Psikolog</h4>
     <p class="text-muted mb-0" style="font-size:.875rem;">
       Selamat datang kembali! Pantau sesi dan kelola konseling Anda.
     </p>
@@ -79,7 +79,7 @@ $menungguHasil = $menungguHasil ?? [];
             <li class="list-group-item d-flex justify-content-between align-items-start gap-2 py-3 px-4">
               <div class="flex-grow-1">
                 <div class="fw-semibold" style="font-size:.875rem;"><?= esc($s['name'] ?? '—') ?></div>
-                <div class="text-muted" style="font-size:.75rem;"><?= esc($s['nim_nip'] ?? '') ?></div>
+                <div class="text-muted" style="font-size:.75rem;"><?= esc($s['uniid'] ?? '') ?></div>
                 <?php if (! empty($s['lokasi_link'])): ?>
                   <div class="text-muted mt-1" style="font-size:.75rem;">
                     <i class="ti tabler-map-pin me-1"></i><?= esc($s['lokasi_link']) ?>

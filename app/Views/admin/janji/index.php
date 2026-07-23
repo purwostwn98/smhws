@@ -23,7 +23,7 @@ $statusMeta = [
 <div class="d-flex align-items-start justify-content-between mb-4 flex-wrap gap-2">
   <div>
     <h4 class="fw-bold mb-1" style="color:#1a2b40;">Kelola Konseling</h4>
-    <p class="text-muted mb-0" style="font-size:.875rem;">Tinjau, tetapkan konselor, dan atur jadwal sesi konseling.</p>
+    <p class="text-muted mb-0" style="font-size:.875rem;">Tinjau, tetapkan psikolog, dan atur jadwal sesi konseling.</p>
   </div>
 </div>
 
@@ -69,7 +69,7 @@ $statusMeta = [
           <th>Metode</th>
           <th>Status</th>
           <th>Jadwal</th>
-          <th>Konselor</th>
+          <th>Psikolog</th>
           <th style="width:80px;">Aksi</th>
         </tr>
       </thead>
@@ -95,7 +95,7 @@ $statusMeta = [
             </td>
             <td>
               <div class="fw-semibold" style="font-size:.875rem;"><?= esc($j['name'] ?? '-') ?></div>
-              <div class="text-muted" style="font-size:.75rem;"><?= esc($j['nim_nip'] ?? '') ?></div>
+              <div class="text-muted" style="font-size:.75rem;"><?= esc($j['uniid'] ?? '') ?></div>
             </td>
             <td>
               <?php if (! empty($j['tema_konseling'])): ?>

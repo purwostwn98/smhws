@@ -9,7 +9,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0" />
   <title><?= $this->renderSection('title') ?> | SMHWS Dashboard</title>
 
-  <link rel="icon" type="image/x-icon" href="<?= base_url('assets/img/favicon/favicon.ico') ?>" />
+  <link rel="icon" type="image/x-icon" href="<?= base_url('favicon.ico') ?>" />
 
   <!-- Fonts -->
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -57,7 +57,7 @@
           <footer class="content-footer footer bg-footer-theme">
             <div class="container-xxl d-flex flex-wrap justify-content-between py-2 flex-md-row flex-column">
               <div class="mb-2 mb-md-0">
-                &copy; <?= date('Y') ?> <strong>SMHWS – Universitas Muhammadiyah Surakarta</strong>
+                &copy; <?= date('Y') ?> <i>Student Mental Health and Wellbeing Support</i> (SMHWS) UMS
               </div>
               <div>
                 <a href="<?= base_url('/') ?>" class="footer-link me-4">Beranda</a>

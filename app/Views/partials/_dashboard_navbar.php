@@ -19,7 +19,7 @@
     <ul class="navbar-nav flex-row align-items-center ms-auto gap-2">
 
       <!-- Notifications -->
-      <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-1">
+      <!-- <li class="nav-item dropdown-notifications navbar-dropdown dropdown me-3 me-xl-1">
         <a class="nav-link dropdown-toggle hide-arrow" href="javascript:void(0)" data-bs-toggle="dropdown" data-bs-auto-close="outside" aria-expanded="false">
           <i class="icon-base ti tabler-bell icon-sm"></i>
           <span class="badge bg-danger rounded-pill badge-notifications">2</span>
@@ -71,7 +71,7 @@
             <a href="javascript:void(0)" class="btn btn-primary w-100">Lihat semua</a>
           </li>
         </ul>
-      </li>
+      </li> -->
 
       <!-- User Dropdown -->
       <li class="nav-item navbar-dropdown dropdown-user dropdown">
@@ -105,16 +105,13 @@
           <li>
             <hr class="dropdown-divider my-1">
           </li>
-          <li>
-            <a class="dropdown-item" href="<?= base_url('profil') ?>">
-              <i class="ti tabler-user-circle me-2 ti-sm"></i>Profil Saya
-            </a>
-          </li>
-          <li>
-            <a class="dropdown-item" href="<?= base_url('janji/buat') ?>">
-              <i class="ti tabler-calendar-plus me-2 ti-sm"></i>Daftar Konseling
-            </a>
-          </li>
+          <?php if (session()->get('user_role') === 'mahasiswa'): ?>
+            <li>
+              <a class="dropdown-item" href="<?= base_url('janji/buat') ?>">
+                <i class="ti tabler-calendar-plus me-2 ti-sm"></i>Daftar Konseling
+              </a>
+            </li>
+          <?php endif ?>
           <li>
             <hr class="dropdown-divider my-1">
           </li>

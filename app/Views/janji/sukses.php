@@ -43,7 +43,7 @@
           <div class="d-flex gap-2 align-items-start">
             <i class="ti tabler-info-circle mt-1" style="color:#f0a500;"></i>
             <div style="font-size:.82rem;">
-              Tim konselor SMHWS akan menghubungimu melalui <strong>WhatsApp</strong> untuk konfirmasi
+              Tim psikolog SMHWS akan menghubungimu melalui <strong>WhatsApp</strong> untuk konfirmasi
               jadwal konseling. Mohon pastikan nomor WA-mu aktif.
             </div>
           </div>

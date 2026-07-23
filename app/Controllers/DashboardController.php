@@ -26,6 +26,10 @@ class DashboardController extends BaseController
             return redirect()->to(base_url('konselor/dashboard'));
         }
 
+        if ($role === 'dosen') {
+            return redirect()->to(base_url('dosen/dashboard'));
+        }
+
         return $this->mahasiswaDashboard();
     }
 
