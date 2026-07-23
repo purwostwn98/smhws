@@ -15,6 +15,9 @@ Thumbs.db
 ehthumbs.db
 Desktop.ini
 
+# Lib_Cas
+/app/Libraries/Lib_Cas.php
+
 # Recycle Bin used on file shares
 $RECYCLE.BIN/
 
