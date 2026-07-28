@@ -62,7 +62,7 @@ $staff       = $staff       ?? [];
         <!-- Gambar -->
         <div class="col-lg-6 text-center">
           <div class="position-relative d-inline-block">
-            <img src="<?= base_url('myimg/hero_landing.jpg') ?>" alt="Layanan SMHWS UMS"
+            <img src="<?= base_url('myimg/hero_landing2.jpg') ?>" alt="Layanan SMHWS UMS"
               class="img-fluid rounded-4 shadow-lg"
               style="max-height:460px;width:100%;object-fit:cover;">
             <!-- floating badge -->

@@ -8,7 +8,7 @@
   .auth-cover-bg {
     background-image:
       linear-gradient(145deg, rgba(13, 74, 97, .82) 0%, rgba(26, 95, 122, .75) 60%, rgba(87, 197, 182, .6) 100%),
-      url('<?= base_url('myimg/bg_login.jpg') ?>') !important;
+      url('<?= base_url('myimg/bg_login2.jpg') ?>') !important;
     background-size: cover !important;
     background-position: center !important;
     flex-direction: column;
