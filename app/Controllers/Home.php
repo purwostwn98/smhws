@@ -39,7 +39,7 @@ class Home extends BaseController
 
             $result[] = [
                 'nama' => $nama,
-                'url'  => base_url(rtrim($urlPrefix, '/') . '/' . rawurlencode(basename($file))),
+                'url'  => base_url(rtrim($urlPrefix, '/') . '/' . rawurlencode(basename($file))) . '?v=' . filemtime($file),
             ];
         }
 
