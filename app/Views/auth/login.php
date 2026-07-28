@@ -73,12 +73,12 @@
           <div class="d-flex flex-wrap gap-2 mb-6">
             <span class="smhws-feature-pill"><i class="ti tabler-shield-check"></i> 100% Rahasia</span>
             <span class="smhws-feature-pill"><i class="ti tabler-currency-dollar-off"></i> Gratis</span>
-            <span class="smhws-feature-pill"><i class="ti tabler-award"></i> Psikolog Bersertifikat</span>
+            <span class="smhws-feature-pill"><i class="ti tabler-award"></i> Psikolog Profesional</span>
             <span class="smhws-feature-pill"><i class="ti tabler-heart-handshake"></i> Pendekatan Holistik</span>
           </div>
 
           <p class="mb-0" style="color:rgba(255,255,255,.45);font-size:.75rem;letter-spacing:.06em;text-transform:uppercase;">
-            Universitas Muhammadiyah Surakarta &mdash; sejak 2019
+            Universitas Muhammadiyah Surakarta
           </p>
 
         </div>
