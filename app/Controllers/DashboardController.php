@@ -77,11 +77,31 @@ class DashboardController extends BaseController
             }
         }
 
+        // Janji yang perlu konfirmasi kehadiran oleh mahasiswa
+        $konfirmasi_pending = array_filter($semuaJanji, fn($j) => $j['status'] === 'dikonfirmasi');
+
+        // Janji selesai yang belum ada feedback-nya
+        $selesai = array_filter($semuaJanji, fn($j) => $j['status'] === 'selesai');
+        $feedback_pending = [];
+        if (! empty($selesai)) {
+            $feedbackModel = new \App\Models\FeedbackKonselingModel();
+            $selesaiIds    = array_column(array_values($selesai), 'id');
+            $sudahFeedback = $feedbackModel->whereIn('janji_id', $selesaiIds)
+                ->findColumn('janji_id') ?? [];
+            foreach ($selesai as $j) {
+                if (! in_array($j['id'], $sudahFeedback)) {
+                    $feedback_pending[] = $j;
+                }
+            }
+        }
+
         return view('dashboard/mahasiswa', [
-            'user'            => $user,
-            'stats'           => $stats,
-            'janji_mendatang' => $janji_mendatang,
-            'konselorMap'     => $konselorMap,
+            'user'                => $user,
+            'stats'               => $stats,
+            'janji_mendatang'     => $janji_mendatang,
+            'konselorMap'         => $konselorMap,
+            'konfirmasi_pending'  => array_values($konfirmasi_pending),
+            'feedback_pending'    => $feedback_pending,
         ]);
     }
 }

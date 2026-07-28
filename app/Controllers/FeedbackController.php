@@ -84,10 +84,19 @@ class FeedbackController extends BaseController
                 ->with('error', 'Rating harus antara 1–5.');
         }
 
+        $kepuasanRaw = $this->request->getPost('kepuasan') ?? [];
+        if (! is_array($kepuasanRaw)) $kepuasanRaw = [];
+        if (in_array('Lainnya', $kepuasanRaw, true)) {
+            $kepuasanRaw = array_diff($kepuasanRaw, ['Lainnya']);
+            $lainnya = trim($this->request->getPost('kepuasan_lainnya') ?? '');
+            if ($lainnya !== '') $kepuasanRaw[] = 'Lainnya: ' . $lainnya;
+        }
+
         $feedbackModel->insert([
             'janji_id' => $janjiId,
             'user_id'  => $userId,
             'rating'   => $rating,
+            'kepuasan' => ! empty($kepuasanRaw) ? json_encode(array_values($kepuasanRaw)) : null,
             'komentar' => $this->request->getPost('komentar') ?? null,
         ]);
 

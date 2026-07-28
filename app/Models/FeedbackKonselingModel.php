@@ -11,7 +11,7 @@ class FeedbackKonselingModel extends Model
     protected $returnType = 'array';
 
     protected $allowedFields = [
-        'janji_id', 'user_id', 'rating', 'komentar',
+        'janji_id', 'user_id', 'rating', 'kepuasan', 'komentar',
     ];
 
     protected $useTimestamps = true;

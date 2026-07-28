@@ -2,6 +2,10 @@
 <?= $this->section('title') ?>Dashboard<?= $this->endSection() ?>
 
 <?= $this->section('content') ?>
+<?php
+$konfirmasi_pending = $konfirmasi_pending ?? [];
+$feedback_pending   = $feedback_pending   ?? [];
+?>
 
 <!-- Breadcrumb -->
 <div class="d-flex align-items-center justify-content-between mb-4">
@@ -17,6 +21,66 @@
     <i class="ti tabler-calendar-plus"></i>Daftar Konseling Baru
   </a>
 </div>
+
+<!-- ===== NOTIFIKASI AKSI ===== -->
+<?php if (! empty($konfirmasi_pending) || ! empty($feedback_pending)): ?>
+<div class="d-flex flex-column gap-3 mb-4">
+
+  <?php foreach ($konfirmasi_pending as $j): ?>
+  <div class="d-flex align-items-start gap-3 p-3 rounded-3"
+       style="background:linear-gradient(135deg,rgba(105,108,255,.08) 0%,rgba(145,85,253,.06) 100%);
+              border:1.5px solid rgba(105,108,255,.3);">
+    <div class="flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center"
+         style="width:2.4rem;height:2.4rem;background:linear-gradient(135deg,#696cff,#9155fd);">
+      <i class="ti tabler-calendar-check text-white" style="font-size:1.1rem;"></i>
+    </div>
+    <div class="flex-grow-1 min-width-0">
+      <div class="fw-semibold mb-1" style="color:#1a2b40;font-size:.88rem;">
+        Jadwal konseling ditetapkan — konfirmasi kehadiranmu!
+      </div>
+      <div class="text-muted" style="font-size:.8rem;">
+        <?php if (! empty($j['tanggal_konseling'])): ?>
+          <i class="ti tabler-calendar me-1"></i><?= date('d M Y', strtotime($j['tanggal_konseling'])) ?>
+          <?php if (! empty($j['jam_konseling'])): ?> · <?= date('H:i', strtotime($j['jam_konseling'])) ?> WIB<?php endif ?>
+        <?php endif ?>
+      </div>
+    </div>
+    <a href="<?= base_url('janji/' . $j['id']) ?>"
+       class="btn btn-sm fw-semibold flex-shrink-0"
+       style="background:linear-gradient(135deg,#696cff,#9155fd);color:#fff;font-size:.8rem;white-space:nowrap;">
+      Konfirmasi
+    </a>
+  </div>
+  <?php endforeach ?>
+
+  <?php foreach ($feedback_pending as $j): ?>
+  <div class="d-flex align-items-start gap-3 p-3 rounded-3"
+       style="background:rgba(240,165,0,.07);border:1.5px solid rgba(240,165,0,.35);">
+    <div class="flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center"
+         style="width:2.4rem;height:2.4rem;background:#f0a500;">
+      <i class="ti tabler-star text-white" style="font-size:1.1rem;"></i>
+    </div>
+    <div class="flex-grow-1 min-width-0">
+      <div class="fw-semibold mb-1" style="color:#1a2b40;font-size:.88rem;">
+        Sesi selesai — bagikan pengalamanmu!
+      </div>
+      <div class="text-muted" style="font-size:.8rem;">
+        <?php if (! empty($j['tanggal_konseling'])): ?>
+          <i class="ti tabler-calendar me-1"></i><?= date('d M Y', strtotime($j['tanggal_konseling'])) ?>
+        <?php endif ?>
+        · Feedback kamu membantu kami berkembang
+      </div>
+    </div>
+    <a href="<?= base_url('feedback/' . $j['id']) ?>"
+       class="btn btn-sm btn-warning fw-semibold flex-shrink-0"
+       style="font-size:.8rem;white-space:nowrap;">
+      Beri Feedback
+    </a>
+  </div>
+  <?php endforeach ?>
+
+</div>
+<?php endif ?>
 
 <!-- ===== STAT CARDS ===== -->
 <div class="row g-4 mb-4">

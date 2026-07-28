@@ -108,7 +108,7 @@ $currentStep = $janji['status'] === 'dibatalkan' ? -1 : array_search($janji['sta
 <div class="row g-4">
 
   <!-- Kiri: Info Utama -->
-  <div class="col-lg-8">
+  <div class="col-lg-8 order-2 order-lg-1">
 
     <!-- Info Konseling -->
     <div class="card mb-4">
@@ -452,7 +452,7 @@ $currentStep = $janji['status'] === 'dibatalkan' ? -1 : array_search($janji['sta
   </div>
 
   <!-- Kanan: Info Pribadi + Safety -->
-  <div class="col-lg-4">
+  <div class="col-lg-4 order-1 order-lg-2">
 
     <!-- Aksi Mahasiswa -->
     <?php if ($janji['status'] === 'dikonfirmasi'): ?>
