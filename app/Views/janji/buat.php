@@ -323,7 +323,7 @@ $fieldLabels  = [
 
           <div class="mb-4 pb-3 border-bottom">
             <h6 class="fw-bold mb-2" style="color:#1a5f7a;">3. Proses dan Durasi Konseling</h6>
-            <p class="mb-2">Saya memahami bahwa sesi konseling dapat berlangsung dalam 1 atau lebih pertemuan, dengan durasi 50 menit per sesi. Frekuensi dan jumlah sesi akan disesuaikan dengan kebutuhan saya.</p>
+            <p class="mb-2">Saya memahami bahwa setiap sesi konseling berdurasi 50 menit, dan saya berhak mendapatkan konseling di SMHWS maksimal sebanyak 3 (tiga) kali pertemuan.</p>
             <p class="mb-0">Saya memahami bahwa saya memiliki hak untuk menghentikan atau menunda sesi kapan saja, dengan menginformasikan kepada admin atau psikolog terlebih dahulu.</p>
           </div>
 

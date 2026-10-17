@@ -60,7 +60,7 @@
             </li>
             <li class="mb-3 d-flex gap-2">
               <i class="ti tabler-clock text-primary flex-shrink-0"></i>
-              <span class="footer-text small">Senin – Jumat: 08.00 – 16.00 WIB</span>
+              <span class="footer-text small">Senin – Jumat: 08.00 – 15.00 WIB<br>Sabtu: 08.00 – 12.00 WIB</span>
             </li>
             <li class="mb-3 d-flex gap-2">
               <i class="ti tabler-mail text-primary flex-shrink-0"></i>

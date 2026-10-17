@@ -220,8 +220,8 @@ $staff       = $staff       ?? [];
             <i class="ti tabler-currency-dollar-off text-primary fs-5"></i>
           </span>
           <div>
-            <h6 class="fw-bold mb-1">Gratis untuk Sivitas UMS</h6>
-            <p class="text-muted small mb-0">Seluruh layanan tidak dipungut biaya bagi mahasiswa aktif UMS.</p>
+            <h6 class="fw-bold mb-1">Gratis untuk Mahasiswa UMS</h6>
+            <p class="text-muted small mb-0">Layanan konseling tidak dikenai biaya apapun bagi seluruh mahasiswa UMS.</p>
           </div>
         </div>
       </div>
@@ -408,7 +408,30 @@ $staff       = $staff       ?? [];
 <!-- / Tim Psikolog -->
 
 <!-- =============== PROSES KONSELING =============== -->
-<section class="section-py">
+<?php
+$ketentuanKonseling = [
+  'Layanan Konseling SMHWS dapat diakses oleh seluruh Mahasiswa UMS.',
+  'Layanan konseling SMHWS tidak dikenai biaya apapun.',
+  'Konseling dilakukan di jam layanan SMHWS, yaitu hari Senin – Jum\'at pukul 08.00 – 15.00 WIB dan Sabtu pukul 08.00 – 12.00 WIB.',
+  'Konseling dilakukan secara individual dengan metode daring dan tatap muka.',
+  'Pengisian formulir pendaftaran ini tidak otomatis mengunci jadwal konseling.',
+  'Konfirmasi kehadiran wajib diberikan sesuai batas waktu yang telah ditentukan. Sesi konseling akan dibatalkan apabila tidak terdapat konfirmasi dari klien.',
+  'Mahasiswa berhak melakukan konseling di SMHWS maksimal sebanyak 3 (tiga) kali pertemuan.',
+  'Setiap sesi pertemuan berdurasi 50 menit.',
+  'Seluruh informasi yang klien berikan, baik yang dicantumkan di formulir pendaftaran maupun yang disampaikan dalam proses konseling, terjaga kerahasiaannya dan hanya digunakan untuk keperluan terbatas.',
+];
+$prosedurKonseling = [
+  'Klien mengakses formulir pendaftaran konseling di website SMHWS.',
+  'Klien mengisi data melalui formulir yang tersedia. Klien diharapkan dapat memberikan informasi dengan lengkap dan jujur sesuai dengan kondisi yang dialami. Jika memungkinkan, mohon untuk memilih waktu konseling lebih dari 1. Periksa kembali isian formulir Anda, pastikan informasi yang Anda berikan sudah benar sebelum mengirimkannya.',
+  'Admin menyesuaikan jadwal konseling yang diinginkan klien dengan urutan antrian dan kesediaan psikolog. Mohon untuk sabar menunggu konseling Anda selesai dijadwalkan.',
+  'Admin menghubungi klien untuk menginformasikan jadwal konseling melalui nomor WhatsApp yang dicantumkan di form pendaftaran. Klien akan mendapatkan jadwal konseling 1-7 hari setelah pengisian form. Jangka waktu pengkonfirmasian jadwal dapat bervariasi bergantung dari antrian. Apabila antrian konseling sedang padat, mungkin akan ada keterlambatan dalam mendapatkan jadwal konseling.',
+  'Klien wajib melakukan konfirmasi kesediaan sesuai batas waktu yang ditentukan. Tidak adanya konfirmasi akan menyebabkan sesi dianggap batal.',
+  'Reschedule hanya dapat dilakukan 1 kali dan hanya pada slot yang tersedia, dengan pengajuan maksimal 1 jam sebelum jadwal konseling.',
+  'Keterlambatan lebih dari 15 menit tanpa informasi akan menyebabkan sesi dianggap batal.',
+  'Bagi yang memilih konseling secara online melalui Google Meet, pastikan Anda mengikuti konseling di tempat yang tenang dan kondusif.',
+];
+?>
+<section id="proses" class="section-py">
   <div class="container">
     <div class="text-center mb-2">
       <span class="badge bg-label-primary px-3 py-2">Alur Layanan</span>
@@ -420,33 +443,72 @@ $staff       = $staff       ?? [];
         <div class="mb-3">
           <span class="d-inline-flex align-items-center justify-content-center rounded-circle fw-bold fs-4 text-white" style="width:64px;height:64px;background:var(--smhws-primary);">1</span>
         </div>
-        <h6 class="fw-bold mb-2">Daftar Online</h6>
-        <p class="text-muted small">Isi formulir pendaftaran online atau hubungi kami via WhatsApp/email untuk membuat jadwal.</p>
+        <h6 class="fw-bold mb-2">Isi Formulir</h6>
+        <p class="text-muted small">Isi formulir pendaftaran dengan lengkap dan jujur. Jika memungkinkan, pilih lebih dari 1 waktu konseling.</p>
       </div>
       <div class="col-lg-3 col-md-6 text-center">
         <div class="mb-3">
           <span class="d-inline-flex align-items-center justify-content-center rounded-circle fw-bold fs-4 text-white" style="width:64px;height:64px;background:var(--smhws-secondary);">2</span>
         </div>
-        <h6 class="fw-bold mb-2">Asesmen Awal</h6>
-        <p class="text-muted small">Psikolog akan melakukan asesmen singkat untuk memahami kebutuhanmu dan merencanakan sesi.</p>
+        <h6 class="fw-bold mb-2">Penjadwalan</h6>
+        <p class="text-muted small">Admin menjadwalkan sesuai antrian dan kesediaan psikolog, lalu menghubungimu via WhatsApp dalam 1–7 hari.</p>
       </div>
       <div class="col-lg-3 col-md-6 text-center">
         <div class="mb-3">
           <span class="d-inline-flex align-items-center justify-content-center rounded-circle fw-bold fs-4 text-white" style="width:64px;height:64px;background:var(--smhws-accent);">3</span>
         </div>
-        <h6 class="fw-bold mb-2">Sesi Konseling</h6>
-        <p class="text-muted small">Jalani sesi konseling tatap muka atau online dengan psikolog secara nyaman dan rahasia.</p>
+        <h6 class="fw-bold mb-2">Konfirmasi Kehadiran</h6>
+        <p class="text-muted small">Konfirmasi kesediaanmu sesuai batas waktu. Tanpa konfirmasi, sesi dianggap batal.</p>
       </div>
       <div class="col-lg-3 col-md-6 text-center">
         <div class="mb-3">
           <span class="d-inline-flex align-items-center justify-content-center rounded-circle fw-bold fs-4 text-white" style="width:64px;height:64px;background:var(--smhws-accent-warm);">4</span>
         </div>
-        <h6 class="fw-bold mb-2">Tindak Lanjut</h6>
-        <p class="text-muted small">Bersama psikolog, susun rencana pengembangan diri dan jadwal sesi lanjutan sesuai kebutuhan.</p>
+        <h6 class="fw-bold mb-2">Sesi Konseling</h6>
+        <p class="text-muted small">Sesi individual 50 menit secara tatap muka atau online, maksimal 3 kali pertemuan.</p>
       </div>
+    </div>
+
+    <div class="text-center mt-6">
+      <button type="button" class="btn btn-label-primary" data-bs-toggle="modal" data-bs-target="#modalKetentuan">
+        <i class="ti tabler-file-text me-2"></i>Lihat Ketentuan &amp; Prosedur Konseling
+      </button>
     </div>
   </div>
 </section>
+
+<!-- Modal Ketentuan & Prosedur -->
+<div class="modal fade" id="modalKetentuan" tabindex="-1" aria-labelledby="modalKetentuanLabel" aria-hidden="true">
+  <div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title fw-bold" id="modalKetentuanLabel">Ketentuan dan Prosedur Konseling SMHWS</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Tutup"></button>
+      </div>
+      <div class="modal-body" style="line-height:1.7;">
+        <h6 class="fw-bold mb-3" style="color:#1a5f7a;"><i class="ti tabler-list-check me-2"></i>Ketentuan Konseling</h6>
+        <ol class="mb-6" style="padding-left:1.4rem;">
+          <?php foreach ($ketentuanKonseling as $item): ?>
+            <li class="mb-2"><?= esc($item) ?></li>
+          <?php endforeach ?>
+        </ol>
+
+        <h6 class="fw-bold mb-3" style="color:#1a5f7a;"><i class="ti tabler-route me-2"></i>Prosedur Konseling</h6>
+        <ol class="mb-0" style="padding-left:1.4rem;">
+          <?php foreach ($prosedurKonseling as $item): ?>
+            <li class="mb-2"><?= esc($item) ?></li>
+          <?php endforeach ?>
+        </ol>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-label-secondary" data-bs-dismiss="modal">Tutup</button>
+        <a href="<?= session()->get('is_logged_in') ? base_url('janji') : base_url('login?redirect=janji') ?>" class="btn btn-primary">
+          <i class="ti tabler-calendar-event me-2"></i>Daftar Konseling
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
 <!-- / Proses -->
 
 <!-- =============== FAQ =============== -->
@@ -472,9 +534,8 @@ $staff       = $staff       ?? [];
             </h2>
             <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#faqAccordion">
               <div class="accordion-body text-muted">
-                Ya, seluruh layanan SMHWS — termasuk konseling individual, konseling kelompok, skrining psikologi,
-                dan kegiatan psychoeducation — sepenuhnya <strong>gratis</strong> bagi mahasiswa aktif dan
-                civitas akademika Universitas Muhammadiyah Surakarta.
+                Ya, layanan konseling SMHWS dapat diakses oleh seluruh mahasiswa Universitas Muhammadiyah
+                Surakarta dan <strong>tidak dikenai biaya apapun</strong>.
               </div>
             </div>
           </div>
@@ -503,9 +564,11 @@ $staff       = $staff       ?? [];
             </h2>
             <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
               <div class="accordion-body text-muted">
-                Kamu bisa mendaftar dengan: (1) mengisi formulir pendaftaran online di bagian Daftar Konseling
-                halaman ini, (2) menghubungi kami via WhatsApp di nomor yang tertera, atau (3) datang langsung
-                ke Gedung Siti Walidah Lantai 2 UMS pada jam kerja Senin–Jumat pukul 08.00–16.00 WIB.
+                Isi formulir pendaftaran konseling di website SMHWS. Pengisian formulir tidak otomatis mengunci
+                jadwal — admin akan menyesuaikan jadwal dengan antrian dan kesediaan psikolog, lalu menghubungimu
+                via WhatsApp dalam <strong>1–7 hari</strong>. Konseling dilakukan pada Senin–Jum'at pukul
+                08.00–15.00 WIB dan Sabtu pukul 08.00–12.00 WIB.
+                <a href="#" data-bs-toggle="modal" data-bs-target="#modalKetentuan">Lihat ketentuan &amp; prosedur lengkap</a>.
               </div>
             </div>
           </div>
@@ -518,8 +581,8 @@ $staff       = $staff       ?? [];
             </h2>
             <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
               <div class="accordion-body text-muted">
-                Setiap sesi konseling individual berlangsung selama <strong>50–60 menit</strong>.
-                Psikolog akan mendiskusikan berapa banyak sesi yang dibutuhkan berdasarkan asesmen awal.
+                Setiap sesi konseling berlangsung selama <strong>50 menit</strong>. Setiap mahasiswa berhak
+                mendapatkan konseling maksimal <strong>3 (tiga) kali pertemuan</strong>.
               </div>
             </div>
           </div>
@@ -532,9 +595,9 @@ $staff       = $staff       ?? [];
             </h2>
             <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#faqAccordion">
               <div class="accordion-body text-muted">
-                Ya, kami menyediakan layanan konseling <strong>online via video call</strong> (Zoom/Google Meet)
-                bagi mahasiswa yang tidak dapat hadir secara langsung. Kamu cukup mencantumkan preferensi
-                "online" saat mendaftar.
+                Ya, konseling dapat dilakukan secara tatap muka maupun <strong>online melalui Google Meet</strong>.
+                Cukup pilih preferensi "online" saat mendaftar, dan pastikan kamu mengikuti konseling di tempat
+                yang tenang dan kondusif.
               </div>
             </div>
           </div>
@@ -571,7 +634,7 @@ $staff       = $staff       ?? [];
           <div class="badge bg-label-primary p-2"><i class="ti tabler-clock text-primary fs-5"></i></div>
           <div>
             <h6 class="fw-bold mb-1">Jam Operasional</h6>
-            <p class="text-muted small mb-0">Senin – Jumat: 08.00 – 16.00 WIB<br>Sabtu &amp; Minggu: Tutup</p>
+            <p class="text-muted small mb-0">Senin – Jumat: 08.00 – 15.00 WIB<br>Sabtu: 08.00 – 12.00 WIB<br>Minggu: Tutup</p>
           </div>
         </div>
 
