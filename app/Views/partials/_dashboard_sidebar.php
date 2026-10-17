@@ -87,6 +87,45 @@ $uri        = uri_string();
       </li>
 
       <li class="menu-header small text-uppercase mt-1">
+        <span class="menu-header-text">Landing</span>
+      </li>
+
+      <li class="menu-item <?= str_starts_with($uri, 'admin/tanya') ? 'active' : '' ?>">
+        <a href="<?= base_url('admin/tanya') ?>" class="menu-link">
+          <i class="menu-icon icon-base ti tabler-message-question"></i>
+          <div>Ask Our Psychologist</div>
+        </a>
+      </li>
+
+      <li class="menu-item <?= str_starts_with($uri, 'admin/agenda-kegiatan') ? 'active' : '' ?>">
+        <a href="<?= base_url('admin/agenda-kegiatan') ?>" class="menu-link">
+          <i class="menu-icon icon-base ti tabler-calendar-event"></i>
+          <div>Agenda Kegiatan</div>
+        </a>
+      </li>
+
+      <li class="menu-item <?= str_starts_with($uri, 'admin/rekap-skrining') ? 'active' : '' ?>">
+        <a href="<?= base_url('admin/rekap-skrining') ?>" class="menu-link">
+          <i class="menu-icon icon-base ti tabler-clipboard-data"></i>
+          <div>Rekap Skrining</div>
+        </a>
+      </li>
+
+      <li class="menu-item <?= str_starts_with($uri, 'admin/learn') && ! str_starts_with($uri, 'admin/learn/topik') ? 'active' : '' ?>">
+        <a href="<?= base_url('admin/learn') ?>" class="menu-link">
+          <i class="menu-icon icon-base ti tabler-books"></i>
+          <div>SMHWS Learn</div>
+        </a>
+      </li>
+
+      <li class="menu-item <?= str_starts_with($uri, 'admin/learn/topik') ? 'active' : '' ?>">
+        <a href="<?= base_url('admin/learn/topik') ?>" class="menu-link">
+          <i class="menu-icon icon-base ti tabler-tags"></i>
+          <div>Topik Learn</div>
+        </a>
+      </li>
+
+      <li class="menu-header small text-uppercase mt-1">
         <span class="menu-header-text">Akun</span>
       </li>
 
@@ -161,6 +200,13 @@ $uri        = uri_string();
         </a>
       </li>
 
+      <li class="menu-item <?= str_starts_with($uri, 'konselor/tanya') ? 'active' : '' ?>">
+        <a href="<?= base_url('konselor/tanya') ?>" class="menu-link">
+          <i class="menu-icon icon-base ti tabler-message-question"></i>
+          <div>Pertanyaan Masuk</div>
+        </a>
+      </li>
+
       <?php if ($isKaprodi): ?>
         <li class="menu-item <?= $uri === 'dosen/dashboard-prodi' ? 'active' : '' ?>">
           <a href="<?= base_url('dosen/dashboard-prodi') ?>" class="menu-link">
@@ -222,6 +268,13 @@ $uri        = uri_string();
         <a href="<?= base_url('janji') ?>" class="menu-link">
           <i class="menu-icon icon-base ti tabler-calendar-event"></i>
           <div>Konseling Saya</div>
+        </a>
+      </li>
+
+      <li class="menu-item <?= str_starts_with($uri, 'tanya') ? 'active' : '' ?>">
+        <a href="<?= base_url('tanya') ?>" class="menu-link">
+          <i class="menu-icon icon-base ti tabler-message-question"></i>
+          <div>Ask Our Psychologist</div>
         </a>
       </li>
 

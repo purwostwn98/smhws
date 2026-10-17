@@ -1,0 +1,13 @@
+.git
+.env
+.DS_Store
+**/.DS_Store
+writable/cache/*
+writable/debugbar/*
+writable/logs/*
+writable/session/*
+!writable/cache/.gitkeep
+!writable/debugbar/.gitkeep
+!writable/logs/.gitkeep
+!writable/session/.gitkeep
+tests

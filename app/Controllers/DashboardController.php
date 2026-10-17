@@ -95,7 +95,11 @@ class DashboardController extends BaseController
             }
         }
 
+        // Jawaban psikolog (Ask Our Psychologist) yang belum dibuka
+        $jawaban_baru = (new \App\Models\PertanyaanPsikologModel())->jawabanBaru((int) $userId);
+
         return view('dashboard/mahasiswa', [
+            'jawaban_baru'        => $jawaban_baru,
             'user'                => $user,
             'stats'               => $stats,
             'janji_mendatang'     => $janji_mendatang,

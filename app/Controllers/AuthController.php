@@ -29,6 +29,9 @@ class AuthController extends BaseController
         // "ini_set(): Session ini settings cannot be changed when a session is active".
         session()->start();
 
+        // Simpan tujuan sebelum diarahkan ke SSO (parameter ?redirect hilang setelah kembali dari CAS)
+        $this->simpanTujuan($this->request->getGet('redirect'));
+
         $cas = new Lib_Cas;
         $cas->forceAuth();
         $casUser = $cas->user();
@@ -86,7 +89,7 @@ class AuthController extends BaseController
             'auth_via_cas'      => true,
         ]);
 
-        return redirect()->to($this->redirectAfterLogin($existing));
+        return redirect()->to($this->ambilTujuan($existing) ?? $this->redirectAfterLogin($existing));
     }
 
     public function login(): \CodeIgniter\HTTP\RedirectResponse
@@ -127,12 +130,9 @@ class AuthController extends BaseController
 
         $model->updateLastLogin($user['id']);
 
-        $redirect = $this->request->getPost('redirect');
-        if ($redirect === 'janji') {
-            return redirect()->to(base_url('janji/buat'));
-        }
+        $this->simpanTujuan($this->request->getPost('redirect'));
 
-        return redirect()->to($this->redirectAfterLogin($user));
+        return redirect()->to($this->ambilTujuan($user) ?? $this->redirectAfterLogin($user));
     }
 
     public function logout(): \CodeIgniter\HTTP\RedirectResponse
@@ -148,6 +148,41 @@ class AuthController extends BaseController
 
         return redirect()->to(base_url('login'))
             ->with('success', 'Anda telah berhasil keluar.');
+    }
+
+    /** Kode ?redirect yang diizinkan → path internal tujuan setelah login. */
+    private const TUJUAN_LOGIN = [
+        'janji' => 'janji/buat',
+        'tanya' => 'tanya/buat',
+    ];
+
+    /** Simpan tujuan dari kode ?redirect (hanya kode di whitelist, mencegah open redirect). */
+    private function simpanTujuan(?string $kode): void
+    {
+        if ($kode && isset(self::TUJUAN_LOGIN[$kode])) {
+            session()->set('redirect_after_login', self::TUJUAN_LOGIN[$kode]);
+        }
+    }
+
+    /**
+     * Ambil & hapus tujuan setelah login. Diisi oleh simpanTujuan() atau oleh filter
+     * (halaman terproteksi yang dibuka sebelum login). Hanya path internal relatif,
+     * dan hanya untuk mahasiswa (semua tujuan yang disimpan adalah halaman mahasiswa).
+     */
+    private function ambilTujuan(array $user): ?string
+    {
+        $path = session()->get('redirect_after_login');
+        session()->remove('redirect_after_login');
+
+        $isAdmin = ! empty($user['is_superadmin']) || ! empty($user['is_admin_fakultas']);
+        if ($isAdmin || ($user['role'] ?? null) !== 'mahasiswa') {
+            return null;
+        }
+
+        if (! is_string($path) || ! preg_match('#^[A-Za-z0-9/_\-]+(\?[A-Za-z0-9=&_\-%]*)?$#', $path) || str_starts_with($path, '/')) {
+            return null;
+        }
+        return base_url($path);
     }
 
     private function redirectAfterLogin(array $user = null): string

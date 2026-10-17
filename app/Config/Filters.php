@@ -118,6 +118,8 @@ class Filters extends BaseFilters
                 'dashboard/mahasiswa',
                 'janji',
                 'janji/*',
+                'tanya',
+                'tanya/*',
             ],
         ],
         'superadmin' => [

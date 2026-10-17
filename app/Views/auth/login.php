@@ -71,8 +71,6 @@
 
           <!-- Feature pills -->
           <div class="d-flex flex-wrap gap-2 mb-6">
-            <span class="smhws-feature-pill"><i class="ti tabler-shield-check"></i> 100% Rahasia</span>
-            <span class="smhws-feature-pill"><i class="ti tabler-currency-dollar-off"></i> Gratis</span>
             <span class="smhws-feature-pill"><i class="ti tabler-award"></i> Psikolog Profesional</span>
             <span class="smhws-feature-pill"><i class="ti tabler-heart-handshake"></i> Pendekatan Holistik</span>
           </div>
@@ -94,6 +92,8 @@
         <p class="mb-4 text-muted" style="font-size:.9rem;">
           <?php if (!empty($redirect) && $redirect === 'janji'): ?>
             Masuk untuk melanjutkan pendaftaran konseling.
+          <?php elseif (!empty($redirect) && $redirect === 'tanya'): ?>
+            Masuk untuk mengajukan pertanyaan kepada psikolog SMHWS.
           <?php else: ?>
             Masuk untuk mengakses layanan SMHWS UMS.
           <?php endif ?>

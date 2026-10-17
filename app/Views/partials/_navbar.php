@@ -1,3 +1,22 @@
+<style>
+  @media (max-width: 991.98px) {
+    .landing-nav-menu .nav-item.dropdown > .dropdown-menu {
+      position: static !important;
+      transform: none !important;
+      inset: auto !important;
+      float: none;
+      width: 100%;
+      min-width: 0 !important;
+      margin: .25rem 0 .5rem !important;
+      padding: .25rem 0 !important;
+      border: 0;
+      box-shadow: none;
+      background: transparent;
+    }
+    .landing-nav-menu .nav-item.dropdown > .dropdown-menu:not(.show) { display: none; }
+    .landing-nav-menu .nav-item.dropdown > .dropdown-menu.show { display: block; }
+  }
+</style>
 <nav class="layout-navbar shadow-none py-0">
   <div class="container">
     <div class="navbar navbar-expand-lg landing-navbar px-3 px-md-4">
@@ -28,8 +47,31 @@
           <li class="nav-item">
             <a class="nav-link fw-medium" href="#hero">Beranda</a>
           </li>
-          <li class="nav-item">
-            <a class="nav-link fw-medium" href="#layanan">Layanan</a>
+          <?php
+          $layananMenu = [
+            ['Mental Health Check',                 'tabler-heart-rate-monitor', '#1a5f7a', base_url('skrining')],
+            ['SMHWS Talk & Care',                   'tabler-user-heart',         '#e5484d', session()->get('is_logged_in') ? base_url('janji') : base_url('login?redirect=janji')],
+            ['Psychoeducation, Webinar & Workshop', 'tabler-school',             '#f0a500', base_url('psikoedukasi')],
+            ['SMHWS Learn',                         'tabler-books',              '#7367f0', base_url('learn')],
+            ['Ask Our Psychologist',                'tabler-message-question',   '#28a745', base_url('tanya/buat')],
+          ];
+          ?>
+          <li class="nav-item dropdown">
+            <a class="nav-link fw-medium dropdown-toggle" href="#layanan" role="button"
+               data-bs-toggle="dropdown" aria-expanded="false">Layanan</a>
+            <ul class="dropdown-menu p-2" style="min-width:290px;border-radius:14px;">
+              <?php foreach ($layananMenu as [$label, $icon, $warna, $url]): ?>
+                <li>
+                  <a class="dropdown-item d-flex align-items-center gap-3 py-2 rounded-3" href="<?= $url ?>">
+                    <span class="d-flex align-items-center justify-content-center flex-shrink-0 rounded-3"
+                      style="width:38px;height:38px;background:<?= $warna ?>1f;color:<?= $warna ?>;">
+                      <i class="icon-base ti <?= $icon ?>" style="font-size:1.35rem;"></i>
+                    </span>
+                    <span class="fw-medium text-heading" style="white-space:normal;line-height:1.3;"><?= esc($label) ?></span>
+                  </a>
+                </li>
+              <?php endforeach ?>
+            </ul>
           </li>
           <li class="nav-item">
             <a class="nav-link fw-medium" href="#tentang">Tentang Kami</a>

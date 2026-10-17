@@ -5,6 +5,7 @@
 <?php
 $konfirmasi_pending = $konfirmasi_pending ?? [];
 $feedback_pending   = $feedback_pending   ?? [];
+$jawaban_baru       = $jawaban_baru       ?? [];
 ?>
 
 <!-- Breadcrumb -->
@@ -23,8 +24,24 @@ $feedback_pending   = $feedback_pending   ?? [];
 </div>
 
 <!-- ===== NOTIFIKASI AKSI ===== -->
-<?php if (! empty($konfirmasi_pending) || ! empty($feedback_pending)): ?>
+<?php if (! empty($konfirmasi_pending) || ! empty($feedback_pending) || ! empty($jawaban_baru)): ?>
 <div class="d-flex flex-column gap-3 mb-4">
+
+  <?php foreach ($jawaban_baru as $q): ?>
+  <div class="d-flex align-items-start gap-3 p-3 rounded-3"
+       style="background:rgba(45,155,110,.07);border:1.5px solid rgba(45,155,110,.35);">
+    <div class="flex-shrink-0 rounded-circle d-flex align-items-center justify-content-center"
+         style="width:2.4rem;height:2.4rem;background:#2d9b6e;">
+      <i class="ti tabler-message-check text-white" style="font-size:1.1rem;"></i>
+    </div>
+    <div class="flex-grow-1 min-width-0">
+      <div class="fw-semibold mb-1" style="color:#1a2b40;font-size:.88rem;">Psikolog sudah menjawab pertanyaanmu</div>
+      <div class="text-muted text-truncate" style="font-size:.8rem;"><?= esc($q['judul']) ?></div>
+    </div>
+    <a href="<?= base_url('tanya/' . $q['id']) ?>" class="btn btn-sm fw-semibold flex-shrink-0"
+       style="background:#2d9b6e;color:#fff;font-size:.8rem;white-space:nowrap;">Lihat Jawaban</a>
+  </div>
+  <?php endforeach ?>
 
   <?php foreach ($konfirmasi_pending as $j): ?>
   <div class="d-flex align-items-start gap-3 p-3 rounded-3"

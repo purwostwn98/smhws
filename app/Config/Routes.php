@@ -6,6 +6,25 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 $routes->get('/', 'Home::index');
+$routes->get('landing', 'Home::landing');
+
+// SMHWS Learn (publik)
+$routes->get('learn',             'LearnController::index');
+$routes->get('learn/(:segment)',  'LearnController::detail/$1');
+
+// Agenda Psychoeducation, Webinar & Workshop (publik)
+$routes->get('psikoedukasi',          'AgendaController::index');
+$routes->get('psikoedukasi/(:num)',   'AgendaController::detail/$1');
+
+// Skrining DASS-21 publik (tanpa login)
+$routes->get('skrining', 'SkriningController::pilih'); // pilih jenis assessment
+$routes->group('skrining', ['namespace' => 'App\Controllers\Skrining'], static function ($routes) {
+    // DASS-21
+    $routes->get('dass',           'DassController::index');
+    $routes->post('dass/submit',   'DassController::submit');
+    $routes->get('dass/hasil',     'DassController::hasil');
+    $routes->get('dass/hasil/pdf', 'DassController::pdf');
+});
 
 // Auth
 $routes->get('login',  'AuthController::loginPage');
@@ -61,7 +80,16 @@ $routes->get('dosen/dashboard-fakultas',           'DosenController::dashboardFa
 $routes->get('dosen/dashboard-fakultas/pdf',       'DosenController::dashboardFakultasPdf');
 $routes->get('dosen/stressor-detail-fakultas',     'DosenController::stressorDetailFakultas');
 
+// Ask Our Psychologist — mahasiswa (filter mahasiswa)
+$routes->get('tanya',              'TanyaController::index');
+$routes->get('tanya/buat',         'TanyaController::buat');
+$routes->post('tanya/simpan',      'TanyaController::simpan');
+$routes->get('tanya/(:num)',       'TanyaController::detail/$1');
+
 // Konselor
+$routes->get('konselor/tanya',              'KonselorTanyaController::index');
+$routes->get('konselor/tanya/(:num)',       'KonselorTanyaController::detail/$1');
+$routes->post('konselor/tanya/jawab/(:num)', 'KonselorTanyaController::jawab/$1');
 $routes->get('konselor/dashboard',                'KonselorController::dashboard');
 $routes->get('konselor/profil',                   'KonselorController::profil');
 $routes->post('konselor/profil/update',           'KonselorController::profilUpdate');
@@ -82,6 +110,40 @@ $routes->get('admin/konselor/edit/(:num)',       'AdminController::konselorEdit/
 $routes->post('admin/konselor/update/(:num)',    'AdminController::konselorUpdate/$1');
 $routes->post('admin/konselor/hapus/(:num)',     'AdminController::konselorHapus/$1');
 $routes->post('admin/konselor/toggle/(:num)',    'AdminController::konselorToggle/$1');
+
+// Admin: Rekap Skrining (Mental Health Check)
+$routes->get('admin/rekap-skrining',              'RekapSkriningController::index');
+$routes->get('admin/rekap-skrining/export',       'RekapSkriningController::export');
+$routes->get('admin/rekap-skrining/(:num)',       'RekapSkriningController::detail/$1');
+
+// Admin: Ask Our Psychologist
+$routes->get('admin/tanya',                    'TanyaAdminController::index');
+$routes->get('admin/tanya/(:num)',             'TanyaAdminController::detail/$1');
+$routes->post('admin/tanya/tugaskan/(:num)',   'TanyaAdminController::tugaskan/$1');
+$routes->post('admin/tanya/tolak/(:num)',      'TanyaAdminController::tolak/$1');
+$routes->post('admin/tanya/terbitkan/(:num)',  'TanyaAdminController::terbitkan/$1');
+
+// Admin: SMHWS Learn
+$routes->get('admin/learn',                      'LearnAdminController::index');
+$routes->get('admin/learn/buat',                 'LearnAdminController::buat');
+$routes->post('admin/learn/simpan',              'LearnAdminController::simpan');
+$routes->get('admin/learn/edit/(:num)',          'LearnAdminController::edit/$1');
+$routes->post('admin/learn/update/(:num)',       'LearnAdminController::update/$1');
+$routes->post('admin/learn/hapus/(:num)',        'LearnAdminController::hapus/$1');
+$routes->post('admin/learn/toggle/(:num)',       'LearnAdminController::toggle/$1');
+$routes->get('admin/learn/topik',                'LearnAdminController::topik');
+$routes->post('admin/learn/topik/simpan',        'LearnAdminController::topikSimpan');
+$routes->post('admin/learn/topik/update/(:num)', 'LearnAdminController::topikUpdate/$1');
+$routes->post('admin/learn/topik/hapus/(:num)',  'LearnAdminController::topikHapus/$1');
+
+// Admin: Agenda Kegiatan (Psychoeducation, Webinar & Workshop)
+$routes->get('admin/agenda-kegiatan',                'AgendaAdminController::index');
+$routes->get('admin/agenda-kegiatan/buat',           'AgendaAdminController::buat');
+$routes->post('admin/agenda-kegiatan/simpan',        'AgendaAdminController::simpan');
+$routes->get('admin/agenda-kegiatan/edit/(:num)',    'AgendaAdminController::edit/$1');
+$routes->post('admin/agenda-kegiatan/update/(:num)', 'AgendaAdminController::update/$1');
+$routes->post('admin/agenda-kegiatan/hapus/(:num)',  'AgendaAdminController::hapus/$1');
+$routes->post('admin/agenda-kegiatan/toggle/(:num)', 'AgendaAdminController::toggle/$1');
 
 // Admin: Instansi Rujukan
 $routes->get('admin/instansi-rujukan',                'AdminController::instansiList');

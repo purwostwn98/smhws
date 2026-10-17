@@ -65,18 +65,6 @@ $staff       = $staff       ?? [];
             <img src="<?= base_url('myimg/hero_landing2.jpg') ?>" alt="Layanan SMHWS UMS"
               class="img-fluid rounded-4 shadow-lg"
               style="max-height:460px;width:100%;object-fit:cover;">
-            <!-- floating badge -->
-            <div class="position-absolute bottom-0 start-0 translate-middle-y ms-4 bg-white shadow rounded-3 px-4 py-3 d-flex align-items-center gap-2">
-              <i class="ti tabler-shield-check text-primary fs-4"></i>
-              <div>
-                <div class="fw-bold text-dark" style="font-size:.82rem;">100% Rahasia</div>
-                <div class="text-muted" style="font-size:.7rem;">Sesuai kode etik psikologi</div>
-              </div>
-            </div>
-            <div class="position-absolute top-0 end-0 translate-middle bg-white shadow rounded-3 px-3 py-2 d-flex align-items-center gap-2">
-              <i class="ti tabler-currency-dollar-off text-success fs-5"></i>
-              <div class="fw-bold" style="font-size:.82rem;color:#1a2b40;">Gratis</div>
-            </div>
           </div>
         </div>
 
@@ -100,9 +88,9 @@ $staff       = $staff       ?? [];
     <div class="row g-5 justify-content-center">
 
       <!-- Mental Health Check -->
-      <div class="col-lg-3 col-md-6">
+      <div class="col-xl col-lg-4 col-md-6">
         <div class="card smhws-service-card h-100 shadow-sm">
-          <div class="card-body p-5 d-flex flex-column">
+          <div class="card-body p-4 d-flex flex-column">
             <div class="mb-4" style="color:var(--smhws-primary);">
               <i class="ti tabler-heart-rate-monitor" style="font-size:2.5rem;"></i>
             </div>
@@ -110,15 +98,15 @@ $staff       = $staff       ?? [];
             <p class="text-muted mb-4 flex-grow-1">
               Di sini kamu bisa melakukan skrining kesehatan mental secara online untuk memahami kondisi dirimu.
             </p>
-            <a href="<?= base_url('login') ?>" class="btn btn-label-primary btn-sm">Cek Sekarang</a>
+            <a href="<?= base_url('skrining') ?>" class="btn btn-label-primary btn-sm">Cek Sekarang</a>
           </div>
         </div>
       </div>
 
       <!-- SMHWS Talk & Care -->
-      <div class="col-lg-3 col-md-6">
+      <div class="col-xl col-lg-4 col-md-6">
         <div class="card smhws-service-card h-100 shadow-sm">
-          <div class="card-body p-5 d-flex flex-column">
+          <div class="card-body p-4 d-flex flex-column">
             <div class="mb-4" style="color:var(--smhws-primary);">
               <i class="ti tabler-user-heart" style="font-size:2.5rem;"></i>
             </div>
@@ -132,27 +120,44 @@ $staff       = $staff       ?? [];
         </div>
       </div>
 
-      <!-- Psychoeducation & Workshop -->
-      <div class="col-lg-3 col-md-6">
+      <!-- Ask Our Psychologist -->
+      <div class="col-xl col-lg-4 col-md-6">
         <div class="card smhws-service-card h-100 shadow-sm">
-          <div class="card-body p-5 d-flex flex-column">
+          <div class="card-body p-4 d-flex flex-column">
+            <div class="mb-4" style="color:var(--smhws-primary);">
+              <i class="ti tabler-message-question" style="font-size:2.5rem;"></i>
+            </div>
+            <h5 class="fw-bold mb-2">Ask Our Psychologist</h5>
+            <p class="text-muted mb-4 flex-grow-1">
+              Di sini kamu bisa bertanya tentang apa pun yang sedang kamu pikirkan atau rasakan, dan
+              dapatkan perspektif serta saran dari psikolog SMHWS.
+            </p>
+            <a href="<?= base_url('tanya/buat') ?>" class="btn btn-label-primary btn-sm">Tanya Sekarang</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Psychoeducation & Workshop -->
+      <div class="col-xl col-lg-4 col-md-6">
+        <div class="card smhws-service-card h-100 shadow-sm">
+          <div class="card-body p-4 d-flex flex-column">
             <div class="mb-4" style="color:var(--smhws-primary);">
               <i class="ti tabler-school" style="font-size:2.5rem;"></i>
             </div>
-            <h5 class="fw-bold mb-2">Psychoeducation &amp; Workshop</h5>
+            <h5 class="fw-bold mb-2">Psychoeducation, Webinar &amp; Workshop</h5>
             <p class="text-muted mb-4 flex-grow-1">
-              Di sini kamu bisa mendaftarkan diri untuk mengikuti kegiatan pengembangan diri, mengelola
+              Lihat agenda dan daftarkan dirimu untuk mengikuti kegiatan pengembangan diri, mengelola
               stres, dan keterampilan kesehatan mental &amp; wellbeing lainnya.
             </p>
-            <a href="<?= base_url('login') ?>" class="btn btn-label-primary btn-sm">Daftar Sekarang</a>
+            <a href="<?= base_url('psikoedukasi') ?>" class="btn btn-label-primary btn-sm">Lihat Agenda</a>
           </div>
         </div>
       </div>
 
       <!-- SMHWS Learn -->
-      <div class="col-lg-3 col-md-6">
+      <div class="col-xl col-lg-4 col-md-6">
         <div class="card smhws-service-card h-100 shadow-sm">
-          <div class="card-body p-5 d-flex flex-column">
+          <div class="card-body p-4 d-flex flex-column">
             <div class="mb-4" style="color:var(--smhws-primary);">
               <i class="ti tabler-books" style="font-size:2.5rem;"></i>
             </div>
@@ -161,7 +166,7 @@ $staff       = $staff       ?? [];
               Di sini kamu bisa menemukan artikel, video, dan media belajar untuk meningkatkan
               kesehatan mental dan kondisi wellbeing-mu.
             </p>
-            <a href="#kontak" class="btn btn-label-primary btn-sm">Jelajahi Sekarang</a>
+            <a href="<?= base_url('learn') ?>" class="btn btn-label-primary btn-sm">Jelajahi Sekarang</a>
           </div>
         </div>
       </div>
@@ -389,15 +394,6 @@ $staff       = $staff       ?? [];
                   <?php else: ?>
                     <p class="text-muted mb-3" style="font-size:.8rem;">Psikolog</p>
                   <?php endif ?>
-                  <div class="d-flex align-items-center justify-content-center gap-3">
-                    <div class="d-flex align-items-center gap-1">
-                      <i class="ti tabler-star-filled" style="color:#f0a500;font-size:.85rem;"></i>
-                      <span class="fw-semibold" style="font-size:.82rem;"><?= number_format((float)$k['rating'], 1) ?></span>
-                    </div>
-                    <span style="color:#ddd;">|</span>
-                    <span style="font-size:.78rem;color:#888;"><?= number_format($k['total_sesi']) ?> sesi</span>
-                  </div>
-
                 </div>
               </div>
             <?php endforeach ?>

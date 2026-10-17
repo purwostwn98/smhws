@@ -11,6 +11,10 @@ class MahasiswaFilter implements FilterInterface
     public function before(RequestInterface $request, $arguments = null)
     {
         if (! session()->get('is_logged_in')) {
+            // Ingat halaman yang dituju agar setelah login langsung kembali ke sini
+            if (strtolower($request->getMethod()) === 'get') {
+                session()->set('redirect_after_login', uri_string());
+            }
             return redirect()->to(base_url('login'))
                 ->with('error', 'Silakan masuk terlebih dahulu.');
         }
