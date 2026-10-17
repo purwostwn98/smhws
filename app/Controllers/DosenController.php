@@ -261,6 +261,7 @@ HTML;
             'margin_footer'     => 5,
             'default_font'      => 'dejavusans',
             'default_font_size' => 10,
+            'tempDir'            => WRITEPATH . 'mpdf_temp',
         ]);
 
         $bulan    = (int) date('n');
@@ -486,6 +487,7 @@ HTML;
             'margin_footer'     => 5,
             'default_font'      => 'dejavusans',
             'default_font_size' => 10,
+            'tempDir'            => WRITEPATH . 'mpdf_temp',
         ]);
 
         $bulan    = (int) date('n');

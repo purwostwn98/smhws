@@ -159,6 +159,7 @@ HTML;
             'margin_header'     => 5,
             'default_font'      => 'dejavusans',
             'default_font_size' => 10,
+            'tempDir'            => WRITEPATH . 'mpdf_temp',
         ]);
         $mpdf->SetTitle($judul);
         $mpdf->SetAuthor('SMHWS UMS');

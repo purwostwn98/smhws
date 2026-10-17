@@ -550,6 +550,7 @@ HTML;
             'margin_footer'     => 0,
             'default_font'      => 'dejavuserif',
             'default_font_size' => 11,
+            'tempDir'            => WRITEPATH . 'mpdf_temp',
         ]);
 
         $mpdf->SetTitle('Laporan Konseling #' . str_pad($janji['id'], 5, '0', STR_PAD_LEFT));
@@ -643,6 +644,7 @@ HTML;
             'margin_footer'     => 0,
             'default_font'      => 'dejavuserif',
             'default_font_size' => 11,
+            'tempDir'            => WRITEPATH . 'mpdf_temp',
         ]);
 
         $mpdf->SetTitle('Surat Rujukan #' . str_pad($janji['id'], 5, '0', STR_PAD_LEFT));

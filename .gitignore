@@ -66,6 +66,8 @@ Vagrantfile
 /writable/debugbar/*
 !/writable/debugbar/index.html
 
+/writable/mpdf_temp/
+
 php_errors.log
 
 #-------------------------
