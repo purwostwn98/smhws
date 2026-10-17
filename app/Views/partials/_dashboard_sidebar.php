@@ -278,22 +278,8 @@ $uri        = uri_string();
         </a>
       </li>
 
-      <li class="menu-item <?= $uri === 'riwayat' ? 'active' : '' ?>">
-        <a href="<?= base_url('riwayat') ?>" class="menu-link">
-          <i class="menu-icon icon-base ti tabler-history"></i>
-          <div>Riwayat Sesi</div>
-        </a>
-      </li>
-
       <li class="menu-header small text-uppercase mt-1">
         <span class="menu-header-text">Akun</span>
-      </li>
-
-      <li class="menu-item <?= $uri === 'profil' ? 'active' : '' ?>">
-        <a href="<?= base_url('profil') ?>" class="menu-link">
-          <i class="menu-icon icon-base ti tabler-user-circle"></i>
-          <div>Profil Saya</div>
-        </a>
       </li>
 
       <li class="menu-item">

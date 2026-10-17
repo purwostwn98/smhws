@@ -39,9 +39,21 @@ class JanjiController extends BaseController
                                        ->where('status', 'selesai')
                                        ->countAllResults() > 0;
 
+        // Hari praktik tiap psikolog (untuk keterangan pada psikolog yang tidak tersedia)
+        $praktik = [];
+        $rows = \Config\Database::connect()->table('konselor_jadwal')
+            ->select('konselor_id, hari')->distinct()
+            ->where('is_active', 1)
+            ->get()->getResultArray();
+        foreach ($rows as $r) {
+            $praktik[(int) $r['konselor_id']][] = $r['hari'];
+        }
+
         return view('janji/buat', [
             'user'          => $user,
             'konselor'      => $konselor,
+            'praktikMap'    => $praktik,
+            'tanggalMin'    => date('Y-m-d', strtotime('+1 day')),
             'dassItems'     => $dassItems,
             'pernahSelesai' => $pernahSelesai,
         ]);
@@ -73,6 +85,13 @@ class JanjiController extends BaseController
         $konselorPilihan = [];
         if (! empty($post['konselor_pilihan'])) {
             $konselorPilihan = [(int) $post['konselor_pilihan']];
+        }
+
+        // Validasi jadwal: tanggal minimal H+1, sesi tersedia, psikolog (bila dipilih) praktik di sesi itu
+        if ($errJadwal = $this->validasiJadwal($post)) {
+            return redirect()->back()->withInput()
+                ->with('error_step', 2)
+                ->with('error', $errJadwal);
         }
 
         $janjiModel = new JanjiModel();
@@ -287,11 +306,11 @@ class JanjiController extends BaseController
         }
 
         $slots = [
-            's1' => ['jam' => '08:00:00', 'label' => '08.00–09.00'],
-            's2' => ['jam' => '09:30:00', 'label' => '09.30–10.30'],
-            's3' => ['jam' => '11:00:00', 'label' => '11.00–12.00'],
-            's4' => ['jam' => '12:30:00', 'label' => '12.30–13.30'],
-            's5' => ['jam' => '14:00:00', 'label' => '14.00–15.00'],
+            's1' => ['jam' => '08:00:00', 'label' => '08.00–08.50'],
+            's2' => ['jam' => '09:20:00', 'label' => '09.20–10.10'],
+            's3' => ['jam' => '10:40:00', 'label' => '10.40–11.30'],
+            's4' => ['jam' => '12:30:00', 'label' => '12.30–13.20'],
+            's5' => ['jam' => '13:50:00', 'label' => '13.50–14.40'],
         ];
         $timeToSlot = array_combine(array_column($slots, 'jam'), array_keys($slots));
 
@@ -336,6 +355,149 @@ class JanjiController extends BaseController
         }
 
         return $this->response->setJSON(['jadwal' => $jadwal]);
+    }
+
+    /** Sesi standar konseling (50 menit). */
+    private const SESI = [
+        's1' => ['jam' => '08:00', 'label' => '08.00–08.50'],
+        's2' => ['jam' => '09:20', 'label' => '09.20–10.10'],
+        's3' => ['jam' => '10:40', 'label' => '10.40–11.30'],
+        's4' => ['jam' => '12:30', 'label' => '12.30–13.20'],
+        's5' => ['jam' => '13:50', 'label' => '13.50–14.40'],
+    ];
+
+    /**
+     * GET /janji/ketersediaan?tanggal=YYYY-MM-DD
+     * API: sesi pada tanggal tersebut beserta psikolog yang praktik & belum terisi.
+     * Penyaringan metode dilakukan di browser memakai field `metode` tiap psikolog.
+     */
+    public function ketersediaan(): \CodeIgniter\HTTP\ResponseInterface
+    {
+        if (! session()->get('is_logged_in')) {
+            return $this->response->setJSON(['error' => 'Unauthorized'])->setStatusCode(401);
+        }
+
+        $tanggal = (string) $this->request->getGet('tanggal');
+        if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $tanggal) || ! strtotime($tanggal)) {
+            return $this->response->setJSON(['error' => 'Tanggal tidak valid'])->setStatusCode(422);
+        }
+
+        return $this->response->setJSON($this->hitungKetersediaan($tanggal));
+    }
+
+    /**
+     * Ketersediaan sesi pada satu tanggal.
+     *
+     * @return array{hari:string, umum:bool, sesi:array<string, array{jam:string,label:string,psikolog:list<array{id:int,metode:?string}>}>}
+     *   umum = true bila belum ada jadwal psikolog sama sekali (semua sesi Senin–Sabtu terbuka, psikolog dipilih admin).
+     */
+    private function hitungKetersediaan(string $tanggal): array
+    {
+        $hariKeys = ['minggu', 'senin', 'selasa', 'rabu', 'kamis', 'jumat', 'sabtu'];
+        $hari     = $hariKeys[(int) date('w', strtotime($tanggal))];
+        $db       = \Config\Database::connect();
+
+        $adaJadwal = $db->table('konselor_jadwal')->where('is_active', 1)->countAllResults() > 0;
+        if (! $adaJadwal) {
+            $sesi = [];
+            if ($hari !== 'minggu') {
+                foreach (self::SESI as $k => $s) $sesi[$k] = $s + ['psikolog' => []];
+            }
+            return ['hari' => $hari, 'umum' => true, 'sesi' => $sesi];
+        }
+
+        $jamKeSesi = [];
+        foreach (self::SESI as $k => $s) $jamKeSesi[$s['jam']] = $k;
+
+        // Psikolog yang praktik di hari tersebut (hanya yang aktif menerima konseling)
+        $rows = $db->table('konselor_jadwal j')
+            ->select('j.konselor_id, j.jam_mulai, j.metode')
+            ->join('konselor k', 'k.id = j.konselor_id')
+            ->where('j.is_active', 1)
+            ->where('j.hari', $hari)
+            ->where('k.is_available', 1)
+            ->where('k.deleted_at', null)
+            ->get()->getResultArray();
+
+        // Sesi yang sudah terisi per psikolog pada tanggal ini: [konselor_id][HH:MM] = true
+        $terisi = [];
+        foreach ($db->table('janji')->select('konselor_id, jam_konseling')
+                     ->where('tanggal_konseling', $tanggal)
+                     ->whereNotIn('status', ['dibatalkan', 'selesai'])
+                     ->where('konselor_id IS NOT NULL')->where('jam_konseling IS NOT NULL')
+                     ->get()->getResultArray() as $r) {
+            $terisi[(int) $r['konselor_id']][substr($r['jam_konseling'], 0, 5)] = true;
+        }
+        // Permintaan yang masih menunggu dengan psikolog pilihan + jadwal pilihan pada tanggal ini
+        foreach ((new JanjiModel())->where('status', 'menunggu')->findAll() as $rec) {
+            foreach ((array) ($rec['jadwal_pilihan'] ?? []) as $slot) {
+                if (($slot['tanggal'] ?? null) !== $tanggal || empty($slot['waktu'])) continue;
+                foreach ((array) ($rec['konselor_pilihan'] ?? []) as $kid) {
+                    $terisi[(int) $kid][substr($slot['waktu'], 0, 5)] = true;
+                }
+            }
+        }
+
+        $sesi = [];
+        foreach ($rows as $r) {
+            $jam = substr($r['jam_mulai'], 0, 5);
+            $key = $jamKeSesi[$jam] ?? null;
+            $kid = (int) $r['konselor_id'];
+            if (! $key || isset($terisi[$kid][$jam])) continue;
+
+            $sesi[$key] ??= self::SESI[$key] + ['psikolog' => []];
+            $sesi[$key]['psikolog'][] = ['id' => $kid, 'metode' => $r['metode']];
+        }
+        // Urutkan sesuai urutan sesi
+        $sesi = array_intersect_key(array_merge(array_fill_keys(array_keys(self::SESI), null), $sesi), $sesi);
+
+        return ['hari' => $hari, 'umum' => false, 'sesi' => $sesi];
+    }
+
+    /** Metode jadwal psikolog cocok dengan metode yang diminta mahasiswa? (null = belum diatur → dianggap keduanya) */
+    private static function metodeCocok(?string $metodeJadwal, string $metodeMahasiswa): bool
+    {
+        return $metodeJadwal === null || $metodeJadwal === 'keduanya' || $metodeJadwal === $metodeMahasiswa;
+    }
+
+    /** Validasi pilihan jadwal di server. Mengembalikan pesan error atau null. */
+    private function validasiJadwal(array $post): ?string
+    {
+        $tanggal = (string) ($post['jadwal_tanggal'] ?? '');
+        $pilihan = (string) ($post['jadwal_pilihan'] ?? '');
+        $metode  = (string) ($post['metode'] ?? 'offline');
+
+        if (! preg_match('/^\d{4}-\d{2}-\d{2}$/', $tanggal) || $pilihan === '') {
+            return 'Pilih tanggal dan sesi konseling yang kamu inginkan.';
+        }
+        if ($tanggal < date('Y-m-d', strtotime('+1 day'))) {
+            return 'Tanggal konseling paling cepat besok (H+1).';
+        }
+
+        $jam  = explode('_', $pilihan, 2)[1] ?? '';
+        $data = $this->hitungKetersediaan($tanggal);
+        $sesi = null;
+        foreach ($data['sesi'] as $s) {
+            if ($s['jam'] === substr($jam, 0, 5)) $sesi = $s;
+        }
+        if (! $sesi) {
+            return 'Sesi yang dipilih sudah tidak tersedia. Silakan pilih sesi lain.';
+        }
+        if ($data['umum']) {
+            return null;
+        }
+
+        $cocok = array_filter($sesi['psikolog'], fn($p) => self::metodeCocok($p['metode'], $metode));
+        if (! $cocok) {
+            return 'Tidak ada psikolog yang melayani konseling ' . ($metode === 'online' ? 'daring' : 'tatap muka') . ' pada sesi tersebut.';
+        }
+
+        $kid = (int) ($post['konselor_pilihan'] ?? 0);
+        if ($kid && ! in_array($kid, array_column($cocok, 'id'), true)) {
+            return 'Psikolog yang dipilih tidak tersedia pada sesi dan metode tersebut. Silakan pilih psikolog lain atau "Siapa saja yang tersedia".';
+        }
+
+        return null;
     }
 
     /** GET /janji/slot-booked — API: slot yang sudah terpakai untuk konselor+tanggal tertentu */

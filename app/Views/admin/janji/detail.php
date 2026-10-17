@@ -1001,11 +1001,29 @@ foreach ($lanjutan_secs as $secKey => $secData):
             </div>
           </div>
 
-          <div class="mb-3">
+          <div class="mb-3 p-2 rounded" style="background:#f6f7ff;">
+            <div class="form-check form-switch mb-0">
+              <input class="form-check-input" type="checkbox" role="switch" name="jadwal_manual" id="jadwalManual" value="1">
+              <label class="form-check-label fw-semibold" for="jadwalManual" style="font-size:.8rem;">
+                Jadwal manual (di luar sesi yang tersedia)
+              </label>
+            </div>
+            <div class="form-text mt-1" style="font-size:.72rem;">
+              Aktifkan bila sudah disepakati dengan psikolog &amp; mahasiswa: tanggal dan jam bebas, tidak terikat jadwal praktik psikolog.
+            </div>
+          </div>
+
+          <div class="mb-3" id="wrapJamSesi">
             <label class="form-label fw-semibold" style="font-size:.82rem;">Sesi / Jam <span class="text-danger">*</span></label>
             <select name="jam_konseling" id="jamSelect" class="form-select form-select-sm" required>
               <option value="">— Pilih psikolog &amp; tanggal dulu —</option>
             </select>
+          </div>
+
+          <div class="mb-3" id="wrapJamManual" style="display:none;">
+            <label class="form-label fw-semibold" style="font-size:.82rem;">Jam Mulai (manual) <span class="text-danger">*</span></label>
+            <input type="time" name="jam_konseling_manual" id="jamManual" class="form-control form-control-sm" disabled>
+            <div class="form-text" style="font-size:.72rem;">Waktu WIB. Sampaikan durasi atau detail lain di catatan untuk mahasiswa bila perlu.</div>
           </div>
 
           <div class="mb-3">
@@ -1141,17 +1159,18 @@ foreach ($lanjutan_secs as $secKey => $secData):
   const INIT_JAM   = '<?= esc($janji['jam_konseling'] ?? '') ?>';
 
   const SLOTS = {
-    s1: { jam: '08:00:00', label: '08.00 – 09.00 WIB' },
-    s2: { jam: '09:30:00', label: '09.30 – 10.30 WIB' },
-    s3: { jam: '11:00:00', label: '11.00 – 12.00 WIB' },
-    s4: { jam: '12:30:00', label: '12.30 – 13.30 WIB' },
-    s5: { jam: '14:00:00', label: '14.00 – 15.00 WIB' },
+    s1: { jam: '08:00:00', label: '08.00 – 08.50 WIB' },
+    s2: { jam: '09:20:00', label: '09.20 – 10.10 WIB' },
+    s3: { jam: '10:40:00', label: '10.40 – 11.30 WIB' },
+    s4: { jam: '12:30:00', label: '12.30 – 13.20 WIB' },
+    s5: { jam: '13:50:00', label: '13.50 – 14.40 WIB' },
   };
   const METODE_LABEL = { online: 'Online', offline: 'Offline', keduanya: 'Online & Offline' };
   const DAY_KEYS     = ['minggu','senin','selasa','rabu','kamis','jumat','sabtu'];
   const DAY_LABELS   = ['Minggu','Senin','Selasa','Rabu','Kamis',"Jum'at",'Sabtu'];
 
   const konselorEl = document.getElementById('konselorSelect');
+  if (!konselorEl) return; // form jadwal tidak tampil pada status ini
   const tanggalEl  = document.getElementById('tanggalInput');
   const jamEl      = document.getElementById('jamSelect');
   const hariInfoEl = document.getElementById('jadwalHariInfo');
@@ -1223,11 +1242,39 @@ foreach ($lanjutan_secs as $secKey => $secData):
     }
   }
 
-  konselorEl.addEventListener('change', () => { updateHariInfo(); renderJamOptions(); });
-  tanggalEl.addEventListener('change', renderJamOptions);
+  // ── Jadwal manual: jam bebas, tanpa batasan jadwal praktik psikolog ──
+  const manualEl     = document.getElementById('jadwalManual');
+  const jamManualEl  = document.getElementById('jamManual');
+  const wrapSesiEl   = document.getElementById('wrapJamSesi');
+  const wrapManualEl = document.getElementById('wrapJamManual');
+
+  function isManual() { return manualEl && manualEl.checked; }
+
+  function terapkanManual() {
+    const m = isManual();
+    wrapSesiEl.style.display   = m ? 'none' : '';
+    wrapManualEl.style.display = m ? '' : 'none';
+    jamEl.disabled       = m;
+    jamEl.required       = !m;
+    jamManualEl.disabled = !m;
+    jamManualEl.required = m;
+    if (m) warnEl.style.display = 'none'; else renderJamOptions();
+  }
+
+  konselorEl.addEventListener('change', () => { updateHariInfo(); if (!isManual()) renderJamOptions(); });
+  tanggalEl.addEventListener('change', () => { if (!isManual()) renderJamOptions(); });
+  manualEl.addEventListener('change', terapkanManual);
 
   updateHariInfo();
   renderJamOptions();
+
+  // Jadwal tersimpan yang bukan salah satu sesi standar → buka dalam mode manual
+  const SLOT_JAM = Object.values(SLOTS).map(s => s.jam.substring(0, 5));
+  if (INIT_JAM && !SLOT_JAM.includes(INIT_JAM.substring(0, 5))) {
+    manualEl.checked  = true;
+    jamManualEl.value = INIT_JAM.substring(0, 5);
+  }
+  terapkanManual();
 })();
 </script>
 <?php endif ?>

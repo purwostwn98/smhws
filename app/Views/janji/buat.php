@@ -84,6 +84,12 @@
     display: block;
   }
 
+  /* Pilihan psikolog */
+  .psikolog-opt { cursor: pointer; transition: border-color .15s, opacity .15s; }
+  .psikolog-opt:hover { border-color: #1a5f7a !important; }
+  .psikolog-opt.is-off { opacity: .45; cursor: not-allowed; background: #f5f5f5; }
+  .psikolog-opt.is-off:hover { border-color: var(--bs-border-color) !important; }
+
   /* DASS item rows */
   .dass-row {
     padding: .6rem .75rem;
@@ -505,60 +511,28 @@ $fieldLabels  = [
             </div>
           </div>
 
-          <!-- Pilihan psikolog (dipindah ke atas jadwal) -->
+          <?php
+          $praktikMap = $praktikMap ?? [];
+          $tanggalMin = $tanggalMin ?? date('Y-m-d', strtotime('+1 day'));
+          ?>
+          <!-- 1. Tanggal -->
           <div class="col-12">
-            <label class="form-label fw-medium">Psikolog yang Diinginkan <small class="text-muted">(pilih satu, opsional)</small></label>
-            <?php if (empty($konselor)): ?>
-              <p class="text-muted" style="font-size:.85rem;">Belum ada psikolog tersedia saat ini.</p>
-            <?php else: ?>
-              <div class="row g-2 mt-1">
-                <?php foreach ($konselor as $k): ?>
-                  <?php
-                  $inisial     = strtoupper(substr($k['name'], 0, 2));
-                  $namaLengkap = trim(($k['gelar_depan'] ? $k['gelar_depan'] . ' ' : '') . $k['name'] . ($k['gelar_belakang'] ? ', ' . $k['gelar_belakang'] : ''));
-                  $spesialis   = is_array($k['spesialisasi']) ? implode(', ', array_slice($k['spesialisasi'], 0, 2)) : ($k['spesialisasi'] ?? '-');
-                  ?>
-                  <div class="col-sm-6 col-lg-4">
-                    <label class="d-flex align-items-start gap-2 p-2 border rounded-3 h-100"
-                           style="cursor:pointer;transition:border-color .15s;"
-                           onmouseover="this.style.borderColor='#1a5f7a'"
-                           onmouseout="this.style.borderColor=''">
-                      <input type="radio" name="konselor_pilihan"
-                             class="form-check-input mt-1 flex-shrink-0 konselor-cb" value="<?= $k['id'] ?>" />
-                      <div class="d-flex align-items-start gap-2">
-                        <div class="avatar avatar-sm flex-shrink-0">
-                          <div class="avatar-initial rounded-circle" style="background:rgba(26,95,122,.15);color:#1a5f7a;font-weight:700;font-size:.75rem;">
-                            <?= $inisial ?>
-                          </div>
-                        </div>
-                        <div>
-                          <div class="fw-semibold" style="font-size:.82rem;color:#1a2b40;"><?= esc($namaLengkap) ?></div>
-                          <div class="text-muted" style="font-size:.72rem;"><?= esc($spesialis) ?></div>
-                        </div>
-                      </div>
-                    </label>
-                  </div>
-                <?php endforeach ?>
-              </div>
-              <div class="mt-2 text-muted" style="font-size:.78rem;">
-                <i class="ti tabler-info-circle me-1"></i>Pilih psikolog untuk melihat jadwal yang tersedia. Jika tidak dipilih, semua slot ditampilkan.
-              </div>
-            <?php endif ?>
+            <label class="form-label fw-medium" for="jadwalTanggal">
+              <span class="badge rounded-pill bg-label-primary me-1">1</span>Tanggal Konseling <span class="req">*</span>
+            </label>
+            <input type="date" id="jadwalTanggal" name="jadwal_tanggal" class="form-control form-control-sm"
+                   min="<?= $tanggalMin ?>" value="<?= esc(old('jadwal_tanggal')) ?>" style="max-width:220px;">
+            <div class="mt-1" style="font-size:.73rem;color:#555;">
+              <i class="ti tabler-info-circle me-1"></i>Paling cepat besok (H+1).
+              <span id="jadwalHariInfo" style="display:none;"> Hari layanan: <span id="hariTersedia" class="fw-semibold"></span>.</span>
+            </div>
           </div>
 
-          <!-- Jadwal pilihan: pilih tanggal dulu → lalu sesi -->
+          <!-- 2. Sesi -->
           <div class="col-12">
-            <label class="form-label fw-medium">Jadwal yang Diinginkan <span class="req">*</span></label>
-            <div class="mt-1 mb-2">
-              <input type="date" id="jadwalTanggal" name="jadwal_tanggal" class="form-control form-control-sm"
-                     min="<?= date('Y-m-d') ?>" style="max-width:220px;">
-              <div id="jadwalHariInfo" class="mt-1" style="font-size:.73rem;color:#555;display:none;">
-                <i class="ti tabler-calendar-week me-1"></i>Hari tersedia: <span id="hariTersedia" class="fw-semibold"></span>
-              </div>
-              <div id="jadwalTanggalWarn" class="form-text text-warning" style="display:none;">
-                <i class="ti tabler-alert-triangle me-1"></i>Psikolog tidak tersedia pada hari yang dipilih.
-              </div>
-            </div>
+            <label class="form-label fw-medium">
+              <span class="badge rounded-pill bg-label-primary me-1">2</span>Sesi yang Tersedia <span class="req">*</span>
+            </label>
             <div id="jadwalContainer">
               <div class="text-muted" style="font-size:.82rem;">
                 <i class="ti tabler-calendar-event me-1"></i>Pilih tanggal untuk melihat sesi yang tersedia.
@@ -566,6 +540,57 @@ $fieldLabels  = [
             </div>
             <div id="jadwalError" class="text-danger mt-2" style="font-size:.82rem;display:none;">
               <i class="ti tabler-alert-circle me-1"></i>Pilih tanggal dan sesi jadwal yang Anda inginkan.
+            </div>
+          </div>
+
+          <!-- 3. Psikolog -->
+          <div class="col-12">
+            <label class="form-label fw-medium">
+              <span class="badge rounded-pill bg-label-primary me-1">3</span>Psikolog yang Diinginkan <small class="text-muted">(opsional)</small>
+            </label>
+            <div id="psikologHint" class="text-muted" style="font-size:.82rem;">
+              <i class="ti tabler-user-question me-1"></i>Pilih sesi terlebih dahulu untuk melihat psikolog yang tersedia.
+            </div>
+            <div id="psikologReset" class="alert alert-warning py-2 px-3 mb-2" style="font-size:.8rem;display:none;">
+              <i class="ti tabler-info-circle me-1"></i>Psikolog yang kamu pilih tidak tersedia pada sesi/metode ini, pilihan dikembalikan ke "Siapa saja yang tersedia".
+            </div>
+
+            <div id="psikologList" class="row g-2 mt-1" style="display:none;">
+              <div class="col-sm-6 col-lg-4">
+                <label class="psikolog-opt d-flex align-items-center gap-2 p-2 border rounded-3 h-100">
+                  <input type="radio" name="konselor_pilihan" class="form-check-input mt-0 flex-shrink-0 konselor-cb" value="" <?= old('konselor_pilihan') ? '' : 'checked' ?> />
+                  <div class="avatar avatar-sm flex-shrink-0">
+                    <div class="avatar-initial rounded-circle" style="background:rgba(26,95,122,.15);color:#1a5f7a;"><i class="ti tabler-users"></i></div>
+                  </div>
+                  <div>
+                    <div class="fw-semibold" style="font-size:.82rem;color:#1a2b40;">Siapa saja yang tersedia</div>
+                    <div class="text-muted" style="font-size:.72rem;">Admin akan memilihkan psikolog</div>
+                  </div>
+                </label>
+              </div>
+              <?php foreach ($konselor ?? [] as $k): ?>
+                <?php
+                $inisial     = strtoupper(substr($k['name'], 0, 2));
+                $namaLengkap = trim(($k['gelar_depan'] ? $k['gelar_depan'] . ' ' : '') . $k['name'] . ($k['gelar_belakang'] ? ', ' . $k['gelar_belakang'] : ''));
+                $spesialis   = is_array($k['spesialisasi']) ? implode(', ', array_slice($k['spesialisasi'], 0, 2)) : ($k['spesialisasi'] ?? '-');
+                ?>
+                <div class="col-sm-6 col-lg-4">
+                  <label class="psikolog-opt d-flex align-items-start gap-2 p-2 border rounded-3 h-100" data-konselor="<?= (int) $k['id'] ?>">
+                    <input type="radio" name="konselor_pilihan" class="form-check-input mt-1 flex-shrink-0 konselor-cb"
+                           value="<?= (int) $k['id'] ?>" <?= (string) old('konselor_pilihan') === (string) $k['id'] ? 'checked' : '' ?> />
+                    <div class="avatar avatar-sm flex-shrink-0">
+                      <div class="avatar-initial rounded-circle" style="background:rgba(26,95,122,.15);color:#1a5f7a;font-weight:700;font-size:.75rem;">
+                        <?= $inisial ?>
+                      </div>
+                    </div>
+                    <div>
+                      <div class="fw-semibold" style="font-size:.82rem;color:#1a2b40;"><?= esc($namaLengkap) ?></div>
+                      <div class="text-muted" style="font-size:.72rem;"><?= esc($spesialis) ?></div>
+                      <div class="psikolog-ket text-danger" style="font-size:.7rem;"></div>
+                    </div>
+                  </label>
+                </div>
+              <?php endforeach ?>
             </div>
           </div>
 
@@ -878,147 +903,176 @@ $fieldLabels  = [
   (function() {
     'use strict';
 
-    // ── Jadwal dinamis: psikolog → tanggal → sesi ────────────────────────
-    const JADWAL_API      = '<?= base_url('janji/konselor-jadwal') ?>';
-    const SLOT_BOOKED_API = '<?= base_url('janji/slot-booked') ?>';
-    const SLOT_LABELS = {s1:'08.00–09.00', s2:'09.30–10.30', s3:'11.00–12.00', s4:'12.30–13.30', s5:'14.00–15.00'};
-    const DAY_KEYS    = ['minggu','senin','selasa','rabu','kamis','jumat','sabtu'];
-    const DAY_NAMES   = ['Minggu','Senin','Selasa','Rabu','Kamis',"Jum'at",'Sabtu'];
+    // ── Jadwal dinamis: tanggal → sesi → psikolog (disaring menurut metode) ──
+    const KETERSEDIAAN_API = '<?= base_url('janji/ketersediaan') ?>';
+    const PRAKTIK   = <?= json_encode($praktikMap ?? [], JSON_FORCE_OBJECT) ?>; // {konselor_id: ['senin', ...]}
+    const INIT_SESI = <?= json_encode((string) old('jadwal_pilihan')) ?>;
+    const DAY_KEYS  = ['minggu','senin','selasa','rabu','kamis','jumat','sabtu'];
+    const DAY_NAMES = ['Minggu','Senin','Selasa','Rabu','Kamis',"Jum'at",'Sabtu'];
+    const namaHari  = h => DAY_NAMES[DAY_KEYS.indexOf(h)] ?? h;
 
-    let cachedJadwal  = {};
-    let bookedSlots   = []; // jam 'HH:MM' yang sudah terpakai untuk psikolog+tanggal ini
-    let jadwalLoading = false;
+    const tanggalEl   = document.getElementById('jadwalTanggal');
+    const sesiBox     = document.getElementById('jadwalContainer');
+    const listEl      = document.getElementById('psikologList');
+    const hintEl      = document.getElementById('psikologHint');
+    const resetEl     = document.getElementById('psikologReset');
+    const sesiErrEl   = document.getElementById('jadwalError');
+    const hariInfoEl  = document.getElementById('jadwalHariInfo');
+    const hariTextEl  = document.getElementById('hariTersedia');
 
-    const jadwalTanggalEl  = document.getElementById('jadwalTanggal');
-    const jadwalHariInfoEl = document.getElementById('jadwalHariInfo');
-    const hariTersediaEl   = document.getElementById('hariTersedia');
-    const jadwalWarnEl     = document.getElementById('jadwalTanggalWarn');
+    let data      = null;   // respons API untuk tanggal terpilih
+    let reqSeq    = 0;      // abaikan respons lama bila tanggal diganti cepat
 
-    function getSelectedHari() {
-      if (!jadwalTanggalEl.value) return null;
-      return DAY_KEYS[new Date(jadwalTanggalEl.value + 'T00:00:00').getDay()];
+    // Hari layanan = gabungan hari praktik semua psikolog
+    const hariLayanan = [...new Set(Object.values(PRAKTIK).flat())]
+      .sort((a, b) => DAY_KEYS.indexOf(a) - DAY_KEYS.indexOf(b));
+    if (hariLayanan.length) {
+      hariTextEl.textContent = hariLayanan.map(namaHari).join(', ');
+      hariInfoEl.style.display = '';
     }
 
-    function updateHariInfo() {
-      const hariList = Object.keys(cachedJadwal);
-      if (!hariList.length) { jadwalHariInfoEl.style.display = 'none'; return; }
-      hariTersediaEl.textContent = hariList
-        .map(h => { const i = DAY_KEYS.indexOf(h); return i >= 0 ? DAY_NAMES[i] : h; })
-        .join(', ');
-      jadwalHariInfoEl.style.display = '';
+    const metodeAktif = () => document.querySelector('[name="metode"]:checked')?.value || 'offline';
+    const cocok = (mJadwal, m) => !mJadwal || mJadwal === 'keduanya' || mJadwal === m;
+    const sesiTerpilih = () => document.querySelector('input[name="jadwal_pilihan"]:checked');
+
+    /** Psikolog pada sesi tertentu yang cocok dengan metode. */
+    function psikologCocok(sesi) {
+      return (sesi?.psikolog || []).filter(p => cocok(p.metode, metodeAktif()));
     }
 
-    function metodeBadge(metode) {
-      const map = {
-        online:   '<span class="badge bg-label-info" style="font-size:.6rem;">Online</span>',
-        offline:  '<span class="badge bg-label-success" style="font-size:.6rem;">Offline</span>',
-        keduanya: '<span class="badge bg-label-primary" style="font-size:.6rem;">Online &amp; Offline</span>',
-      };
-      return metode ? (map[metode] || '') : '';
+    function metodeBadge(list) {
+      const set = new Set(list.map(p => p.metode || 'keduanya'));
+      const on  = set.has('online')  || set.has('keduanya');
+      const off = set.has('offline') || set.has('keduanya');
+      if (on && off) return '<span class="badge bg-label-primary" style="font-size:.6rem;">Online &amp; Offline</span>';
+      if (on)        return '<span class="badge bg-label-info" style="font-size:.6rem;">Online</span>';
+      return '<span class="badge bg-label-success" style="font-size:.6rem;">Offline</span>';
     }
 
-    async function fetchBookedSlots() {
-      const konselorId = document.querySelector('.konselor-cb:checked')?.value ?? '';
-      const tanggal    = jadwalTanggalEl.value;
-    
-      if (!konselorId || !tanggal) { bookedSlots = []; return; }
-      try {
-        const res  = await fetch(`${SLOT_BOOKED_API}?konselor_id=${konselorId}&tanggal=${tanggal}`);
-        const data = await res.json();
-        bookedSlots = data.booked || [];
-      } catch {
-        bookedSlots = [];
-      }
+    function pesanSesi(icon, teks) {
+      sesiBox.innerHTML = `<div class="text-muted" style="font-size:.82rem;"><i class="ti ${icon} me-1"></i>${teks}</div>`;
     }
 
-    function renderJadwalForDate() {
-      if (jadwalLoading) return;
-      const container  = document.getElementById('jadwalContainer');
-      const hari       = getSelectedHari();
-      const hasJadwal  = Object.keys(cachedJadwal).length > 0;
+    // ── 2. Render sesi ──
+    function renderSesi() {
+      if (!tanggalEl.value) { pesanSesi('tabler-calendar-event', 'Pilih tanggal untuk melihat sesi yang tersedia.'); renderPsikolog(); return; }
+      if (!data)            { renderPsikolog(); return; }
 
-      // Warning jika hari yang dipilih tidak tersedia di jadwal psikolog
-      if (hari && hasJadwal && !cachedJadwal[hari]) {
-        jadwalWarnEl.style.display = '';
-      } else {
-        jadwalWarnEl.style.display = 'none';
-      }
+      const prev    = sesiTerpilih()?.value || INIT_SESI;
+      const entries = Object.entries(data.sesi || {})
+        .filter(([, s]) => data.umum || psikologCocok(s).length > 0);
 
-      if (!jadwalTanggalEl.value) {
-        container.innerHTML = '<div class="text-muted" style="font-size:.82rem;"><i class="ti tabler-calendar-event me-1"></i>Pilih tanggal untuk melihat sesi yang tersedia.</div>';
+      if (!entries.length) {
+        const m = metodeAktif() === 'online' ? 'daring' : 'tatap muka';
+        const adaSesi = Object.keys(data.sesi || {}).length > 0;
+        pesanSesi('tabler-calendar-off', adaSesi
+          ? `Tidak ada sesi konseling ${m} yang tersedia pada ${namaHari(data.hari)} ini. Coba tanggal lain atau ganti metode.`
+          : `Tidak ada sesi tersedia pada ${namaHari(data.hari)} ini. Silakan pilih tanggal lain.`);
+        renderPsikolog();
         return;
       }
 
-      const hariSlots = hari ? (cachedJadwal[hari] ?? null) : null;
-
-      if (!hariSlots || !Object.keys(hariSlots).length) {
-        container.innerHTML = '<div class="text-muted" style="font-size:.82rem;"><i class="ti tabler-calendar-off me-1"></i>Tidak ada sesi tersedia pada hari ini.</div>';
-        return;
-      }
-
-      const prevVal = document.querySelector('input[name="jadwal_pilihan"]:checked')?.value;
-      let hasSlot   = false;
-      let html      = '<div class="d-flex flex-wrap gap-2 mt-1">';
-
-      Object.entries(SLOT_LABELS).forEach(([key, label]) => {
-        const info = hariSlots[key];
-        if (!info) return;
-        hasSlot         = true;
-        const val      = `${hari}_${info.jam}`;
-        const isBooked = bookedSlots.includes(info.jam);
-        if (isBooked) return; // hide fully-booked slots
-        const checked  = prevVal === val ? 'checked' : '';
+      let html = '<div class="d-flex flex-wrap gap-2 mt-1">';
+      entries.forEach(([key, s]) => {
+        const val     = `${data.hari}_${s.jam}`;
+        const list    = data.umum ? [] : psikologCocok(s);
+        const jumlah  = data.umum ? '' : `<span class="text-muted" style="font-size:.68rem;">${list.length} psikolog</span>`;
         html += `
           <div>
-            <input type="radio" class="btn-check" name="jadwal_pilihan" id="jp_${key}" value="${val}" ${checked}>
-            <label class="btn btn-sm btn-outline-primary d-flex flex-column align-items-center px-3 py-2 gap-1"
-                   for="jp_${key}" style="min-width:110px;">
+            <input type="radio" class="btn-check" name="jadwal_pilihan" id="jp_${key}" value="${val}" ${prev === val ? 'checked' : ''}>
+            <label class="btn btn-sm btn-outline-primary d-flex flex-column align-items-center px-3 py-2 gap-1" for="jp_${key}" style="min-width:120px;">
               <i class="ti tabler-clock" style="font-size:1rem;"></i>
-              <span class="fw-semibold" style="font-size:.82rem;">${label}</span>
-              ${metodeBadge(info.metode)}
+              <span class="fw-semibold" style="font-size:.82rem;">${s.label}</span>
+              ${data.umum ? '' : metodeBadge(list)}
+              ${jumlah}
             </label>
           </div>`;
       });
-      html += '</div>';
+      sesiBox.innerHTML = html + '</div>';
+      renderPsikolog();
+    }
 
-      if (!hasSlot) {
-        container.innerHTML = '<div class="text-muted" style="font-size:.82rem;"><i class="ti tabler-calendar-off me-1"></i>Tidak ada sesi tersedia pada hari ini.</div>';
+    // ── 3. Render psikolog: tersedia = bisa dipilih, lainnya abu-abu + alasan ──
+    function renderPsikolog() {
+      const sesiEl = sesiTerpilih();
+      if (!sesiEl || !data) {
+        listEl.style.display = 'none';
+        hintEl.style.display = '';
+        hintEl.innerHTML = '<i class="ti tabler-user-question me-1"></i>Pilih sesi terlebih dahulu untuk melihat psikolog yang tersedia.';
         return;
       }
-      container.innerHTML = html;
+      listEl.style.display = '';
+      hintEl.style.display = 'none';
+
+      const jam      = sesiEl.value.split('_')[1];
+      const sesi     = Object.values(data.sesi || {}).find(s => s.jam === jam);
+      const semuaDi  = new Map((sesi?.psikolog || []).map(p => [String(p.id), p]));
+      const tersedia = new Set(psikologCocok(sesi).map(p => String(p.id)));
+      const m        = metodeAktif() === 'online' ? 'daring' : 'tatap muka';
+      let direset    = false;
+
+      listEl.querySelectorAll('label[data-konselor]').forEach(lbl => {
+        const id    = lbl.dataset.konselor;
+        const input = lbl.querySelector('input');
+        const ket   = lbl.querySelector('.psikolog-ket');
+        // Mode umum (belum ada jadwal psikolog): semua psikolog boleh dipilih
+        const ok    = data.umum || tersedia.has(id);
+
+        lbl.classList.toggle('is-off', !ok);
+        input.disabled = !ok;
+        if (ok) {
+          ket.textContent = '';
+        } else if (semuaDi.has(id)) {
+          ket.textContent = `Tidak melayani konseling ${m} di sesi ini`;
+        } else if ((PRAKTIK[id] || []).includes(data.hari)) {
+          ket.textContent = 'Tidak tersedia / sudah terisi di sesi ini';
+        } else {
+          const hari = (PRAKTIK[id] || []).map(namaHari);
+          ket.textContent = hari.length ? `Praktik: ${hari.join(', ')}` : 'Belum ada jadwal praktik';
+        }
+        if (!ok && input.checked) { input.checked = false; direset = true; }
+      });
+
+      if (direset) {
+        listEl.querySelector('input.konselor-cb[value=""]').checked = true;
+        resetEl.style.display = '';
+      }
     }
 
-    async function updateJadwal() {
-      const ids = [...document.querySelectorAll('.konselor-cb:checked')].map(e => e.value);
-      const container = document.getElementById('jadwalContainer');
-      jadwalLoading = true;
-      container.innerHTML = '<div class="text-center text-muted py-3 mt-1"><span class="spinner-border spinner-border-sm me-1"></span> Memuat jadwal...</div>';
+    async function muatKetersediaan() {
+      data = null;
+      if (!tanggalEl.value) { renderSesi(); return; }
+      if (tanggalEl.value < tanggalEl.min) {
+        pesanSesi('tabler-alert-triangle', 'Tanggal konseling paling cepat besok (H+1).');
+        renderPsikolog();
+        return;
+      }
+      const seq = ++reqSeq;
+      sesiBox.innerHTML = '<div class="text-muted py-2" style="font-size:.82rem;"><span class="spinner-border spinner-border-sm me-1"></span> Memuat sesi...</div>';
       try {
-        const qs  = ids.length ? ids.map(id => `ids[]=${id}`).join('&') : '';
-        const res = await fetch(JADWAL_API + (qs ? '?' + qs : ''));
-        const data = await res.json();
-        cachedJadwal = data.jadwal || {};
+        const res  = await fetch(`${KETERSEDIAAN_API}?tanggal=${encodeURIComponent(tanggalEl.value)}`);
+        const json = await res.json();
+        if (seq !== reqSeq) return;
+        data = res.ok ? json : null;
       } catch {
-        cachedJadwal = {};
+        if (seq !== reqSeq) return;
+        data = null;
       }
-      jadwalLoading = false;
-      updateHariInfo();
-      await fetchBookedSlots();
-      renderJadwalForDate();
+      if (!data) { pesanSesi('tabler-alert-circle', 'Gagal memuat sesi. Coba muat ulang halaman.'); renderPsikolog(); return; }
+      renderSesi();
     }
 
-    jadwalTanggalEl.addEventListener('change', async () => {
-      await fetchBookedSlots();
-      renderJadwalForDate();
+    tanggalEl.addEventListener('change', () => { resetEl.style.display = 'none'; muatKetersediaan(); });
+    document.querySelectorAll('[name="metode"]').forEach(r => r.addEventListener('change', () => { resetEl.style.display = 'none'; renderSesi(); }));
+    sesiBox.addEventListener('change', e => {
+      if (e.target.name !== 'jadwal_pilihan') return;
+      if (sesiErrEl) sesiErrEl.style.display = 'none';
+      resetEl.style.display = 'none';
+      renderPsikolog();
     });
-    document.querySelectorAll('.konselor-cb').forEach(cb => cb.addEventListener('change', updateJadwal));
-    document.getElementById('jadwalContainer').addEventListener('change', e => {
-      if (e.target.name === 'jadwal_pilihan') {
-        const errEl = document.getElementById('jadwalError');
-        if (errEl) errEl.style.display = 'none';
-      }
-    });
-    updateJadwal();
+    listEl.addEventListener('change', () => { resetEl.style.display = 'none'; });
+
+    muatKetersediaan();
 
     // ── Urgensi border color on select ────────────────────────────────────
     document.querySelectorAll('[name="urgensi"]').forEach(radio => {

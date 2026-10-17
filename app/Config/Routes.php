@@ -70,6 +70,7 @@ $routes->post('janji/konfirmasi/(:num)',     'JanjiController::konfirmasiKehadir
 $routes->post('janji/batal/(:num)',          'JanjiController::batalKonseling/$1');
 $routes->get('janji/konselor-jadwal',        'JanjiController::konselorJadwal');
 $routes->get('janji/slot-booked',           'JanjiController::slotBooked');
+$routes->get('janji/ketersediaan',          'JanjiController::ketersediaan');
 
 // Dosen
 $routes->get('dosen/dashboard',                    'DosenController::dashboard');

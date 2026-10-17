@@ -241,10 +241,10 @@ class AdminController extends BaseController
         // Preload jadwal semua konselor → dipakai JS form tetapkan jadwal
         $timeToSlot = [
             '08:00:00' => 's1',
-            '09:30:00' => 's2',
-            '11:00:00' => 's3',
+            '09:20:00' => 's2',
+            '10:40:00' => 's3',
             '12:30:00' => 's4',
-            '14:00:00' => 's5',
+            '13:50:00' => 's5',
         ];
         $konselorJadwalMap = [];
         if (! empty($konselorList)) {
@@ -892,6 +892,7 @@ HTML;
                     'status'   => $j['status'],
                     'nim'      => $j['uniid'] ?? '',
                     'metode'   => $j['metode'] ?? '',
+                    'lokasi'   => $j['lokasi_link'] ?? '',
                     'konselor' => $kNama,
                 ],
             ];
@@ -957,10 +958,24 @@ HTML;
 
         $post = $this->request->getPost();
 
+        // Jadwal manual: jam bebas di luar sesi standar psikolog
+        $manual = ! empty($post['jadwal_manual']);
+        $jam    = $manual ? ($post['jam_konseling_manual'] ?? '') : ($post['jam_konseling'] ?? '');
+
+        if (empty($post['konselor_id']) || empty($post['tanggal_konseling'])) {
+            return redirect()->back()->withInput()->with('error', 'Psikolog dan tanggal konseling wajib diisi.');
+        }
+        if (! preg_match('/^([01]\d|2[0-3]):[0-5]\d(:[0-5]\d)?$/', (string) $jam)) {
+            return redirect()->back()->withInput()->with('error', $manual ? 'Jam manual wajib diisi dengan format yang benar.' : 'Pilih sesi konseling.');
+        }
+        if (strlen($jam) === 5) {
+            $jam .= ':00';
+        }
+
         $updateData = [
             'konselor_id'       => (int) $post['konselor_id'],
             'tanggal_konseling' => $post['tanggal_konseling'],
-            'jam_konseling'     => $post['jam_konseling'],
+            'jam_konseling'     => $jam,
             'lokasi_link'       => $post['lokasi_link'] ?? null,
             'catatan_admin'     => $post['catatan_admin'] ?? null,
             'status'            => 'dikonfirmasi',
@@ -1801,11 +1816,11 @@ HTML;
     private static function jadwalSlots(): array
     {
         return [
-            's1' => ['mulai' => '08:00:00', 'selesai' => '09:00:00', 'label' => '08.00–09.00'],
-            's2' => ['mulai' => '09:30:00', 'selesai' => '10:30:00', 'label' => '09.30–10.30'],
-            's3' => ['mulai' => '11:00:00', 'selesai' => '12:00:00', 'label' => '11.00–12.00'],
-            's4' => ['mulai' => '12:30:00', 'selesai' => '13:30:00', 'label' => '12.30–13.30'],
-            's5' => ['mulai' => '14:00:00', 'selesai' => '15:00:00', 'label' => '14.00–15.00'],
+            's1' => ['mulai' => '08:00:00', 'selesai' => '08:50:00', 'label' => '08.00–08.50'],
+            's2' => ['mulai' => '09:20:00', 'selesai' => '10:10:00', 'label' => '09.20–10.10'],
+            's3' => ['mulai' => '10:40:00', 'selesai' => '11:30:00', 'label' => '10.40–11.30'],
+            's4' => ['mulai' => '12:30:00', 'selesai' => '13:20:00', 'label' => '12.30–13.20'],
+            's5' => ['mulai' => '13:50:00', 'selesai' => '14:40:00', 'label' => '13.50–14.40'],
         ];
     }
 

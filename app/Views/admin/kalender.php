@@ -47,6 +47,16 @@
     background: #f8fafc;
     cursor: pointer;
   }
+  .fc-list-meta {
+    font-size: .75rem;
+    color: #64748b;
+    margin-top: 2px;
+  }
+  .fc-list-meta a {
+    color: #1a5f7a;
+    text-decoration: underline;
+    word-break: break-all;
+  }
   /* tooltip */
   .fc-event-tooltip {
     position: fixed;
@@ -111,6 +121,10 @@ $statusColor = [
     <?= $label ?>
   </span>
   <?php endforeach ?>
+  <span class="text-muted ms-3 me-1" style="font-size:.78rem;">Metode:</span>
+  <span class="d-inline-flex align-items-center gap-1" style="font-size:.78rem;"><i class="ti tabler-building"></i> Offline</span>
+  <span class="d-inline-flex align-items-center gap-1" style="font-size:.78rem;"><i class="ti tabler-video"></i> Online</span>
+  <span class="d-inline-flex align-items-center gap-1" style="font-size:.78rem;"><i class="ti tabler-arrows-exchange"></i> Hybrid</span>
 </div>
 
 <!-- Kalender -->
@@ -142,6 +156,31 @@ $statusColor = [
     dibatalkan:   'Dibatalkan',
   };
 
+  const metodeInfo = {
+    offline: { label: 'Offline', icon: 'tabler-building' },
+    online:  { label: 'Online',  icon: 'tabler-video' },
+    hybrid:  { label: 'Hybrid',  icon: 'tabler-arrows-exchange' },
+  };
+
+  function esc(str) {
+    const d = document.createElement('div');
+    d.textContent = str ?? '';
+    return d.innerHTML;
+  }
+
+  function isUrl(str) {
+    return /^https?:\/\//i.test(str ?? '');
+  }
+
+  /* "Online · https://meet..." / "Offline · Ruang 2" — teks aman untuk HTML */
+  function metodeLokasiText(p) {
+    const m = metodeInfo[p.metode];
+    const parts = [];
+    if (m) parts.push(m.label);
+    parts.push(p.lokasi ? esc(p.lokasi) : (p.status === 'menunggu' ? 'Tempat/link belum ditetapkan' : 'Tempat/link belum diisi'));
+    return parts.join(' · ');
+  }
+
   const cal = new FullCalendar.Calendar(document.getElementById('kalender-smhws'), {
     locale: 'id',
     initialView: 'dayGridMonth',
@@ -163,6 +202,7 @@ $statusColor = [
 
     /* Klik event → navigasi ke detail */
     eventClick: function (info) {
+      if (info.jsEvent.target.closest('.fc-list-meta a')) return; // link meeting dibuka di tab baru
       info.jsEvent.preventDefault();
       if (info.event.url) window.location.href = info.event.url;
     },
@@ -181,8 +221,9 @@ $statusColor = [
       const jam = info.event.start
         ? info.event.start.toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' }) + ' WIB · '
         : '';
-      tooltip.innerHTML = info.event.title + ' · ' + nim + jam + lbl 
-        + (ks ? '<br>' + ks : '');
+      tooltip.innerHTML = esc(info.event.title) + ' · ' + esc(nim) + jam + lbl
+        + (ks ? '<br>' + esc(ks) : '')
+        + '<br>' + metodeLokasiText(p);
       tooltip.style.display = 'block';
     },
     eventMouseLeave: function () {
@@ -194,11 +235,41 @@ $statusColor = [
       const p   = arg.event.extendedProps;
       const lbl = statusLabel[p.status] ?? '';
       if (arg.view.type === 'listWeek') return; // pakai default list
-      const dot = '<span style="width:6px;height:6px;border-radius:50%;background:#fff;display:inline-block;margin-right:4px;opacity:.85;flex-shrink:0;"></span>';
-      const name = '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + arg.event.title + '</span>';
+      const m    = metodeInfo[p.metode];
+      const icon = m
+        ? '<i class="ti ' + m.icon + '" title="' + m.label + '" style="font-size:.85rem;margin-right:4px;flex-shrink:0;"></i>'
+        : '<span style="width:6px;height:6px;border-radius:50%;background:#fff;display:inline-block;margin-right:4px;opacity:.85;flex-shrink:0;"></span>';
+      const name = '<span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc(arg.event.title) + '</span>';
       return {
-        html: '<div style="display:flex;align-items:center;width:100%;overflow:hidden;">' + dot + name + '</div>',
+        html: '<div style="display:flex;align-items:center;width:100%;overflow:hidden;">' + icon + name + '</div>',
       };
+    },
+
+    /* Tampilan Daftar: tambah baris metode + tempat/link di bawah nama */
+    eventDidMount: function (arg) {
+      if (arg.view.type !== 'listWeek') return;
+      const titleCell = arg.el.querySelector('.fc-list-event-title');
+      if (!titleCell) return;
+
+      const p = arg.event.extendedProps;
+      const m = metodeInfo[p.metode];
+      const meta = document.createElement('div');
+      meta.className = 'fc-list-meta';
+
+      let html = m ? '<i class="ti ' + m.icon + ' me-1"></i>' + m.label : '';
+      if (p.lokasi) {
+        const lokasi = isUrl(p.lokasi)
+          ? '<a href="' + esc(p.lokasi) + '" target="_blank" rel="noopener">' + esc(p.lokasi) + '</a>'
+          : esc(p.lokasi);
+        html += (html ? ' · ' : '') + '<i class="ti tabler-map-pin me-1"></i>' + lokasi;
+      } else {
+        html += (html ? ' · ' : '') + '<span class="fst-italic">' + (p.status === 'menunggu' ? 'Tempat/link belum ditetapkan' : 'Tempat/link belum diisi') + '</span>';
+      }
+      meta.innerHTML = html;
+
+      // Klik link meeting tidak ikut membuka halaman detail janji
+      meta.querySelectorAll('a').forEach(a => a.addEventListener('click', e => e.stopPropagation()));
+      titleCell.appendChild(meta);
     },
 
     noEventsContent: 'Tidak ada jadwal pada periode ini.',
