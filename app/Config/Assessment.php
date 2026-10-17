@@ -25,5 +25,16 @@ class Assessment extends BaseConfig
             'url'         => 'skrining/dass',
             'aktif'       => true,
         ],
+        'internet' => [
+            'nama'        => 'Kebiasaan & dampak penggunaan internet',
+            'singkatan'   => 'Pola Penggunaan Internet',
+            'deskripsi'   => 'Mengenali kebiasaan penggunaan internetmu dan dampaknya terhadap belajar, tidur, dan hubungan sosial.',
+            'icon'        => 'tabler-world-www',
+            'color'       => '#2d9b6e',
+            'jumlah_item' => '18 pertanyaan',
+            'durasi'      => '± 5 menit',
+            'url'         => 'skrining/internet',
+            'aktif'       => true,
+        ],
     ];
 }

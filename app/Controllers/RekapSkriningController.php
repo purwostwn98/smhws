@@ -6,12 +6,13 @@ use App\Models\DassAssessmentModel;
 use App\Models\SkriningPublikModel;
 
 /**
- * Rekap hasil Mental Health Check (skrining publik). Saat ini: DASS-21.
+ * Rekap hasil Mental Health Check (skrining publik) — DASS-21.
+ * Rekap Pola Penggunaan Internet ada di RekapInternetController (memakai helper filter di sini).
  * Dilindungi filter superadmin untuk URL admin/*.
  */
 class RekapSkriningController extends BaseController
 {
-    private const PER_HALAMAN = 20;
+    protected const PER_HALAMAN = 20;
     private const SUBSKALA    = ['depresi' => 'Depresi', 'anxiety' => 'Kecemasan', 'stress' => 'Stres'];
     private const KATEGORI    = ['normal', 'ringan', 'sedang', 'berat', 'sangat_berat'];
 
@@ -30,7 +31,8 @@ class RekapSkriningController extends BaseController
             'total'   => $total,
             'filters' => $filters,
             'stats'   => $this->statistik($filters),
-            'opsi'    => $this->opsiFilter(),
+            'opsi'    => $this->opsiFilter('skrining_publik'),
+            'jenisAktif' => 'dass',
             'queryString' => http_build_query(array_filter($filters, fn($v) => $v !== '')),
         ]);
     }
@@ -52,6 +54,23 @@ class RekapSkriningController extends BaseController
         return view('admin/rekap_skrining/detail', ['row' => $row, 'jawaban' => $jawaban]);
     }
 
+    /** Kirim CSV sebagai unduhan (BOM UTF-8 agar Excel membaca benar). */
+    protected function kirimCsv(array $header, array $baris, string $namaFile)
+    {
+        $out = fopen('php://temp', 'r+');
+        fwrite($out, "\xEF\xBB\xBF");
+        fputcsv($out, $header);
+        foreach ($baris as $b) fputcsv($out, $b);
+        rewind($out);
+        $csv = stream_get_contents($out);
+        fclose($out);
+
+        return $this->response
+            ->setHeader('Content-Type', 'text/csv; charset=utf-8')
+            ->setHeader('Content-Disposition', 'attachment; filename="' . $namaFile . '"')
+            ->setBody($csv);
+    }
+
     /** Unduh CSV (hasil sesuai filter). */
     public function export()
     {
@@ -59,31 +78,27 @@ class RekapSkriningController extends BaseController
         $this->terapkanFilter($model, $this->filters());
         $rows = $model->orderBy('created_at', 'DESC')->findAll();
 
-        $out = fopen('php://temp', 'r+');
-        fwrite($out, "\xEF\xBB\xBF"); // BOM agar Excel membaca UTF-8
-        fputcsv($out, ['No', 'Tanggal', 'Jenis Kelamin', 'Semester', 'Fakultas', 'Program Studi',
-            'Skor Depresi', 'Kategori Depresi', 'Skor Kecemasan', 'Kategori Kecemasan', 'Skor Stres', 'Kategori Stres']);
+        $baris = [];
         foreach ($rows as $i => $r) {
-            fputcsv($out, [
+            $baris[] = [
                 $i + 1, $r['created_at'], $r['jenis_kelamin'], $r['semester'], $r['nama_fakultas'], $r['nama_prodi'],
                 $r['skor_depresi'], DassAssessmentModel::labelKategori($r['kategori_depresi']),
                 $r['skor_anxiety'], DassAssessmentModel::labelKategori($r['kategori_anxiety']),
                 $r['skor_stress'],  DassAssessmentModel::labelKategori($r['kategori_stress']),
-            ]);
+            ];
         }
-        rewind($out);
-        $csv = stream_get_contents($out);
-        fclose($out);
 
-        return $this->response
-            ->setHeader('Content-Type', 'text/csv; charset=utf-8')
-            ->setHeader('Content-Disposition', 'attachment; filename="rekap-skrining-dass-' . date('Ymd') . '.csv"')
-            ->setBody($csv);
+        return $this->kirimCsv(
+            ['No', 'Tanggal', 'Jenis Kelamin', 'Semester', 'Fakultas', 'Program Studi',
+             'Skor Depresi', 'Kategori Depresi', 'Skor Kecemasan', 'Kategori Kecemasan', 'Skor Stres', 'Kategori Stres'],
+            $baris,
+            'rekap-skrining-dass-' . date('Ymd') . '.csv'
+        );
     }
 
     // ── Helper ─────────────────────────────────────────────────────────────
 
-    private function filters(): array
+    protected function filters(): array
     {
         $g = fn(string $k) => trim((string) ($this->request->getGet($k) ?? ''));
         return [
@@ -97,7 +112,7 @@ class RekapSkriningController extends BaseController
     }
 
     /** Terapkan filter ke model/builder (where saja). */
-    private function terapkanFilter($b, array $f): void
+    protected function terapkanFilter($b, array $f): void
     {
         if ($f['fakultas'] !== '')      $b->where('nama_fakultas', $f['fakultas']);
         if ($f['id_lembaga'] !== '')    $b->where('id_lembaga', $f['id_lembaga']);
@@ -124,13 +139,14 @@ class RekapSkriningController extends BaseController
         return $stats;
     }
 
-    private function opsiFilter(): array
+    /** Opsi dropdown filter dari data yang sudah ada di tabel hasil. */
+    protected function opsiFilter(string $tabel): array
     {
         $db = \Config\Database::connect();
         return [
-            'fakultas' => array_column($db->table('skrining_publik')->select('nama_fakultas')->distinct()
+            'fakultas' => array_column($db->table($tabel)->select('nama_fakultas')->distinct()
                 ->where('nama_fakultas IS NOT NULL')->orderBy('nama_fakultas')->get()->getResultArray(), 'nama_fakultas'),
-            'prodi'    => $db->table('skrining_publik')->select('id_lembaga, nama_prodi')->distinct()
+            'prodi'    => $db->table($tabel)->select('id_lembaga, nama_prodi')->distinct()
                 ->orderBy('nama_prodi')->get()->getResultArray(),
             'semester' => range(1, 14),
         ];

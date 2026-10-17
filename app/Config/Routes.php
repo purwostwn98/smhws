@@ -24,6 +24,12 @@ $routes->group('skrining', ['namespace' => 'App\Controllers\Skrining'], static f
     $routes->post('dass/submit',   'DassController::submit');
     $routes->get('dass/hasil',     'DassController::hasil');
     $routes->get('dass/hasil/pdf', 'DassController::pdf');
+
+    // Pola Penggunaan Internet
+    $routes->get('internet',           'InternetController::index');
+    $routes->post('internet/submit',   'InternetController::submit');
+    $routes->get('internet/hasil',     'InternetController::hasil');
+    $routes->get('internet/hasil/pdf', 'InternetController::pdf');
 });
 
 // Auth
@@ -116,6 +122,9 @@ $routes->post('admin/konselor/toggle/(:num)',    'AdminController::konselorToggl
 $routes->get('admin/rekap-skrining',              'RekapSkriningController::index');
 $routes->get('admin/rekap-skrining/export',       'RekapSkriningController::export');
 $routes->get('admin/rekap-skrining/(:num)',       'RekapSkriningController::detail/$1');
+$routes->get('admin/rekap-skrining/internet',          'RekapInternetController::index');
+$routes->get('admin/rekap-skrining/internet/export',   'RekapInternetController::export');
+$routes->get('admin/rekap-skrining/internet/(:num)',   'RekapInternetController::detail/$1');
 
 // Admin: Ask Our Psychologist
 $routes->get('admin/tanya',                    'TanyaAdminController::index');
