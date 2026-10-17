@@ -19,7 +19,7 @@ $staff       = $staff       ?? [];
     <div class="position-absolute bottom-0 start-0 opacity-25" style="width:350px;height:350px;background:radial-gradient(circle,#1a5f7a 0%,transparent 70%);transform:translate(-30%,30%);pointer-events:none;"></div>
 
     <div class="container">
-      <div class="row align-items-center gy-8">
+      <div class="row align-items-center gy-8 mt-2">
 
         <!-- Teks -->
         <div class="col-lg-6">

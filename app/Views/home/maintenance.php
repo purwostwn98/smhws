@@ -59,7 +59,7 @@
   <div class="misc-wrapper">
 
     <div class="misc-logo mb-6">
-      <img src="<?= base_url('myimg/logo_with_text.png') ?>" alt="SMHWS UMS">
+      <img src="<?= base_url('myimg/logo_smhws_ums_transparent.png') ?>" alt="SMHWS UMS">
     </div>
 
     <span class="badge bg-label-warning px-3 py-2 mb-4">

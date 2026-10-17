@@ -1,6 +1,6 @@
 <style>
   @media (max-width: 991.98px) {
-    .landing-nav-menu .nav-item.dropdown > .dropdown-menu {
+    .landing-nav-menu .nav-item.dropdown>.dropdown-menu {
       position: static !important;
       transform: none !important;
       inset: auto !important;
@@ -13,8 +13,14 @@
       box-shadow: none;
       background: transparent;
     }
-    .landing-nav-menu .nav-item.dropdown > .dropdown-menu:not(.show) { display: none; }
-    .landing-nav-menu .nav-item.dropdown > .dropdown-menu.show { display: block; }
+
+    .landing-nav-menu .nav-item.dropdown>.dropdown-menu:not(.show) {
+      display: none;
+    }
+
+    .landing-nav-menu .nav-item.dropdown>.dropdown-menu.show {
+      display: block;
+    }
   }
 </style>
 <nav class="layout-navbar shadow-none py-0">
@@ -31,8 +37,8 @@
         </button>
 
         <a href="<?= base_url('/') ?>" class="app-brand-link">
-          <img src="<?= base_url('myimg/logo_with_text.png') ?>" alt="SMHWS UMS"
-            style="height:47px;width:auto;object-fit:contain;">
+          <img src="<?= base_url('myimg/logo_smhws_ums_transparent.png') ?>" alt="SMHWS UMS"
+            style="height: 40px;width:auto;object-fit:contain;">
         </a>
       </div>
 
@@ -58,7 +64,7 @@
           ?>
           <li class="nav-item dropdown">
             <a class="nav-link fw-medium dropdown-toggle" href="#layanan" role="button"
-               data-bs-toggle="dropdown" aria-expanded="false">Layanan</a>
+              data-bs-toggle="dropdown" aria-expanded="false">Layanan</a>
             <ul class="dropdown-menu p-2" style="min-width:290px;border-radius:14px;">
               <?php foreach ($layananMenu as [$label, $icon, $warna, $url]): ?>
                 <li>
@@ -128,7 +134,7 @@
         <?php else: ?>
           <li>
             <a href="<?= base_url('login') ?>" class="btn"
-               style="background:var(--smhws-accent-warm);color:#fff;">
+              style="background:var(--smhws-accent-warm);color:#fff;">
               <span class="tf-icons icon-base ti tabler-login me-md-1"></span>
               <span class="d-none d-md-block">Login</span>
             </a>

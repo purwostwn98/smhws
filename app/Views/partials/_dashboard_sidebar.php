@@ -10,8 +10,8 @@ $uri        = uri_string();
 
   <!-- Brand -->
   <div class="app-brand demo">
-    <a href="<?= base_url('/') ?>" class="app-brand-link">
-      <img src="<?= base_url('myimg/logo_with_text.png') ?>" alt="SMHWS UMS" style="height:70px;width:auto;">
+    <a href="<?= base_url('/') ?>" class="app-brand-link flex-grow-1 justify-content-center" style="margin-top:10px;">
+      <img src="<?= base_url('myimg/logo_smhws_ums_transparent.png') ?>" alt="SMHWS UMS" style="height:45px;width:auto;">
     </a>
 
     <a href="javascript:void(0)" class="layout-menu-toggle menu-link text-auto ms-auto d-block d-xl-none">

@@ -46,7 +46,7 @@
 
   <!-- Logo brand (posisi absolute di atas) -->
   <a href="<?= base_url('/') ?>" class="app-brand auth-cover-brand d-flex align-items-center gap-2">
-    <img src="<?= base_url('myimg/logo_with_text.png') ?>" alt="SMHWS UMS" style="height:40px;width:auto;">
+    <img src="<?= base_url('myimg/logo_smhws_ums_transparent.png') ?>" alt="SMHWS UMS" style="height:40px;width:auto;">
   </a>
 
   <div class="authentication-inner row m-0">
@@ -57,7 +57,7 @@
         <div class="smhws-cover-content">
 
           <!-- Logo putih -->
-          <img src="<?= base_url('myimg/logo_with_text.png') ?>" alt="SMHWS UMS"
+          <img src="<?= base_url('myimg/logo_smhws_ums_transparent.png') ?>" alt="SMHWS UMS"
             style="height:56px;width:auto;filter:brightness(0) invert(1);opacity:.95;margin-bottom:2rem;display:block;">
 
           <!-- Tagline -->
