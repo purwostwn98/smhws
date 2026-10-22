@@ -488,7 +488,7 @@ HTML;
             return redirect()->to(base_url('login'))
                 ->with('error', 'Silakan masuk terlebih dahulu.');
         }
-        if (! (session()->get('is_superadmin') || session()->get('is_admin_fakultas'))) {
+        if (! (session()->get('is_superadmin') || session()->get('is_admin_fakultas') || session()->get('is_pimpinan_univ'))) {
             return redirect()->to(base_url('dashboard'));
         }
 
@@ -562,7 +562,7 @@ HTML;
         if (! session()->get('is_logged_in')) {
             return redirect()->to(base_url('login'))->with('error', 'Silakan masuk terlebih dahulu.');
         }
-        if (! (session()->get('is_superadmin') || session()->get('is_admin_fakultas'))) {
+        if (! (session()->get('is_superadmin') || session()->get('is_admin_fakultas') || session()->get('is_pimpinan_univ'))) {
             return redirect()->to(base_url('dashboard'));
         }
 

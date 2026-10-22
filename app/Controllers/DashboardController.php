@@ -22,6 +22,10 @@ class DashboardController extends BaseController
             return redirect()->to(base_url('admin/dashboard'));
         }
 
+        if (session()->get('is_pimpinan_univ')) {
+            return redirect()->to(base_url('admin/dashboard-univ'));
+        }
+
         if ($role === 'konselor') {
             return redirect()->to(base_url('konselor/dashboard'));
         }

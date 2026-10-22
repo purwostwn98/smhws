@@ -24,6 +24,7 @@ class UserModel extends Model
         'avatar',
         'is_superadmin',
         'is_admin_fakultas',
+        'is_pimpinan_univ',
         'is_active',
         'email_verified_at',
         'last_login_at',

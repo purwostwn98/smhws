@@ -85,6 +85,7 @@ class AuthController extends BaseController
             'user_uniid'      => $existing['uniid'],
             'is_superadmin'     => (bool) $existing['is_superadmin'],
             'is_admin_fakultas' => (bool) $existing['is_admin_fakultas'],
+            'is_pimpinan_univ'  => (bool) $existing['is_pimpinan_univ'],
             'is_logged_in'      => true,
             'auth_via_cas'      => true,
         ]);
@@ -125,6 +126,7 @@ class AuthController extends BaseController
             'user_uniid'      => $user['uniid'] ?? '',
             'is_superadmin'     => (bool) $user['is_superadmin'],
             'is_admin_fakultas' => (bool) $user['is_admin_fakultas'],
+            'is_pimpinan_univ'  => (bool) $user['is_pimpinan_univ'],
             'is_logged_in'      => true,
         ]);
 
@@ -174,7 +176,7 @@ class AuthController extends BaseController
         $path = session()->get('redirect_after_login');
         session()->remove('redirect_after_login');
 
-        $isAdmin = ! empty($user['is_superadmin']) || ! empty($user['is_admin_fakultas']);
+        $isAdmin = ! empty($user['is_superadmin']) || ! empty($user['is_admin_fakultas']) || ! empty($user['is_pimpinan_univ']);
         if ($isAdmin || ($user['role'] ?? null) !== 'mahasiswa') {
             return null;
         }
@@ -191,11 +193,16 @@ class AuthController extends BaseController
             $user = [
                 'is_superadmin'     => (bool) session()->get('is_superadmin'),
                 'is_admin_fakultas' => (bool) session()->get('is_admin_fakultas'),
+                'is_pimpinan_univ'  => (bool) session()->get('is_pimpinan_univ'),
             ];
         }
 
         if (! empty($user['is_superadmin']) || ! empty($user['is_admin_fakultas'])) {
             return base_url('admin/dashboard');
+        }
+
+        if (! empty($user['is_pimpinan_univ'])) {
+            return base_url('admin/dashboard-univ');
         }
 
         $role = $user['role'] ?? session()->get('user_role');

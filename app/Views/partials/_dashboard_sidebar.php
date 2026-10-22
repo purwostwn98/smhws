@@ -4,6 +4,7 @@ $isKonselor = session()->get('user_role') === 'konselor';
 $isDosen    = session()->get('user_role') === 'dosen';
 $isKaprodi  = (bool) session()->get('is_kaprodi'); // berlaku untuk dosen maupun psikolog
 $isDekan    = (bool) session()->get('is_dekan');   // berlaku untuk dosen maupun psikolog
+$isPimpinanUniv = (bool) session()->get('is_pimpinan_univ'); // berlaku untuk dosen maupun psikolog
 $uri        = uri_string();
 ?>
 <aside id="layout-menu" class="layout-menu menu-vertical menu bg-menu-theme">
@@ -168,6 +169,15 @@ $uri        = uri_string();
         </li>
       <?php endif ?>
 
+      <?php if ($isPimpinanUniv): ?>
+        <li class="menu-item <?= $uri === 'admin/dashboard-univ' ? 'active' : '' ?>">
+          <a href="<?= base_url('admin/dashboard-univ') ?>" class="menu-link">
+            <i class="menu-icon icon-base ti tabler-building-community"></i>
+            <div>Dashboard Universitas</div>
+          </a>
+        </li>
+      <?php endif ?>
+
       <li class="menu-header small text-uppercase mt-1">
         <span class="menu-header-text">Akun</span>
       </li>
@@ -221,6 +231,15 @@ $uri        = uri_string();
           <a href="<?= base_url('dosen/dashboard-fakultas') ?>" class="menu-link">
             <i class="menu-icon icon-base ti tabler-building-community"></i>
             <div>Dashboard Fakultas</div>
+          </a>
+        </li>
+      <?php endif ?>
+
+      <?php if ($isPimpinanUniv): ?>
+        <li class="menu-item <?= $uri === 'admin/dashboard-univ' ? 'active' : '' ?>">
+          <a href="<?= base_url('admin/dashboard-univ') ?>" class="menu-link">
+            <i class="menu-icon icon-base ti tabler-building-community"></i>
+            <div>Dashboard Universitas</div>
           </a>
         </li>
       <?php endif ?>
