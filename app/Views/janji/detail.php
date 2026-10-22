@@ -3,6 +3,7 @@
 $janji               = $janji ?? [];
 $konselorNama        = $konselorNama ?? null;
 $konselorPilihanList = $konselorPilihanList ?? [];
+$imu                 = $imu ?? null;
 $dass                = $dass ?? null;
 $safety              = $safety ?? null;
 $feedback            = $feedback ?? null;
@@ -323,7 +324,24 @@ $currentStep = $janji['status'] === 'dibatalkan' ? -1 : array_search($janji['sta
       </div>
     </div>
 
-    <!-- DASS Assessment -->
+    <!-- Asesmen Awal (IMU) -->
+    <?php if ($imu): ?>
+      <div class="card mb-4">
+        <div class="card-header d-flex align-items-center justify-content-between">
+          <h5 class="card-title mb-0">
+            <i class="ti tabler-brain me-2" style="color:#f0a500;"></i>Hasil Asesmen Awal
+          </h5>
+          <span class="text-muted" style="font-size:.78rem;">
+            <?= date('d M Y', strtotime($imu['created_at'])) ?>
+          </span>
+        </div>
+        <div class="card-body">
+          <?= view('partials/_imu_hasil', ['imu' => $imu, 'tampilArea' => false]) ?>
+        </div>
+      </div>
+    <?php endif ?>
+
+    <!-- DASS Assessment (janji lama sebelum asesmen awal IMU) -->
     <?php if ($dass): ?>
       <div class="card mb-4">
         <div class="card-header d-flex align-items-center justify-content-between">

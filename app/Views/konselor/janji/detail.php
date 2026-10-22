@@ -2,6 +2,7 @@
 <?php
 $janji           = $janji ?? [];
 $safety          = $safety ?? null;
+$imu             = $imu ?? null;
 $dass            = $dass ?? null;
 $hasil           = $hasil ?? null;
 $instansiRujukan = $instansiRujukan ?? [];
@@ -204,18 +205,15 @@ $statusNikah = $statusNikahMap[$janji['status_pernikahan'] ?? ''] ?? ucwords(str
 <?php endif ?>
 
 <!-- Safety Alert -->
-<?php if ($safety && ($safety['pikiran_mengakhiri_hidup'] === 'ya' || $safety['pernah_selfharm'] === 'ya')): ?>
+<?php if ($safetyAlasan = \App\Libraries\SafetyFlag::alasan($safety, $imu)): ?>
   <div class="alert alert-danger d-flex gap-3 align-items-start mb-3">
     <i class="ti tabler-alert-triangle" style="font-size:1.5rem;flex-shrink:0;"></i>
     <div>
       <div class="fw-bold mb-1">Perhatian: Safety Flag Aktif</div>
       <ul class="mb-0" style="font-size:.875rem;">
-        <?php if ($safety['pikiran_mengakhiri_hidup'] === 'ya'): ?>
-          <li>Mahasiswa memiliki pikiran mengakhiri hidup</li>
-        <?php endif ?>
-        <?php if ($safety['pernah_selfharm'] === 'ya'): ?>
-          <li>Mahasiswa pernah melakukan self-harm</li>
-        <?php endif ?>
+        <?php foreach ($safetyAlasan as $alasan): ?>
+          <li><?= esc($alasan) ?></li>
+        <?php endforeach ?>
       </ul>
     </div>
   </div>
@@ -446,7 +444,15 @@ if ($isFormMode): ?>
 <?php $secCard('IV', 'Hasil Asesmen Awal', 'tabler-chart-bar', '#dc3545', true) ?>
   <div class="card-body py-3 px-4" style="background:#f8f9fa;">
 
-    <!-- DASS-21 -->
+    <!-- Inventori Masalah Umum -->
+    <?php if ($imu): ?>
+    <div class="mb-4">
+      <div class="text-muted fw-semibold mb-2" style="font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;">Hasil Asesmen Awal (Inventori Masalah Umum)</div>
+      <?= view('partials/_imu_hasil', ['imu' => $imu, 'tampilArea' => true]) ?>
+    </div>
+    <?php endif ?>
+
+    <!-- DASS-21 (janji lama) -->
     <?php if ($dass):
       $dassInterpretasi = [
         'depresi' => [
@@ -499,7 +505,7 @@ if ($isFormMode): ?>
     <?php endif ?>
 
     <!-- Safety Screening (ringkas) -->
-    <?php if ($safety && array_filter([$safety['pernah_selfharm'] ?? null, $safety['pikiran_mengakhiri_hidup'] ?? null, $safety['pikiran_mengganggu'] ?? null], fn($v) => $v === 'ya')): ?>
+    <?php if (\App\Libraries\SafetyFlag::alasan($safety)): ?>
     <div class="mb-4">
       <div class="text-muted fw-semibold mb-2" style="font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;">Safety Screening</div>
       <div class="row g-2" style="font-size:.82rem;">

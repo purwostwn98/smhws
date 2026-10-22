@@ -7,8 +7,11 @@ use App\Models\KonselorModel;
 use App\Models\UserModel;
 use App\Models\HasilKonselingModel;
 use App\Models\DassAssessmentModel;
+use App\Models\ImuAssessmentModel;
 use App\Models\ChecklistItemModel;
 use App\Models\InstansiRujukanModel;
+use App\Libraries\SafetyFlag;
+use App\Libraries\InventoriMasalahUmum as IMU;
 
 class AdminController extends BaseController
 {
@@ -51,29 +54,30 @@ class AdminController extends BaseController
         $safetyFlagIds = [];
         if (! empty($janjiMenunggu)) {
             $ids     = array_column($janjiMenunggu, 'id');
-            $flagRows = $db->table('janji_safety_screening')
-                ->select('janji_id')
-                ->whereIn('janji_id', $ids)
-                ->groupStart()
-                ->where('pikiran_mengakhiri_hidup', 'ya')
-                ->orWhere('pernah_selfharm', 'ya')
-                ->groupEnd()
-                ->get()->getResultArray();
+            $flagRows = SafetyFlag::where(
+                $db->table('janji_safety_screening')
+                    ->select('janji_id')
+                    ->whereIn('janji_id', $ids)
+            )->get()->getResultArray();
             $safetyFlagIds = array_column($flagRows, 'janji_id');
         }
 
         // ── Safety screening aktif (semua status aktif yang bermasalah) ──────
-        $safetyAlerts = $db->table('janji')
-            ->select('janji.id, janji.status, janji.created_at, users.name AS mahasiswa_nama,
-                      jss.pernah_selfharm, jss.pikiran_mengakhiri_hidup, jss.pikiran_mengganggu')
-            ->join('users', 'users.id = janji.user_id')
-            ->join('janji_safety_screening jss', 'jss.janji_id = janji.id')
-            ->where('janji.deleted_at', null)
-            ->whereIn('janji.status', ['menunggu', 'dikonfirmasi', 'berlangsung'])
-            ->groupStart()
-            ->where('jss.pikiran_mengakhiri_hidup', 'ya')
-            ->orWhere('jss.pernah_selfharm', 'ya')
-            ->groupEnd()
+        $safetyAlerts = SafetyFlag::where(
+            $db->table('janji')
+                ->select('janji.id, janji.status, janji.created_at, users.name AS mahasiswa_nama,
+                          jss.pernah_selfharm, jss.pikiran_mengakhiri_hidup, jss.pikiran_mengganggu, jss.merasa_aman')
+                ->select('(SELECT imj.jawaban FROM imu_assessments imu
+                           JOIN imu_jawaban imj ON imj.assessment_id = imu.id
+                           WHERE imu.janji_id = janji.id AND imu.deleted_at IS NULL
+                             AND imj.nomor_item = ' . IMU::BUTIR_BUNUH_DIRI . ' LIMIT 1) AS imu_bunuh_diri', false)
+                ->join('users', 'users.id = janji.user_id')
+                ->join('janji_safety_screening jss', 'jss.janji_id = janji.id')
+                ->where('janji.deleted_at', null)
+                ->whereIn('janji.status', ['menunggu', 'dikonfirmasi', 'berlangsung']),
+            'jss.',
+            'janji.id'
+        )
             ->orderBy('janji.created_at', 'DESC')
             ->limit(6)
             ->get()->getResultArray();
@@ -84,15 +88,19 @@ class AdminController extends BaseController
             ->orderBy('konselor.total_sesi', 'DESC')
             ->findAll();
 
-        // ── DASS overview ────────────────────────────────────────────────────
-        $dassStats = $db->query("
+        // ── Ringkasan asesmen awal IMU ───────────────────────────────────────
+        $ambangArea = IMU::AMBANG_AREA;
+        $imuStats = $db->query("
             SELECT
-                COALESCE(SUM(kategori_depresi IN ('berat','sangat_berat')), 0) AS depresi_berat,
-                COALESCE(SUM(kategori_anxiety IN ('berat','sangat_berat')), 0) AS anxiety_berat,
-                COALESCE(SUM(kategori_stress  IN ('berat','sangat_berat')), 0) AS stress_berat,
-                COUNT(*) AS total
-            FROM dass_assessments WHERE deleted_at IS NULL
-        ")->getRowArray() ?? ['depresi_berat' => 0, 'anxiety_berat' => 0, 'stress_berat' => 0, 'total' => 0];
+                COUNT(*) AS total,
+                COALESCE(SUM(kategori = 'rendah'), 0) AS rendah,
+                COALESCE(SUM(kategori = 'sedang'), 0) AS sedang,
+                COALESCE(SUM(kategori = 'tinggi'), 0) AS tinggi,
+                COALESCE(SUM(skor_area_emosi > {$ambangArea}), 0)     AS area_emosi,
+                COALESCE(SUM(skor_area_akademik > {$ambangArea}), 0)  AS area_akademik,
+                COALESCE(SUM(skor_area_kesehatan > {$ambangArea}), 0) AS area_kesehatan
+            FROM imu_assessments WHERE deleted_at IS NULL
+        ")->getRowArray() ?? [];
 
         return view('admin/dashboard', [
             'stats'         => $stats,
@@ -102,7 +110,7 @@ class AdminController extends BaseController
             'safetyFlagIds' => $safetyFlagIds,
             'safetyAlerts'  => $safetyAlerts,
             'konselorList'  => $konselorList,
-            'dassStats'     => $dassStats,
+            'imuStats'      => $imuStats,
         ]);
     }
 
@@ -139,14 +147,11 @@ class AdminController extends BaseController
         $safetyFlagIds = [];
         if (! empty($daftarJanji)) {
             $ids      = array_column($daftarJanji, 'id');
-            $flagRows = $db->table('janji_safety_screening')
-                ->select('janji_id')
-                ->whereIn('janji_id', $ids)
-                ->groupStart()
-                ->where('pikiran_mengakhiri_hidup', 'ya')
-                ->orWhere('pernah_selfharm', 'ya')
-                ->groupEnd()
-                ->get()->getResultArray();
+            $flagRows = SafetyFlag::where(
+                $db->table('janji_safety_screening')
+                    ->select('janji_id')
+                    ->whereIn('janji_id', $ids)
+            )->get()->getResultArray();
             $safetyFlagIds = array_column($flagRows, 'janji_id');
         }
 
@@ -226,9 +231,9 @@ class AdminController extends BaseController
             if ($k) $konselorNama = KonselorModel::namaLengkap($k);
         }
 
-        // DASS
-        $dassModel = new DassAssessmentModel();
-        $dass = $dassModel->where('janji_id', $id)->first();
+        // Asesmen awal: IMU (janji baru) atau DASS (janji lama)
+        $imu  = (new ImuAssessmentModel())->byJanji($id);
+        $dass = $imu ? null : (new DassAssessmentModel())->where('janji_id', $id)->first();
 
         // Safety screening
         $safety = $db->table('janji_safety_screening')
@@ -273,6 +278,7 @@ class AdminController extends BaseController
             'konselorList'        => $konselorList,
             'konselorNama'        => $konselorNama,
             'konselorPilihanList' => $konselorPilihanList,
+            'imu'                 => $imu,
             'dass'                => $dass,
             'safety'              => $safety,
             'hasil'               => $hasil,
@@ -308,8 +314,8 @@ class AdminController extends BaseController
             }
         }
 
-        $dassModel = new DassAssessmentModel();
-        $dass      = $dassModel->where('janji_id', $id)->first();
+        $imu       = (new ImuAssessmentModel())->byJanji($id);
+        $dass      = $imu ? null : (new DassAssessmentModel())->where('janji_id', $id)->first();
         $safety    = $db->table('janji_safety_screening')->where('janji_id', $id)->get()->getRowArray();
 
         $hasilModel      = new HasilKonselingModel();
@@ -321,6 +327,7 @@ class AdminController extends BaseController
             'janji'           => $janji,
             'konselorNama'    => $konselorNama,
             'konselorNoStr'   => $konselorNoStr,
+            'imu'             => $imu,
             'dass'            => $dass,
             'safety'          => $safety,
             'hasil'           => $hasil,

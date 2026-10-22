@@ -6,6 +6,7 @@ $janji               = $janji ?? [];
 $konselorList        = $konselorList ?? [];
 $konselorNama        = $konselorNama ?? null;
 $konselorPilihanList = $konselorPilihanList ?? [];
+$imu                 = $imu ?? null;
 $dass                = $dass ?? null;
 $safety              = $safety ?? null;
 $hasil               = $hasil ?? null;
@@ -122,18 +123,15 @@ $statusNikah = $statusNikahMap[$janji['status_pernikahan'] ?? ''] ?? ucwords(str
 <?php endif ?>
 
 <!-- Safety Alert -->
-<?php if ($safety && ($safety['pikiran_mengakhiri_hidup'] === 'ya' || $safety['pernah_selfharm'] === 'ya')): ?>
+<?php if ($safetyAlasan = \App\Libraries\SafetyFlag::alasan($safety, $imu)): ?>
   <div class="alert alert-danger d-flex gap-3 align-items-start mb-4" role="alert">
     <i class="ti tabler-alert-triangle" style="font-size:1.5rem;flex-shrink:0;margin-top:.1rem;"></i>
     <div>
       <div class="fw-bold mb-1">Safety Flag Aktif</div>
       <ul class="mb-0" style="font-size:.875rem;">
-        <?php if ($safety['pikiran_mengakhiri_hidup'] === 'ya'): ?>
-          <li>Mahasiswa memiliki pikiran mengakhiri hidup</li>
-        <?php endif ?>
-        <?php if ($safety['pernah_selfharm'] === 'ya'): ?>
-          <li>Mahasiswa pernah melakukan self-harm</li>
-        <?php endif ?>
+        <?php foreach ($safetyAlasan as $alasan): ?>
+          <li><?= esc($alasan) ?></li>
+        <?php endforeach ?>
       </ul>
     </div>
   </div>
@@ -337,7 +335,15 @@ $isDisplayMode = (bool) $hasil;
 <?php $secCard('IV', 'Hasil Asesmen Awal', 'tabler-chart-bar', '#dc3545', true) ?>
   <div class="card-body py-3 px-4" style="background:#f8f9fa;">
 
-    <!-- DASS-21 -->
+    <!-- Inventori Masalah Umum -->
+    <?php if ($imu): ?>
+    <div class="mb-4">
+      <div class="text-muted fw-semibold mb-2" style="font-size:.78rem;text-transform:uppercase;letter-spacing:.05em;">Hasil Asesmen Awal (Inventori Masalah Umum)</div>
+      <?= view('partials/_imu_hasil', ['imu' => $imu, 'tampilArea' => true]) ?>
+    </div>
+    <?php endif ?>
+
+    <!-- DASS-21 (janji lama) -->
     <?php if ($dass):
       $dassInterpretasi = [
         'depresi' => [
@@ -745,7 +751,19 @@ foreach ($lanjutan_secs as $secKey => $secData):
       </div>
     </div>
 
-    <!-- DASS -->
+    <!-- Asesmen Awal (IMU) -->
+    <?php if ($imu): ?>
+    <div class="card shadow-sm mb-4">
+      <div class="card-header py-3">
+        <h6 class="mb-0 fw-semibold"><i class="ti tabler-chart-bar me-2 text-danger"></i>Hasil Asesmen Awal (Inventori Masalah Umum)</h6>
+      </div>
+      <div class="card-body">
+        <?= view('partials/_imu_hasil', ['imu' => $imu, 'tampilArea' => true]) ?>
+      </div>
+    </div>
+    <?php endif ?>
+
+    <!-- DASS (janji lama) -->
     <?php if ($dass): ?>
     <div class="card shadow-sm mb-4">
       <div class="card-header py-3">

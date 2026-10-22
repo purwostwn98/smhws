@@ -8,6 +8,7 @@
 /** @var array      $janji */
 /** @var string|null $konselorNama */
 /** @var string     $konselorNoStr */
+/** @var array|null $imu */
 /** @var array|null $dass */
 /** @var array|null $safety */
 /** @var array|null $hasil */
@@ -16,6 +17,7 @@
 $janji           = $janji           ?? [];
 $konselorNama    = $konselorNama    ?? null;
 $konselorNoStr   = $konselorNoStr   ?? '—';
+$imu             = $imu             ?? null;
 $dass            = $dass            ?? null;
 $safety          = $safety          ?? null;
 $hasil           = $hasil           ?? null;
@@ -511,6 +513,40 @@ if ($hasil && (! empty($hasil['jam_mulai']) || ! empty($hasil['jam_selesai']))) 
 
 <!-- ═══ IV. HASIL ASESMEN ═══ -->
 <div class="sec">IV. Hasil Asesmen</div>
+
+<?php if ($imu):
+  $imuLib = \App\Libraries\InventoriMasalahUmum::class;
+  $imuKat = $imuLib::KATEGORI[$imu['kategori']] ?? $imuLib::KATEGORI['rendah'];
+  $imuArea = $imuLib::skorAreaDariBaris($imu);
+?>
+  <p style="font-weight:bold;margin-bottom:3pt;">Hasil Asesmen Awal (Inventori Masalah Umum)</p>
+  <table class="dass">
+    <tr>
+      <th>Aspek</th>
+      <th class="num">Skor</th>
+      <th class="kat">Kategori</th>
+    </tr>
+    <tr>
+      <td><strong>Skor Total (Distres Global)</strong></td>
+      <td class="num"><strong><?= (int) $imu['skor_total'] ?></strong></td>
+      <td class="kat"><strong><?= esc($imuKat[2]) ?></strong></td>
+    </tr>
+    <?php foreach ($imuLib::AREA as $kode => [$awal, $akhir, $nama]): ?>
+      <tr>
+        <td><?= esc($nama) ?> (butir <?= $awal ?>–<?= $akhir ?>)</td>
+        <td class="num"><?= $imuArea[$kode] ?></td>
+        <td class="kat"><?= $imuLib::areaTinggi($imuArea[$kode]) ? 'Di atas ' . $imuLib::AMBANG_AREA : 'Dalam batas' ?></td>
+      </tr>
+    <?php endforeach ?>
+  </table>
+  <p style="font-size:10pt;margin:0 0 8pt;"><?= esc($imuKat[3]) ?></p>
+  <?php if (! empty($imu['obat_keterangan'])): ?>
+    <p style="font-size:10pt;margin:0 0 3pt;">Obat yang diresepkan dokter: <?= esc($imu['obat_keterangan']) ?></p>
+  <?php endif ?>
+  <?php if (! empty($imu['lainnya_keterangan'])): ?>
+    <p style="font-size:10pt;margin:0 0 8pt;">Masalah lainnya: <?= esc($imu['lainnya_keterangan']) ?></p>
+  <?php endif ?>
+<?php endif ?>
 
 <?php if ($dass): ?>
   <p style="font-weight:bold;margin-bottom:3pt;">Hasil Asesmen Awal (DASS-21)</p>

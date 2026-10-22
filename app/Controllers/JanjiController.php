@@ -3,8 +3,9 @@
 namespace App\Controllers;
 
 use App\Models\JanjiModel;
-use App\Models\DassItemModel;
+use App\Libraries\InventoriMasalahUmum as IMU;
 use App\Models\DassAssessmentModel;
+use App\Models\ImuAssessmentModel;
 use App\Models\FeedbackKonselingModel;
 use App\Models\KonselorModel;
 use App\Models\UserModel;
@@ -27,12 +28,10 @@ class JanjiController extends BaseController
 
         $userModel    = new UserModel();
         $konselorModel = new KonselorModel();
-        $dassItemModel = new DassItemModel();
 
         $userId    = session()->get('user_id');
         $user      = $userModel->find($userId);
         $konselor  = $konselorModel->withUser()->available()->findAll();
-        $dassItems = $dassItemModel->orderBy('nomor')->findAll();
 
         $janjiModel       = new JanjiModel();
         $pernahSelesai    = $janjiModel->where('user_id', $userId)
@@ -54,7 +53,6 @@ class JanjiController extends BaseController
             'konselor'      => $konselor,
             'praktikMap'    => $praktik,
             'tanggalMin'    => date('Y-m-d', strtotime('+1 day')),
-            'dassItems'     => $dassItems,
             'pernahSelesai' => $pernahSelesai,
         ]);
     }
@@ -88,10 +86,25 @@ class JanjiController extends BaseController
         }
 
         // Validasi jadwal: tanggal minimal H+1, sesi tersedia, psikolog (bila dipilih) praktik di sesi itu
+        // error_step memakai penomoran server (1–4); view menggesernya +1 karena step 1 = informed consent
         if ($errJadwal = $this->validasiJadwal($post)) {
             return redirect()->back()->withInput()
-                ->with('error_step', 2)
+                ->with('error_step', 1)
                 ->with('error', $errJadwal);
+        }
+
+        $jawaban = $this->ambilJawabanImu($post);
+        if ($jawaban === null) {
+            return redirect()->back()->withInput()
+                ->with('error_step', 3)
+                ->with('error', 'Semua ' . count(IMU::BUTIR) . ' pertanyaan Asesmen Awal wajib dijawab.');
+        }
+
+        $safety = $this->ambilSafetyScreening($post);
+        if ($safety === null) {
+            return redirect()->back()->withInput()
+                ->with('error_step', 4)
+                ->with('error', 'Semua pertanyaan Skrining Keselamatan wajib dijawab.');
         }
 
         $janjiModel = new JanjiModel();
@@ -128,7 +141,7 @@ class JanjiController extends BaseController
             $dbError          = $db->error();
             log_message('error', '[JanjiController::simpan] Validation failed: ' . json_encode($validationErrors));
             log_message('error', '[JanjiController::simpan] DB error: ' . json_encode($dbError));
-            log_message('error', '[JanjiController::simpan] POST data: ' . json_encode(array_diff_key($post, ['dass_item_1' => '', 'persetujuan' => ''])));
+            log_message('error', '[JanjiController::simpan] POST data: ' . json_encode(array_diff_key($post, ['persetujuan' => ''])));
 
             // Tentukan step pertama yang ada error-nya
             $stepFields = [
@@ -149,35 +162,24 @@ class JanjiController extends BaseController
                 ->with('error', 'Terdapat kesalahan pada formulir. Silakan periksa kembali.');
         }
 
-        // ── 2. Simpan DASS Assessment dengan janji_id ────────────────────────
-        $jawaban = [];
-        foreach ($post as $key => $val) {
-            if (str_starts_with($key, 'dass_item_')) {
-                $itemId = (int) str_replace('dass_item_', '', $key);
-                $jawaban[$itemId] = (int) $val;
-            }
-        }
+        // ── 2. Simpan Asesmen Awal (IMU) dengan janji_id ─────────────────────
+        $lainnya     = trim((string) ($post['imu_lainnya_keterangan'] ?? ''));
+        $lainnyaSkor = (int) ($post['imu_lainnya_skor'] ?? 0);
+        $obat        = trim((string) ($post['imu_obat_keterangan'] ?? ''));
 
-        if (count($jawaban) === 21) {
-            $dassModel = new DassAssessmentModel();
-            $dassModel->simpanAsesmenLengkap([
-                'janji_id'          => $janjiId,
-                'user_id'           => $userId,
-                'tanggal_pengisian' => date('Y-m-d'),
-                'pemeriksa'         => null,
-            ], $jawaban);
-        }
+        (new ImuAssessmentModel())->simpanAsesmen([
+            'janji_id'           => $janjiId,
+            'user_id'            => $userId,
+            'obat_keterangan'    => $obat !== '' ? mb_substr($obat, 0, 255) : null,
+            'lainnya_keterangan' => $lainnya !== '' ? $lainnya : null,
+            'lainnya_skor'       => $lainnya !== '' && isset(IMU::SKALA[$lainnyaSkor]) ? $lainnyaSkor : null,
+        ], $jawaban);
 
         // ── 3. Simpan Safety Screening ───────────────────────────────────────
-        $db->table('janji_safety_screening')->insert([
-            'janji_id'                    => $janjiId,
-            'pernah_selfharm'             => $post['pernah_selfharm'] ?? 'tidak',
-            'merasa_aman'                 => $post['merasa_aman'] ?? 'ya',
-            'pikiran_mengakhiri_hidup'    => $post['pikiran_mengakhiri_hidup'] ?? 'tidak',
-            'pikiran_mengganggu'          => $post['pikiran_mengganggu'] ?? 'tidak_berlaku',
-            'riwayat_selfharm_keterangan' => $post['riwayat_selfharm_keterangan'] ?? null,
-            'created_at'                  => date('Y-m-d H:i:s'),
-            'updated_at'                  => date('Y-m-d H:i:s'),
+        $db->table('janji_safety_screening')->insert($safety + [
+            'janji_id'   => $janjiId,
+            'created_at' => date('Y-m-d H:i:s'),
+            'updated_at' => date('Y-m-d H:i:s'),
         ]);
 
         $db->transComplete();
@@ -230,7 +232,8 @@ class JanjiController extends BaseController
         // Hapus safety screening terkait
         $db->table('janji_safety_screening')->where('janji_id', $id)->delete();
 
-        // Hapus DASS assessment + jawaban (jawaban ikut CASCADE dari FK)
+        // Hapus asesmen awal + jawaban (jawaban ikut CASCADE dari FK); DASS untuk janji lama
+        $db->table('imu_assessments')->where('janji_id', $id)->delete();
         $db->table('dass_assessments')->where('janji_id', $id)->delete();
 
         // Soft-delete janji
@@ -500,6 +503,55 @@ class JanjiController extends BaseController
         return null;
     }
 
+    /**
+     * Jawaban Asesmen Awal (IMU) dari POST: [nomor_item => 1..5].
+     * Null bila ada butir yang belum dijawab atau nilainya di luar skala.
+     */
+    private function ambilJawabanImu(array $post): ?array
+    {
+        $jawaban = [];
+        foreach (array_keys(IMU::BUTIR) as $nomor) {
+            $val = (string) ($post['imu_item_' . $nomor] ?? '');
+            if (! ctype_digit($val) || ! isset(IMU::SKALA[(int) $val])) return null;
+            $jawaban[$nomor] = (int) $val;
+        }
+        return $jawaban;
+    }
+
+    /**
+     * Data skrining keselamatan dari POST, sudah tervalidasi.
+     * Null bila ada pertanyaan wajib yang kosong / bernilai tidak dikenal.
+     */
+    private function ambilSafetyScreening(array $post): ?array
+    {
+        $opsi = [
+            'pernah_selfharm'          => ['tidak', 'ya', 'tidak_mau_menjawab'],
+            'merasa_aman'              => ['ya', 'tidak', 'tidak_mau_menjawab'],
+            'pikiran_mengakhiri_hidup' => ['tidak', 'ya', 'tidak_mau_menjawab'],
+        ];
+
+        $data = [];
+        foreach ($opsi as $field => $valid) {
+            $val = $post[$field] ?? null;
+            if (! in_array($val, $valid, true)) return null;
+            $data[$field] = $val;
+        }
+
+        // Pertanyaan lanjutan hanya berlaku bila ada (atau tidak mau menyebut) pikiran mengakhiri hidup
+        if ($data['pikiran_mengakhiri_hidup'] === 'tidak') {
+            $data['pikiran_mengganggu'] = 'tidak_berlaku';
+        } else {
+            $val = $post['pikiran_mengganggu'] ?? null;
+            if (! in_array($val, ['ya', 'tidak'], true)) return null;
+            $data['pikiran_mengganggu'] = $val;
+        }
+
+        $keterangan = trim((string) ($post['riwayat_selfharm_keterangan'] ?? ''));
+        $data['riwayat_selfharm_keterangan'] = $keterangan !== '' ? $keterangan : null;
+
+        return $data;
+    }
+
     /** GET /janji/slot-booked — API: slot yang sudah terpakai untuk konselor+tanggal tertentu */
     public function slotBooked(): \CodeIgniter\HTTP\ResponseInterface
     {
@@ -627,9 +679,9 @@ class JanjiController extends BaseController
             }
         }
 
-        // DASS assessment terkait
-        $dassModel = new DassAssessmentModel();
-        $dass = $dassModel->where('janji_id', $id)->first();
+        // Asesmen awal: IMU (janji baru) atau DASS (janji lama)
+        $imu  = (new ImuAssessmentModel())->byJanji($id);
+        $dass = $imu ? null : (new DassAssessmentModel())->where('janji_id', $id)->first();
 
         // Safety screening
         $db = \Config\Database::connect();
@@ -676,6 +728,7 @@ class JanjiController extends BaseController
             'janji'               => $janji,
             'konselorNama'        => $konselorNama,
             'konselorPilihanList' => $konselorPilihanList,
+            'imu'                 => $imu,
             'dass'                => $dass,
             'safety'              => $safety,
             'feedback'            => $feedback,

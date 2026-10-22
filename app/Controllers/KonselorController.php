@@ -6,6 +6,7 @@ use App\Models\JanjiModel;
 use App\Models\KonselorModel;
 use App\Models\HasilKonselingModel;
 use App\Models\DassAssessmentModel;
+use App\Models\ImuAssessmentModel;
 use App\Models\InstansiRujukanModel;
 
 class KonselorController extends BaseController
@@ -142,8 +143,9 @@ class KonselorController extends BaseController
         $safety = $db->table('janji_safety_screening')
             ->where('janji_id', $id)->get()->getRowArray();
 
-        $dassModel = new DassAssessmentModel();
-        $dass = $dassModel->where('janji_id', $id)->first();
+        // Asesmen awal: IMU (janji baru) atau DASS (janji lama)
+        $imu  = (new ImuAssessmentModel())->byJanji($id);
+        $dass = $imu ? null : (new DassAssessmentModel())->where('janji_id', $id)->first();
 
         $hasilModel = new HasilKonselingModel();
         $hasil = $hasilModel->byJanji($id);
@@ -158,6 +160,7 @@ class KonselorController extends BaseController
             'konselor'        => $konselor,
             'janji'           => $janji,
             'safety'          => $safety,
+            'imu'             => $imu,
             'dass'            => $dass,
             'hasil'           => $hasil,
             'instansiRujukan' => $instansiRujukan,
@@ -493,7 +496,8 @@ class KonselorController extends BaseController
         }
 
         $db   = \Config\Database::connect();
-        $dass = (new DassAssessmentModel())->where('janji_id', $id)->first();
+        $imu    = (new ImuAssessmentModel())->byJanji($id);
+        $dass   = $imu ? null : (new DassAssessmentModel())->where('janji_id', $id)->first();
         $safety = $db->table('janji_safety_screening')->where('janji_id', $id)->get()->getRowArray();
 
         $hasil           = (new HasilKonselingModel())->byJanji($id);
@@ -507,6 +511,7 @@ class KonselorController extends BaseController
             'janji'           => $janji,
             'konselorNama'    => $konselorNama,
             'konselorNoStr'   => $konselorNoStr,
+            'imu'             => $imu,
             'dass'            => $dass,
             'safety'          => $safety,
             'hasil'           => $hasil,

@@ -90,27 +90,23 @@
   .psikolog-opt.is-off { opacity: .45; cursor: not-allowed; background: #f5f5f5; }
   .psikolog-opt.is-off:hover { border-color: var(--bs-border-color) !important; }
 
-  /* DASS item rows */
-  .dass-row {
+  /* Asesmen awal (IMU) item rows */
+  .imu-row {
     padding: .6rem .75rem;
     border-radius: .5rem;
     transition: background .15s;
   }
 
-  .dass-row:hover {
+  .imu-row:hover {
     background: rgba(26, 95, 122, .04);
   }
 
-  .dass-row .form-check-inline {
-    margin-right: 0;
-  }
-
-  .dass-answer {
+  .imu-answer {
     display: flex;
     gap: .5rem;
   }
 
-  .dass-answer label {
+  .imu-answer label {
     cursor: pointer;
     width: 2.2rem;
     height: 2.2rem;
@@ -126,11 +122,11 @@
     user-select: none;
   }
 
-  .dass-answer input[type=radio] {
+  .imu-answer input[type=radio] {
     display: none;
   }
 
-  .dass-answer input[type=radio]:checked+label {
+  .imu-answer input[type=radio]:checked+label {
     border-color: #1a5f7a;
     background: #1a5f7a;
     color: #fff;
@@ -237,7 +233,7 @@
 
 <?php
 $user = $user ?? session()->get('user');
-$dassItems = $dassItems ?? [];
+$imu = \App\Libraries\InventoriMasalahUmum::class;
 $flashErrors  = session()->getFlashdata('errors') ?? [];
 $flashError   = session()->getFlashdata('error');
 $flashErrStep = (int)(session()->getFlashdata('error_step') ?? 1);
@@ -710,7 +706,7 @@ $fieldLabels  = [
   </div>
 
   <!-- ═══════════════════════════════════════════════════════════════
-     STEP 4 — DASS-21
+     STEP 4 — Asesmen Awal: Inventori Masalah Umum (IMU)
 ═════════════════════════════════════════════════════════════════ -->
   <div class="step-panel" id="step4">
     <div class="card mb-4">
@@ -719,52 +715,72 @@ $fieldLabels  = [
           <div>
             <h5 class="card-title mb-0"><i class="ti tabler-brain me-2" style="color:#1a5f7a;"></i>Asesmen Awal</h5>
             <p class="text-muted mb-0 mt-1" style="font-size:.82rem;">
-              Pilih jawaban yang paling sesuai dengan kondisi kamu <strong>dalam 1 minggu terakhir</strong>.
+              Berikut ini masalah-masalah yang umum dialami individu. Seberapa besar masing-masing masalah
+              membuat kamu merasa tertekan, khawatir, atau terganggu <strong>dalam beberapa minggu terakhir</strong>?
             </p>
           </div>
-          <div id="dassProgress" class="badge bg-label-primary" style="font-size:.8rem;">0 / 21 dijawab</div>
+          <div id="imuProgress" class="badge bg-label-primary" style="font-size:.8rem;">0 / <?= count($imu::BUTIR) ?> dijawab</div>
         </div>
       </div>
       <div class="card-body p-0">
         <!-- Skala legend -->
         <div class="d-flex gap-3 flex-wrap px-4 py-3 border-bottom" style="background:#f8fafb;">
-          <div class="d-flex align-items-center gap-2">
-            <div class="dass-answer"><label style="width:1.8rem;height:1.8rem;font-size:.75rem;border:2px solid #ccc;">0</label></div>
-            <small class="text-muted">Tidak pernah</small>
-          </div>
-          <div class="d-flex align-items-center gap-2">
-            <div class="dass-answer"><label style="width:1.8rem;height:1.8rem;font-size:.75rem;border:2px solid #ccc;">1</label></div>
-            <small class="text-muted">Kadang-kadang</small>
-          </div>
-          <div class="d-flex align-items-center gap-2">
-            <div class="dass-answer"><label style="width:1.8rem;height:1.8rem;font-size:.75rem;border:2px solid #ccc;">2</label></div>
-            <small class="text-muted">Cukup sering</small>
-          </div>
-          <div class="d-flex align-items-center gap-2">
-            <div class="dass-answer"><label style="width:1.8rem;height:1.8rem;font-size:.75rem;border:2px solid #ccc;">3</label></div>
-            <small class="text-muted">Sering sekali</small>
-          </div>
+          <?php foreach ($imu::SKALA as $val => $label): ?>
+            <div class="d-flex align-items-center gap-2">
+              <div class="imu-answer"><label style="width:1.8rem;height:1.8rem;font-size:.75rem;border:2px solid #ccc;"><?= $val ?></label></div>
+              <small class="text-muted"><?= $label ?></small>
+            </div>
+          <?php endforeach ?>
         </div>
 
         <!-- Items -->
         <div class="px-2 py-1">
-          <?php foreach ($dassItems as $item): ?>
-            <div class="dass-row d-flex align-items-center gap-3" id="row_dass_<?= $item['id'] ?>">
+          <?php foreach ($imu::BUTIR as $nomor => $pertanyaan): ?>
+            <div class="imu-row" id="row_imu_<?= $nomor ?>">
+              <div class="d-flex align-items-center gap-3">
+                <div class="flex-shrink-0 text-muted fw-bold" style="width:1.8rem;font-size:.82rem;text-align:right;">
+                  <?= $nomor ?>.
+                </div>
+                <div class="flex-grow-1" style="font-size:.875rem;">
+                  <?= esc($pertanyaan) ?>
+                </div>
+                <div class="imu-answer flex-shrink-0" style="gap:.35rem;">
+                  <?php foreach (array_keys($imu::SKALA) as $val): ?>
+                    <input type="radio" name="imu_item_<?= $nomor ?>" id="imu_<?= $nomor ?>_<?= $val ?>"
+                      value="<?= $val ?>" required class="imu-radio" data-item="<?= $nomor ?>"
+                      <?= old('imu_item_' . $nomor) === (string) $val ? 'checked' : '' ?> />
+                    <label for="imu_<?= $nomor ?>_<?= $val ?>" title="<?= $imu::SKALA[$val] ?>"><?= $val ?></label>
+                  <?php endforeach ?>
+                </div>
+              </div>
+              <?php if ($nomor === $imu::BUTIR_OBAT): ?>
+                <div style="margin-left:2.55rem;" class="mt-2">
+                  <input type="text" name="imu_obat_keterangan" class="form-control form-control-sm" maxlength="255"
+                    placeholder="Jika ya, obat apa? (opsional)" value="<?= esc(old('imu_obat_keterangan') ?? '') ?>" />
+                </div>
+              <?php endif ?>
+            </div>
+          <?php endforeach ?>
+
+          <!-- Butir 25: Lainnya (opsional, tidak dihitung dalam skor) -->
+          <div class="imu-row">
+            <div class="d-flex align-items-center gap-3 flex-wrap flex-md-nowrap">
               <div class="flex-shrink-0 text-muted fw-bold" style="width:1.8rem;font-size:.82rem;text-align:right;">
-                <?= $item['nomor'] ?>.
+                <?= count($imu::BUTIR) + 1 ?>.
               </div>
-              <div class="flex-grow-1" style="font-size:.875rem;">
-                <?= esc($item['pernyataan']) ?>
+              <div class="flex-grow-1">
+                <input type="text" name="imu_lainnya_keterangan" class="form-control form-control-sm"
+                  placeholder="Lainnya, sebutkan (opsional)" value="<?= esc(old('imu_lainnya_keterangan') ?? '') ?>" />
               </div>
-              <div class="dass-answer flex-shrink-0" style="gap:.35rem;">
-                <?php foreach ([0, 1, 2, 3] as $val): ?>
-                  <input type="radio" name="dass_item_<?= $item['id'] ?>" id="di_<?= $item['id'] ?>_<?= $val ?>"
-                    value="<?= $val ?>" required class="dass-radio" data-item="<?= $item['id'] ?>" />
-                  <label for="di_<?= $item['id'] ?>_<?= $val ?>"><?= $val ?></label>
+              <div class="imu-answer flex-shrink-0" style="gap:.35rem;">
+                <?php foreach (array_keys($imu::SKALA) as $val): ?>
+                  <input type="radio" name="imu_lainnya_skor" id="imu_lainnya_<?= $val ?>" value="<?= $val ?>"
+                    <?= old('imu_lainnya_skor') === (string) $val ? 'checked' : '' ?> />
+                  <label for="imu_lainnya_<?= $val ?>" title="<?= $imu::SKALA[$val] ?>"><?= $val ?></label>
                 <?php endforeach ?>
               </div>
             </div>
-          <?php endforeach ?>
+          </div>
         </div>
       </div>
     </div>
@@ -773,7 +789,7 @@ $fieldLabels  = [
       <button type="button" class="btn btn-label-primary btn-prev" data-to="3">
         <i class="ti tabler-arrow-left me-1"></i> Kembali
       </button>
-      <button type="button" class="btn btn-primary btn-next" data-to="5" id="btnNextDass">
+      <button type="button" class="btn btn-primary btn-next" data-to="5" id="btnNextImu">
         Lanjut: Skrining <i class="ti tabler-arrow-right ms-1"></i>
       </button>
     </div>
@@ -1151,7 +1167,7 @@ $fieldLabels  = [
         if (el.type === 'radio') {
           const group = panel.querySelectorAll(`[name="${el.name}"]`);
           const checked = [...group].some(r => r.checked);
-          const wrap = document.getElementById('row_dass_' + el.dataset?.item) || el.closest('.dass-row, .col-md-6, .col-12, .col-md-4');
+          const wrap = document.getElementById('row_imu_' + el.dataset?.item) || el.closest('.imu-row, .col-md-6, .col-12, .col-md-4');
           if (!checked) {
             valid = false;
             if (wrap) wrap.style.outline = '2px solid #dc3545';
@@ -1194,21 +1210,25 @@ $fieldLabels  = [
       return valid;
     }
 
-    // ── DASS progress counter ──────────────────────────────────────────────
-    const dassProgress = document.getElementById('dassProgress');
-    document.querySelectorAll('.dass-radio').forEach(radio => {
+    // ── Asesmen awal (IMU) progress counter ────────────────────────────────
+    const imuProgress = document.getElementById('imuProgress');
+    const IMU_TOTAL = <?= count($imu::BUTIR) ?>;
+    function updateImuProgress() {
+      const answered = new Set(
+        [...document.querySelectorAll('.imu-radio:checked')].map(r => r.dataset.item)
+      ).size;
+      imuProgress.textContent = answered + ' / ' + IMU_TOTAL + ' dijawab';
+      imuProgress.className = 'badge ' + (answered === IMU_TOTAL ? 'bg-label-success' : 'bg-label-primary');
+    }
+    document.querySelectorAll('.imu-radio').forEach(radio => {
       radio.addEventListener('change', () => {
-        const answered = new Set(
-          [...document.querySelectorAll('.dass-radio:checked')].map(r => r.dataset.item)
-        ).size;
-        dassProgress.textContent = answered + ' / 21 dijawab';
-        dassProgress.className = 'badge ' + (answered === 21 ? 'bg-label-success' : 'bg-label-primary');
-
+        updateImuProgress();
         // Hapus highlight error pada item yang sudah dijawab
-        const wrap = document.getElementById('row_dass_' + radio.dataset.item);
+        const wrap = document.getElementById('row_imu_' + radio.dataset.item);
         if (wrap) wrap.style.outline = '';
       });
     });
+    updateImuProgress();
 
     // ── Safety Q4 visibility ───────────────────────────────────────────────
     document.querySelectorAll('[name="pikiran_mengakhiri_hidup"]').forEach(r => {
@@ -1216,6 +1236,7 @@ $fieldLabels  = [
         const show = r.value === 'ya' || r.value === 'tidak_mau_menjawab';
         document.getElementById('q4Wrap').style.display = show ? 'block' : 'none';
         document.getElementById('pgDefault').disabled = show;
+        document.querySelectorAll('#q4Wrap input[type=radio]').forEach(q => q.required = show);
       });
     });
 

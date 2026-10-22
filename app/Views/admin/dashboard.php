@@ -11,7 +11,7 @@ $janjiMenunggu = $janjiMenunggu ?? [];
 $safetyFlagIds = $safetyFlagIds ?? [];
 $konselorList = $konselorList ?? [];
 $safetyAlerts = $safetyAlerts ?? [];
-$dassStats = $dassStats ?? [];
+$imuStats = $imuStats ?? [];
 $totalJanji = $totalJanji ?? 0;
 
 ?>
@@ -340,7 +340,7 @@ $totalJanji = $totalJanji ?? 0;
 
 </div>
 
-<!-- ===== ROW 4: Safety Alerts + DASS Overview ===== -->
+<!-- ===== ROW 4: Safety Alerts + Ringkasan IMU ===== -->
 <div class="row g-4">
 
   <!-- Safety Screening Alerts -->
@@ -374,6 +374,8 @@ $totalJanji = $totalJanji ?? 0;
               if ($sf['pernah_selfharm'] === 'ya')               $flags[] = 'Riwayat self-harm';
               if ($sf['pikiran_mengakhiri_hidup'] === 'ya')       $flags[] = 'Pikiran mengakhiri hidup';
               if ($sf['pikiran_mengganggu'] === 'ya')             $flags[] = 'Pikiran sulit dikendalikan';
+              if ($sf['merasa_aman'] === 'tidak')                 $flags[] = 'Merasa tidak aman';
+              if ((int) $sf['imu_bunuh_diri'] >= \App\Libraries\InventoriMasalahUmum::AMBANG_BUNUH_DIRI) $flags[] = 'Asesmen awal: pikiran bunuh diri';
               ?>
               <div class="d-flex align-items-start gap-3 p-3 rounded-2"
                 style="background:rgba(220,53,69,.05);border-left:3px solid #dc3545;">
@@ -398,33 +400,46 @@ $totalJanji = $totalJanji ?? 0;
     </div>
   </div>
 
-  <!-- DASS Overview -->
+  <!-- Ringkasan Asesmen Awal (IMU) -->
   <div class="col-lg-5">
     <div class="card h-100">
       <div class="card-header">
-        <h5 class="card-title mb-0">Ringkasan DASS-21</h5>
+        <h5 class="card-title mb-0">Ringkasan Asesmen Awal (IMU)</h5>
       </div>
       <div class="card-body">
-        <div class="text-center mb-4">
+        <?php
+        $imu   = \App\Libraries\InventoriMasalahUmum::class;
+        $total = (int) ($imuStats['total'] ?? 0);
+        ?>
+        <div class="text-center mb-3">
           <div class="fw-bold" style="font-size:2.5rem;color:#1a2b40;line-height:1;">
-            <?= $dassStats['total'] ?>
+            <?= $total ?>
           </div>
           <div class="text-muted" style="font-size:.8rem;">Total Asesmen</div>
         </div>
 
+        <!-- Sebaran tingkat distres global -->
+        <div class="d-flex justify-content-center gap-2 flex-wrap mb-4">
+          <?php foreach ($imu::KATEGORI as $kode => [, , $label, , $warna]): ?>
+            <span class="badge" style="background:<?= $warna ?>1a;color:<?= $warna ?>;font-size:.75rem;">
+              <?= $label ?>: <?= (int) ($imuStats[$kode] ?? 0) ?>
+            </span>
+          <?php endforeach ?>
+        </div>
+
         <?php
-        $dassInfo = [
-          ['label' => 'Depresi',  'key' => 'depresi_berat', 'color' => '#dc3545', 'bg' => 'rgba(220,53,69,.08)',  'icon' => 'tabler-mood-sad'],
-          ['label' => 'Anxiety',  'key' => 'anxiety_berat', 'color' => '#f0a500', 'bg' => 'rgba(240,165,0,.08)', 'icon' => 'tabler-brain'],
-          ['label' => 'Stres',    'key' => 'stress_berat',  'color' => '#57c5b6', 'bg' => 'rgba(87,197,182,.08)', 'icon' => 'tabler-bolt'],
+        $areaInfo = [
+          'emosi'     => ['color' => '#dc3545', 'bg' => 'rgba(220,53,69,.08)',  'icon' => 'tabler-mood-sad'],
+          'akademik'  => ['color' => '#f0a500', 'bg' => 'rgba(240,165,0,.08)', 'icon' => 'tabler-school'],
+          'kesehatan' => ['color' => '#57c5b6', 'bg' => 'rgba(87,197,182,.08)', 'icon' => 'tabler-heartbeat'],
         ];
         ?>
 
         <div class="d-flex flex-column gap-3">
-          <?php foreach ($dassInfo as $d): ?>
+          <?php foreach ($imu::AREA as $kode => [, , $nama]): ?>
             <?php
-            $count = (int) ($dassStats[$d['key']] ?? 0);
-            $total = (int) ($dassStats['total'] ?? 0);
+            $d     = $areaInfo[$kode];
+            $count = (int) ($imuStats['area_' . $kode] ?? 0);
             $pct   = $total > 0 ? round($count / $total * 100, 1) : 0;
             ?>
             <div class="d-flex align-items-center gap-3 p-3 rounded-2" style="background:<?= $d['bg'] ?>;">
@@ -434,8 +449,8 @@ $totalJanji = $totalJanji ?? 0;
                 </div>
               </div>
               <div class="flex-grow-1">
-                <div class="fw-semibold" style="font-size:.85rem;color:#1a2b40;"><?= $d['label'] ?> Berat</div>
-                <div class="text-muted" style="font-size:.75rem;">Kategori berat & sangat berat</div>
+                <div class="fw-semibold" style="font-size:.85rem;color:#1a2b40;"><?= esc($nama) ?></div>
+                <div class="text-muted" style="font-size:.75rem;">Skor area di atas <?= $imu::AMBANG_AREA ?></div>
               </div>
               <div class="text-end">
                 <div class="fw-bold" style="font-size:1.4rem;color:<?= $d['color'] ?>;line-height:1;"><?= $count ?></div>
@@ -446,7 +461,7 @@ $totalJanji = $totalJanji ?? 0;
         </div>
 
         <p class="text-muted text-center mt-3 mb-0" style="font-size:.75rem;">
-          Kasus berat &amp; sangat berat yang memerlukan perhatian lebih
+          Area masalah yang memerlukan perhatian lebih
         </p>
       </div>
     </div>
