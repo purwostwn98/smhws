@@ -130,3 +130,6 @@ _modules/*
 
 /results/
 /phpunit*.xml
+
+# Data impor (berisi data pribadi, jangan di-commit)
+/writable/impor/*
