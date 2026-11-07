@@ -12,6 +12,8 @@ use CodeIgniter\Database\BaseConnection;
  *   php spark smhws:impor-lama writable/impor/konseling_lama.csv            → simulasi (tidak menyimpan)
  *   php spark smhws:impor-lama writable/impor/konseling_lama.csv --simpan   → impor sungguhan
  *   php spark smhws:impor-lama --batal=<batch>                              → hapus semua data satu batch impor
+ *   php spark smhws:impor-lama --isi-stressor [--simpan]                    → estimasi stressor dari keluhan (data impor)
+ *   php spark smhws:impor-lama --hapus-stressor                             → kosongkan lagi stressor hasil estimasi
  *
  * Setiap baris yang dibuat dicatat di tabel impor_data_lama sehingga dapat dibatalkan.
  * Baris yang tidak dapat diimpor ditulis ke writable/impor/ditolak_<waktu>.csv.
@@ -21,7 +23,22 @@ class ImporKonselingLama extends BaseCommand
     protected $group       = 'SMHWS';
     protected $name        = 'smhws:impor-lama';
     protected $description = 'Impor data layanan konseling dari sistem lama (CSV).';
-    protected $usage       = 'smhws:impor-lama <file.csv> [--simpan] | smhws:impor-lama --batal=<batch>';
+    protected $usage       = 'smhws:impor-lama <file.csv> [--simpan] | --batal=<batch> | --isi-stressor [--simpan] | --hapus-stressor';
+
+    /** Penanda pada JSON stressor bahwa isinya hasil estimasi dari teks keluhan, bukan asesmen psikolog. */
+    public const STRESSOR_ESTIMASI = 'estimasi_keluhan_data_lama';
+
+    /** Kata kunci di teks keluhan → stressor (satu sesi boleh lebih dari satu). */
+    private const STRESSOR_KW = [
+        'akademik'        => '/kuliah|skripsi|tesis|akademik|\bipk\b|tugas|ujian|\bdosen|belajar|praktikum|\bkkn\b|\bpkl\b|koas|magang|\bstudi|\bnilai\b/u',
+        'karier'          => '/karier|karir|pekerjaan|\bbekerja|masa depan|\blulus|wisuda|\bprofesi\b/u',
+        'keluarga'        => '/keluarga|orang ?tua|\bortu\b|\bayah|\bibu|\bbapak|\bmama\b|\bpapa\b|\badik|\bkakak|saudara|\bcerai|perceraian|\bkdrt/u',
+        'relasi_sosial'   => '/teman|pertemanan|sahabat|perundungan|\bbully|kesepian|sosialisasi|bergaul|pergaulan|lingkungan sosial|organisasi|rekan/u',
+        'relasi_romantis' => '/pacar|percintaan|\bputus\b|pasangan|mantan|asmara|lawan jenis|pernikahan|menikah|\bsuami|\bistri|tunangan|\bldr\b/u',
+        'finansial'       => '/biaya|\buang\b|ekonomi|finansial|keuangan|\bukt\b|hutang|utang|beasiswa|sambil kuliah|nafkah/u',
+        'digital'         => '/media sosial|sosmed|medsos|instagram|tiktok|twitter|\bgame|internet|\bhp\b|gadget|smartphone|scroll|\bchat/u', // "online" tidak dipakai: umumnya berarti kuliah daring
+        'kesehatan'       => '/sakit|penyakit|\btidur|insomnia|\bmedis|dokter|skoliosis|haid|menstruasi|operasi|dirawat|psikiater|\bobat\b|gangguan makan|nafsu makan/u',
+    ];
 
     private const TEMA = [
         'akademik' => 'akademik', 'keorganisasian' => 'keorganisasian', 'pengembangan diri' => 'pengembangan_diri',
@@ -55,6 +72,17 @@ class ImporKonselingLama extends BaseCommand
 
         if ($batal = CLI::getOption('batal')) {
             $this->batal((string) $batal);
+            return;
+        }
+        if (CLI::getOption('isi-stressor') !== null) {
+            $this->isiStressor(CLI::getOption('simpan') !== null);
+            return;
+        }
+        if (CLI::getOption('hapus-stressor') !== null) {
+            $n = $this->db->table('hasil_konseling')
+                ->where("JSON_UNQUOTE(JSON_EXTRACT(stressor, '$._sumber')) =", self::STRESSOR_ESTIMASI)
+                ->set('stressor', null)->update();
+            CLI::write('Stressor hasil estimasi dikosongkan: ' . $this->db->affectedRows() . ' sesi.', 'green');
             return;
         }
 
@@ -119,10 +147,19 @@ class ImporKonselingLama extends BaseCommand
                 $konselor[$kunci] = $this->buatKonselorArsip($nama);
             }
             $n = 0;
+            $userLama = $users; // akun yang sudah ada sebelum batch ini
             foreach ($rows as $r) {
                 $nimL = strtolower($r['nim']);
                 if (! isset($users[$nimL])) {
                     $users[$nimL] = $this->buatUser($r);
+                }
+                // Impor susulan: nomor sesi ikut menghitung sesi mahasiswa yang sudah ada di sistem
+                if (isset($userLama[$nimL])) {
+                    $r['sesi_ke'] += $this->db->table('janji')
+                        ->where('user_id', $userLama[$nimL])
+                        ->where('tanggal_konseling <', $r['tanggal'])
+                        ->where('deleted_at', null)
+                        ->countAllResults();
                 }
                 if (! isset($mhs[$nimL])) {
                     $this->buatMahasiswa($r);
@@ -377,6 +414,58 @@ class ImporKonselingLama extends BaseCommand
             'created_at' => $waktu, 'updated_at' => $waktu,
         ]);
         $this->catat('hasil_konseling', (int) $this->db->insertID());
+    }
+
+    // ══ Estimasi stressor ══════════════════════════════════════════════════
+
+    /**
+     * Isi stressor sesi impor (yang stressor-nya masih kosong) dari teks keluhan utama.
+     * Ditandai dengan "_sumber" agar dapat dibedakan dari asesmen psikolog dan dapat dihapus.
+     */
+    private function isiStressor(bool $simpan): void
+    {
+        $rows = $this->db->table('hasil_konseling h')
+            ->select('h.id, j.keluhan_utama')
+            ->join('janji j', 'j.id = h.janji_id')
+            ->join('impor_data_lama i', "i.tabel = 'hasil_konseling' AND i.ref_id = h.id")
+            ->where('h.stressor', null)
+            ->get()->getResultArray();
+
+        $hitung = array_fill_keys(array_keys(self::STRESSOR_KW), 0);
+        $contoh = [];
+        $update = [];
+        $tanpa  = 0;
+        foreach ($rows as $r) {
+            $teks = mb_strtolower((string) $r['keluhan_utama']);
+            $data = [];
+            foreach (self::STRESSOR_KW as $key => $rx) {
+                if (preg_match($rx, $teks)) {
+                    $data[$key] = ['Estimasi dari keluhan (data sistem lama)'];
+                    $hitung[$key]++;
+                    if (count($contoh[$key] ?? []) < 3) $contoh[$key][] = mb_strimwidth($r['keluhan_utama'], 0, 90, '…');
+                }
+            }
+            if (! $data) { $tanpa++; continue; }
+            $data['_sumber'] = self::STRESSOR_ESTIMASI;
+            $update[] = ['id' => $r['id'], 'stressor' => json_encode($data, JSON_UNESCAPED_UNICODE)];
+        }
+
+        CLI::write('Sesi impor dengan stressor kosong : ' . count($rows));
+        CLI::write('Mendapat minimal satu stressor    : ' . count($update), 'green');
+        CLI::write('Tidak ada petunjuk (tetap kosong) : ' . $tanpa);
+        foreach ($hitung as $k => $n) {
+            CLI::write(str_pad($k, 16) . ': ' . str_pad((string) $n, 5, ' ', STR_PAD_LEFT));
+            foreach ($contoh[$k] ?? [] as $c) CLI::write('      - ' . $c, 'light_gray');
+        }
+
+        if (! $simpan) {
+            CLI::write(PHP_EOL . 'PRATINJAU — belum disimpan. Tambahkan --simpan untuk menyimpan.', 'yellow');
+            return;
+        }
+        foreach (array_chunk($update, 500) as $chunk) {
+            $this->db->table('hasil_konseling')->updateBatch($chunk, 'id');
+        }
+        CLI::write('Tersimpan: ' . count($update) . ' sesi.', 'green');
     }
 
     // ══ Pembatalan ═════════════════════════════════════════════════════════
