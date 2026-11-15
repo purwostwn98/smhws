@@ -237,6 +237,8 @@ $imu = \App\Libraries\InventoriMasalahUmum::class;
 $flashErrors  = session()->getFlashdata('errors') ?? [];
 $flashError   = session()->getFlashdata('error');
 $flashErrStep = (int)(session()->getFlashdata('error_step') ?? 1);
+// Checkbox yang tidak dicentang tidak ikut terkirim, jadi perlu dibedakan dari "belum ada input lama"
+$adaInputLama = ! empty(session()->getFlashdata('_ci_old_input'));
 $fieldLabels  = [
   'jenis_kelamin'  => 'Jenis Kelamin',
   'usia'           => 'Usia',
@@ -396,7 +398,7 @@ $fieldLabels  = [
             <div class="input-group">
               <span class="input-group-text"><i class="ti tabler-brand-whatsapp" style="color:#25D366;"></i></span>
               <input type="tel" name="phone" class="form-control"
-                placeholder="08xxxxxxxxxx" required />
+                placeholder="08xxxxxxxxxx" value="<?= esc(old('phone', $user['phone'] ?? '')) ?>" required />
             </div>
           </div>
           <!-- Prodi & Fakultas -->
@@ -413,14 +415,15 @@ $fieldLabels  = [
             <label class="form-label fw-medium">Jenis Kelamin <span class="req">*</span></label>
             <select name="jenis_kelamin" class="form-select" required>
               <option value="">-- Pilih --</option>
-              <option value="laki-laki">Laki-laki</option>
-              <option value="perempuan">Perempuan</option>
+              <?php foreach (['laki-laki' => 'Laki-laki', 'perempuan' => 'Perempuan'] as $v => $l): ?>
+                <option value="<?= $v ?>" <?= old('jenis_kelamin') === $v ? 'selected' : '' ?>><?= $l ?></option>
+              <?php endforeach ?>
             </select>
           </div>
           <!-- Usia -->
           <div class="col-md-4">
             <label class="form-label fw-medium">Usia <span class="req">*</span></label>
-            <input type="number" name="usia" class="form-control" placeholder="Contoh: 20" min="15" max="99" required />
+            <input type="number" name="usia" class="form-control" placeholder="Contoh: 20" min="15" max="99" value="<?= esc(old('usia') ?? '') ?>" required />
           </div>
           <!-- Semester -->
           <div class="col-md-4">
@@ -428,7 +431,7 @@ $fieldLabels  = [
             <select name="semester" class="form-select" required>
               <option value="">-- Pilih --</option>
               <?php for ($s = 1; $s <= 14; $s++): ?>
-                <option value="<?= $s ?>">Semester <?= $s ?></option>
+                <option value="<?= $s ?>" <?= old('semester') === (string) $s ? 'selected' : '' ?>>Semester <?= $s ?></option>
               <?php endfor ?>
             </select>
           </div>
@@ -437,38 +440,34 @@ $fieldLabels  = [
             <label class="form-label fw-medium">Agama <span class="req">*</span></label>
             <select name="agama" class="form-select" required>
               <option value="">-- Pilih --</option>
-              <option>Islam</option>
-              <option>Kristen</option>
-              <option>Katolik</option>
-              <option>Hindu</option>
-              <option>Buddha</option>
-              <option>Konghucu</option>
-              <option>Lainnya</option>
+              <?php foreach (['Islam', 'Kristen', 'Katolik', 'Hindu', 'Buddha', 'Konghucu', 'Lainnya'] as $a): ?>
+                <option <?= old('agama') === $a ? 'selected' : '' ?>><?= $a ?></option>
+              <?php endforeach ?>
             </select>
           </div>
           <!-- Status Pernikahan -->
           <div class="col-md-4">
             <label class="form-label fw-medium">Status Pernikahan</label>
             <select name="status_pernikahan" class="form-select">
-              <option value="belum_menikah">Belum Menikah</option>
-              <option value="menikah">Menikah</option>
-              <option value="cerai">Cerai</option>
+              <?php foreach (['belum_menikah' => 'Belum Menikah', 'menikah' => 'Menikah', 'cerai' => 'Cerai'] as $v => $l): ?>
+                <option value="<?= $v ?>" <?= old('status_pernikahan') === $v ? 'selected' : '' ?>><?= $l ?></option>
+              <?php endforeach ?>
             </select>
           </div>
           <!-- Dosen PA -->
           <div class="col-md-4">
             <label class="form-label fw-medium">Dosen Pembimbing Akademik</label>
-            <input type="text" name="dosen_pa" class="form-control" placeholder="Nama dosen PA" />
+            <input type="text" name="dosen_pa" class="form-control" placeholder="Nama dosen PA" value="<?= esc(old('dosen_pa') ?? '') ?>" />
           </div>
           <!-- Domisili -->
           <div class="col-md-8">
             <label class="form-label fw-medium">Domisili / Tempat Tinggal Saat Ini</label>
-            <input type="text" name="domisili" class="form-control" placeholder="Contoh: Kos Jl. Ahmad Yani No. 5, Surakarta" />
+            <input type="text" name="domisili" class="form-control" placeholder="Contoh: Kos Jl. Ahmad Yani No. 5, Surakarta" value="<?= esc(old('domisili') ?? '') ?>" />
           </div>
           <!-- Pekerjaan -->
           <div class="col-md-4">
             <label class="form-label fw-medium">Pekerjaan <small class="text-muted">(jika ada)</small></label>
-            <input type="text" name="pekerjaan" class="form-control" placeholder="Contoh: Freelancer, Karyawan, dll." />
+            <input type="text" name="pekerjaan" class="form-control" placeholder="Contoh: Freelancer, Karyawan, dll." value="<?= esc(old('pekerjaan') ?? '') ?>" />
           </div>
 
         </div>
@@ -488,7 +487,7 @@ $fieldLabels  = [
             <div class="d-flex gap-3 flex-wrap mt-1">
               <?php foreach (['offline' => 'Tatap Muka (Offline)', 'online' => 'Daring (Online)'] as $val => $lbl): ?>
                 <div class="form-check">
-                  <input class="form-check-input" type="radio" name="metode" id="metode_<?= $val ?>" value="<?= $val ?>" <?= $val === 'offline' ? 'checked' : '' ?> required />
+                  <input class="form-check-input" type="radio" name="metode" id="metode_<?= $val ?>" value="<?= $val ?>" <?= old('metode', 'offline') === $val ? 'checked' : '' ?> required />
                   <label class="form-check-label" for="metode_<?= $val ?>"><?= $lbl ?></label>
                 </div>
               <?php endforeach ?>
@@ -500,7 +499,7 @@ $fieldLabels  = [
           <div class="col-md-6">
             <label class="form-label fw-medium">Riwayat Konseling SMHWS</label>
             <div class="form-check mt-1">
-              <input class="form-check-input" type="checkbox" name="pernah_konseling_smhws" id="pernahKonseling" value="1" <?= $pernahSelesai ? 'checked' : '' ?> />
+              <input class="form-check-input" type="checkbox" name="pernah_konseling_smhws" id="pernahKonseling" value="1" <?= ($adaInputLama ? old('pernah_konseling_smhws') === '1' : $pernahSelesai) ? 'checked' : '' ?> />
               <label class="form-check-label" for="pernahKonseling">
                 Saya <strong>sudah pernah</strong> menggunakan layanan konseling SMHWS sebelumnya
               </label>
@@ -645,7 +644,7 @@ $fieldLabels  = [
             <label class="form-label fw-medium">Keluhan Utama yang Ingin Dibicarakan <span class="req">*</span></label>
             <textarea name="keluhan_utama" class="form-control" rows="5"
               placeholder="Ceritakan secara singkat apa yang sedang kamu rasakan atau alami. Tidak perlu sempurna, tuliskan apa adanya..."
-              required minlength="20" maxlength="450" id="keluhanUtama"></textarea>
+              required minlength="20" maxlength="450" id="keluhanUtama"><?= esc(old('keluhan_utama') ?? '') ?></textarea>
             <div class="d-flex justify-content-between">
               <div class="form-text">Minimal 20 karakter. Informasi ini bersifat rahasia.</div>
               <div class="form-text" id="keluhanCounter">0 / 450</div>
@@ -682,13 +681,13 @@ $fieldLabels  = [
           <div class="col-md-6">
             <label class="form-label fw-medium">Keluhan Dirasakan Sejak</label>
             <input type="text" name="mulai_keluhan" class="form-control"
-              placeholder="Contoh: 2 minggu lalu, sejak awal semester, dll." />
+              placeholder="Contoh: 2 minggu lalu, sejak awal semester, dll." value="<?= esc(old('mulai_keluhan') ?? '') ?>" />
           </div>
 
           <div class="col-md-6">
             <label class="form-label fw-medium">Upaya yang Sudah Dilakukan</label>
             <textarea name="upaya_dilakukan" class="form-control" rows="3"
-              placeholder="Contoh: bercerita ke teman, berdoa, olahraga, dll. Jika belum pernah, tulis 'belum ada'."></textarea>
+              placeholder="Contoh: bercerita ke teman, berdoa, olahraga, dll. Jika belum pernah, tulis 'belum ada'."><?= esc(old('upaya_dilakukan') ?? '') ?></textarea>
           </div>
 
         </div>
@@ -820,7 +819,7 @@ $fieldLabels  = [
             </label>
             <div class="safety-card">
               <?php foreach (['tidak' => 'Tidak', 'ya' => 'Ya', 'tidak_mau_menjawab' => 'Tidak Ingin Menjawab Saat Ini'] as $v => $l): ?>
-                <input type="radio" name="pernah_selfharm" id="sh_<?= $v ?>" value="<?= $v ?>" required />
+                <input type="radio" name="pernah_selfharm" id="sh_<?= $v ?>" value="<?= $v ?>" <?= old('pernah_selfharm') === $v ? 'checked' : '' ?> required />
                 <label for="sh_<?= $v ?>"><?= $l ?></label>
               <?php endforeach ?>
             </div>
@@ -833,7 +832,7 @@ $fieldLabels  = [
             </label>
             <div class="safety-card">
               <?php foreach (['ya' => 'Ya, Merasa Aman', 'tidak' => 'Tidak', 'tidak_mau_menjawab' => 'Tidak Ingin Menjawab Saat Ini'] as $v => $l): ?>
-                <input type="radio" name="merasa_aman" id="ma_<?= $v ?>" value="<?= $v ?>" required />
+                <input type="radio" name="merasa_aman" id="ma_<?= $v ?>" value="<?= $v ?>" <?= old('merasa_aman') === $v ? 'checked' : '' ?> required />
                 <label for="ma_<?= $v ?>"><?= $l ?></label>
               <?php endforeach ?>
             </div>
@@ -847,7 +846,7 @@ $fieldLabels  = [
             </label>
             <div class="safety-card">
               <?php foreach (['tidak' => 'Tidak', 'ya' => 'Ya', 'tidak_mau_menjawab' => 'Tidak Ingin Menjawab Saat Ini'] as $v => $l): ?>
-                <input type="radio" name="pikiran_mengakhiri_hidup" id="pm_<?= $v ?>" value="<?= $v ?>" required />
+                <input type="radio" name="pikiran_mengakhiri_hidup" id="pm_<?= $v ?>" value="<?= $v ?>" <?= old('pikiran_mengakhiri_hidup') === $v ? 'checked' : '' ?> required />
                 <label for="pm_<?= $v ?>"><?= $l ?></label>
               <?php endforeach ?>
             </div>
@@ -860,7 +859,7 @@ $fieldLabels  = [
             </label>
             <div class="safety-card">
               <?php foreach (['ya' => 'Ya', 'tidak' => 'Tidak'] as $v => $l): ?>
-                <input type="radio" name="pikiran_mengganggu" id="pg_<?= $v ?>" value="<?= $v ?>" />
+                <input type="radio" name="pikiran_mengganggu" id="pg_<?= $v ?>" value="<?= $v ?>" <?= old('pikiran_mengganggu') === $v ? 'checked' : '' ?> />
                 <label for="pg_<?= $v ?>"><?= $l ?></label>
               <?php endforeach ?>
             </div>
@@ -871,7 +870,7 @@ $fieldLabels  = [
           <div id="selfharmDetail" style="display:none;">
             <label class="form-label fw-medium">Keterangan Tambahan (opsional)</label>
             <textarea name="riwayat_selfharm_keterangan" class="form-control" rows="3"
-              placeholder="Jika kamu ingin berbagi lebih lanjut, silakan tulis di sini. Ini sepenuhnya opsional."></textarea>
+              placeholder="Jika kamu ingin berbagi lebih lanjut, silakan tulis di sini. Ini sepenuhnya opsional."><?= esc(old('riwayat_selfharm_keterangan') ?? '') ?></textarea>
           </div>
 
           <!-- Informasi dukungan -->
@@ -890,7 +889,7 @@ $fieldLabels  = [
 
           <!-- Persetujuan -->
           <div class="form-check">
-            <input class="form-check-input" type="checkbox" id="persetujuan" name="persetujuan" required />
+            <input class="form-check-input" type="checkbox" id="persetujuan" name="persetujuan" <?= old('persetujuan') ? 'checked' : '' ?> required />
             <label class="form-check-label fw-medium" for="persetujuan">
               Saya menyatakan bahwa semua informasi yang saya isi adalah <strong>benar dan jujur</strong>,
               dan saya setuju data ini digunakan untuk keperluan layanan konseling SMHWS secara <strong>rahasia</strong>.
@@ -1113,6 +1112,7 @@ $fieldLabels  = [
         counterEl.textContent = len + ' / 450';
         counterEl.style.color = len >= 430 ? '#dc3545' : len >= 400 ? '#f0a500' : '';
       });
+      keluhanEl.dispatchEvent(new Event('input'));
     }
 
     // IC adalah step 1; step server (1–4) digeser +1 menjadi step 2–5
@@ -1247,6 +1247,10 @@ $fieldLabels  = [
           (r.value === 'ya' || r.value === 'tidak_mau_menjawab') ? 'block' : 'none';
       });
     });
+
+    // Terapkan tampilan kondisional untuk jawaban yang dipulihkan setelah error
+    document.querySelectorAll('[name="pikiran_mengakhiri_hidup"]:checked, [name="pernah_selfharm"]:checked')
+      .forEach(r => r.dispatchEvent(new Event('change')));
 
     // ── Submit guard — validasi semua step (lewati step 1 IC) ─────────────
     document.getElementById('formJanji').addEventListener('submit', function(e) {

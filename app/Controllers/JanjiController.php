@@ -85,8 +85,15 @@ class JanjiController extends BaseController
             $konselorPilihan = [(int) $post['konselor_pilihan']];
         }
 
-        // Validasi jadwal: tanggal minimal H+1, sesi tersedia, psikolog (bila dipilih) praktik di sesi itu
         // error_step memakai penomoran server (1–4); view menggesernya +1 karena step 1 = informed consent
+        $phone = preg_replace('/[\s\-]/', '', (string) ($post['phone'] ?? ''));
+        if (! preg_match('/^\+?[0-9]{9,15}$/', $phone)) {
+            return redirect()->back()->withInput()
+                ->with('error_step', 1)
+                ->with('error', 'Nomor WhatsApp tidak valid. Gunakan angka saja, contoh: 081234567890.');
+        }
+
+        // Validasi jadwal: tanggal minimal H+1, sesi tersedia, psikolog (bila dipilih) praktik di sesi itu
         if ($errJadwal = $this->validasiJadwal($post)) {
             return redirect()->back()->withInput()
                 ->with('error_step', 1)
@@ -161,6 +168,8 @@ class JanjiController extends BaseController
                 ->with('error_step', $errorStep)
                 ->with('error', 'Terdapat kesalahan pada formulir. Silakan periksa kembali.');
         }
+
+        (new UserModel())->update($userId, ['phone' => $phone]);
 
         // ── 2. Simpan Asesmen Awal (IMU) dengan janji_id ─────────────────────
         $lainnya     = trim((string) ($post['imu_lainnya_keterangan'] ?? ''));
