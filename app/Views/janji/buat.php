@@ -920,7 +920,8 @@ $fieldLabels  = [
 
     // ── Jadwal dinamis: tanggal → sesi → psikolog (disaring menurut metode) ──
     const KETERSEDIAAN_API = '<?= base_url('janji/ketersediaan') ?>';
-    const PRAKTIK   = <?= json_encode($praktikMap ?? [], JSON_FORCE_OBJECT) ?>; // {konselor_id: ['senin', ...]}
+    // Cast hanya peta luar ke objek; JSON_FORCE_OBJECT ikut mengubah daftar hari menjadi objek
+    const PRAKTIK   = <?= json_encode((object) ($praktikMap ?? [])) ?>; // {konselor_id: ['senin', ...]}
     const INIT_SESI = <?= json_encode((string) old('jadwal_pilihan')) ?>;
     const DAY_KEYS  = ['minggu','senin','selasa','rabu','kamis','jumat','sabtu'];
     const DAY_NAMES = ['Minggu','Senin','Selasa','Rabu','Kamis',"Jum'at",'Sabtu'];
