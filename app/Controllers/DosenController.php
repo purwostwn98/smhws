@@ -2,6 +2,8 @@
 
 namespace App\Controllers;
 
+use App\Libraries\DokumenTerbit;
+
 class DosenController extends BaseController
 {
     // ── Auth guards ──────────────────────────────────────────────────────────
@@ -220,13 +222,13 @@ class DosenController extends BaseController
 
         $stats = $this->buildProdiStats($db, $kode, $filters);
 
-        $htmlContent = view('admin/dashboard_univ_pdf', [
+        $viewData = [
             'stats'        => $stats,
             'filters'      => $filters,
             'prodiNama'    => $prodiNama,
             'fakultasNama' => $fakultasNama,
             'periodeLabel' => $periodeLabel,
-        ]);
+        ];
 
         $logoPath   = ROOTPATH . 'public/assets/img/branding/logo-ums.png';
         $headerHtml = <<<HTML
@@ -271,11 +273,19 @@ HTML;
         $mpdf->SetCreator('SMHWS UMS');
         $mpdf->SetHTMLHeader($headerHtml);
         $mpdf->SetHTMLFooter('<div style="text-align:right;font-size:7.5pt;color:#888;">Dicetak: ' . $tglCetak . ' &nbsp;|&nbsp; Hal. {PAGENO} dari {nbpg}</div>');
-        $mpdf->WriteHTML($htmlContent);
 
-        $filename = 'laporan-agregat-fakultas-' . date('Ymd') . '.pdf';
-        $mpdf->Output($filename, \Mpdf\Output\Destination::INLINE);
-        exit;
+        $pdf = DokumenTerbit::terbitkan($mpdf, 'admin/dashboard_univ_pdf', $viewData, [
+            'jenis'   => 'fakultas',
+            'judul'   => 'Laporan Agregat Konseling — ' . $fakultasNama,
+            'cakupan' => $fakultasNama . ' — ' . $prodiNama,
+            'periode' => $periodeLabel,
+            'filters' => $filters,
+        ]);
+
+        return $this->response
+            ->setContentType('application/pdf')
+            ->setHeader('Content-Disposition', 'inline; filename="laporan-agregat-fakultas-' . date('Ymd') . '.pdf"')
+            ->setBody($pdf);
     }
 
     /** GET /dosen/stressor-detail-fakultas?key=...&[filters] — JSON detail stressor untuk modal (scope: fakultas) */
@@ -446,13 +456,13 @@ HTML;
 
         $stats = $this->buildProdiStats($db, $kodeLembaga, $filters);
 
-        $htmlContent = view('admin/dashboard_univ_pdf', [
+        $viewData = [
             'stats'        => $stats,
             'filters'      => $filters,
             'prodiNama'    => $prodiNama,
             'fakultasNama' => $fakultasNama,
             'periodeLabel' => $periodeLabel,
-        ]);
+        ];
 
         $logoPath   = ROOTPATH . 'public/assets/img/branding/logo-ums.png';
         $headerHtml = <<<HTML
@@ -497,11 +507,19 @@ HTML;
         $mpdf->SetCreator('SMHWS UMS');
         $mpdf->SetHTMLHeader($headerHtml);
         $mpdf->SetHTMLFooter('<div style="text-align:right;font-size:7.5pt;color:#888;">Dicetak: ' . $tglCetak . ' &nbsp;|&nbsp; Hal. {PAGENO} dari {nbpg}</div>');
-        $mpdf->WriteHTML($htmlContent);
 
-        $filename = 'laporan-agregat-prodi-' . date('Ymd') . '.pdf';
-        $mpdf->Output($filename, \Mpdf\Output\Destination::INLINE);
-        exit;
+        $pdf = DokumenTerbit::terbitkan($mpdf, 'admin/dashboard_univ_pdf', $viewData, [
+            'jenis'   => 'prodi',
+            'judul'   => 'Laporan Agregat Konseling — ' . $prodiNama,
+            'cakupan' => $prodiNama . ' (' . $fakultasNama . ')',
+            'periode' => $periodeLabel,
+            'filters' => $filters,
+        ]);
+
+        return $this->response
+            ->setContentType('application/pdf')
+            ->setHeader('Content-Disposition', 'inline; filename="laporan-agregat-prodi-' . date('Ymd') . '.pdf"')
+            ->setBody($pdf);
     }
 
     /** GET /dosen/stressor-detail?key=...&[filters] — JSON detail stressor untuk modal */

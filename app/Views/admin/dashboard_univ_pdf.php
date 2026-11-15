@@ -462,10 +462,15 @@ $tglCetak = date('j') . ' ' . $bulanId[$bulan] . ' ' . date('Y');
 </table>
 
 <!-- ── Tanda Tangan ──────────────────────────────────────────────────────── -->
-<div style="margin-top:28pt; text-align:right;">
+<div style="margin-top:28pt; text-align:right; page-break-inside:avoid;">
   <div style="display:inline-block; text-align:center; min-width:180pt;">
     <div style="font-size:10pt; margin-bottom:2pt;">Surakarta, <?= $tglCetak ?></div>
-    <div style="font-size:9.5pt; color:#444; margin-bottom:48pt;">Ketua SMHWS UMS,</div>
-    <div style="font-size:10pt; font-weight:bold; border-top:0.5pt solid #333; padding-top:3pt; display:inline-block; min-width:160pt;">Dr. Usmi Karyani, M.Si., Psikolog</div>
+    <div style="font-size:9.5pt; color:#444; margin-bottom:4pt;"><?= esc($ttdJabatan) ?>,</div>
+    <img src="<?= $ttdQr ?>" style="width:62pt; height:62pt; margin-bottom:4pt;" />
+    <div style="font-size:10pt; font-weight:bold; border-top:0.5pt solid #333; padding-top:3pt; display:inline-block; min-width:160pt;"><?= esc($ttdNama) ?></div>
   </div>
+</div>
+<div style="margin-top:10pt; font-size:7pt; color:#666; line-height:1.4;">
+  Dokumen ini ditandatangani secara elektronik melalui sistem SMHWS UMS. Pindai kode QR atau buka
+  <?= esc($ttdUrl) ?> untuk memverifikasi keaslian dan melihat salinan dokumen.
 </div>

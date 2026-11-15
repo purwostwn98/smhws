@@ -10,6 +10,7 @@ use App\Models\DassAssessmentModel;
 use App\Models\ImuAssessmentModel;
 use App\Models\ChecklistItemModel;
 use App\Models\InstansiRujukanModel;
+use App\Libraries\DokumenTerbit;
 use App\Libraries\SafetyFlag;
 use App\Libraries\InventoriMasalahUmum as IMU;
 
@@ -634,13 +635,13 @@ HTML;
 
         $stats = $this->buildProdiStats($db, $kode, $filters);
 
-        $htmlContent = view('admin/dashboard_univ_pdf', [
+        $viewData = [
             'stats'        => $stats,
             'filters'      => $filters,
             'prodiNama'    => $prodiNama,
             'fakultasNama' => $fakultasNama,
             'periodeLabel' => $periodeLabel,
-        ]);
+        ];
 
         $logoPath = ROOTPATH . 'public/assets/img/branding/logo-ums.png';
         $headerHtml = <<<HTML
@@ -685,11 +686,19 @@ HTML;
         $mpdf->SetCreator('SMHWS UMS');
         $mpdf->SetHTMLHeader($headerHtml);
         $mpdf->SetHTMLFooter('<div style="text-align:right;font-size:7.5pt;color:#888;">Dicetak: ' . $tglCetak . ' &nbsp;|&nbsp; Hal. {PAGENO} dari {nbpg}</div>');
-        $mpdf->WriteHTML($htmlContent);
 
-        $filename = 'laporan-agregat-konseling-' . date('Ymd') . '.pdf';
-        $mpdf->Output($filename, \Mpdf\Output\Destination::INLINE);
-        exit;
+        $pdf = DokumenTerbit::terbitkan($mpdf, 'admin/dashboard_univ_pdf', $viewData, [
+            'jenis'   => 'univ',
+            'judul'   => 'Laporan Agregat Konseling SMHWS UMS',
+            'cakupan' => $fakultasNama . ' — ' . $prodiNama,
+            'periode' => $periodeLabel,
+            'filters' => $filters,
+        ]);
+
+        return $this->response
+            ->setContentType('application/pdf')
+            ->setHeader('Content-Disposition', 'inline; filename="laporan-agregat-konseling-' . date('Ymd') . '.pdf"')
+            ->setBody($pdf);
     }
 
     /** GET /admin/stressor-detail?key=akademik&[filters] — JSON detail untuk modal */

@@ -177,3 +177,7 @@ $routes->get('admin/checklist/(:segment)',               'ChecklistAdminControll
 // Feedback
 $routes->get('feedback/(:num)',              'FeedbackController::buat/$1');
 $routes->post('feedback/simpan/(:num)',      'FeedbackController::simpan/$1');
+
+// Verifikasi dokumen bertanda tangan elektronik (publik, tujuan QR pada PDF laporan)
+$routes->get('dokumen/(:segment)',         'DokumenController::info/$1');
+$routes->get('dokumen/(:segment)/salinan', 'DokumenController::salinan/$1');
