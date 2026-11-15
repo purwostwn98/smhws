@@ -53,8 +53,11 @@ class Lib_Cas extends phpCAS
         // Assumes the cas server is load balanced across multiple hosts
         $cas_real_hosts = array('cas-real-1.example.com', 'cas-real-2.example.com');
 
-        // Client config for the required domain name, should be protocol, hostname and port
-        $client_service_name = 'http://localhost.ums.ac.id:8088/';
+        // Client config for the required domain name, should be protocol, hostname and port.
+        // Diambil dari app.baseURL (.env) supaya otomatis benar di tiap environment
+        // (lokal vs production https://smhws.ums.ac.id/) tanpa perlu diubah manual saat deploy.
+        helper('url');
+        $client_service_name = base_url();
 
         // Client config for cookie hardening
         $client_domain = '127.0.0.1';
