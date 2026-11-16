@@ -51,6 +51,7 @@ $routes->post('janji/simpan',        'JanjiController::simpan');
 $routes->get('janji/sukses/(:num)',  'JanjiController::sukses/$1');
 $routes->get('janji/(:num)',         'JanjiController::detail/$1');
 $routes->post('janji/hapus/(:num)', 'JanjiController::hapus/$1');
+$routes->get('janji/(:num)/surat-rujukan', 'JanjiController::suratRujukan/$1');
 
 // Admin
 $routes->get('admin/dashboard',              'AdminController::dashboard');

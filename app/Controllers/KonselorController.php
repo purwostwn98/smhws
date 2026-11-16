@@ -593,95 +593,10 @@ HTML;
                 ->with('error', 'Tidak ada rujukan untuk sesi ini.');
         }
 
-        $konselorData = $konselor;
-
-        $instansiRujukanList = (new \App\Models\InstansiRujukanModel())->getAll();
-        $checklistData       = (new \App\Models\ChecklistItemModel())->allForForm();
-
-        [$namaInstansi, $alamatInstansi] = $this->resolveInstansi($hasil, $instansiRujukanList);
-
-        $htmlContent = view('admin/janji/pdf_surat_rujukan', [
-            'janji'          => $janji,
-            'hasil'          => $hasil,
-            'konselor'       => $konselorData,
-            'namaInstansi'   => $namaInstansi,
-            'alamatInstansi' => $alamatInstansi,
-            'checklistData'  => $checklistData,
-        ]);
-
-        $logoPath   = ROOTPATH . 'public/assets/img/branding/logo-ums.png';
-        $romanMonth = ['I','II','III','IV','V','VI','VII','VIII','IX','X','XI','XII'];
-        $nomorSurat = str_pad($janji['id'], 5, '0', STR_PAD_LEFT)
-                    . '/' . $romanMonth[date('n') - 1]
-                    . '/' . date('Y');
-
-        $headerHtml = <<<HTML
-<table style="width:100%;border-collapse:collapse;">
-  <tr>
-    <td style="width:72pt;text-align:center;vertical-align:middle;padding-right:8pt;border-left:10pt solid #1a3a7a;">
-      <img src="{$logoPath}" style="width:150pt;" />
-    </td>
-    <td style="vertical-align:middle;">
-      <div style="font-size:10pt;font-weight:bold;color:#1a3a7a;margin-bottom:1pt;">Student Mental Health and Wellbeing Support (SMHWS)</div>
-      <div style="font-size:8.5pt;margin-bottom:1pt;">Direktorat Kemahasiswaan dan Pengembangan Talenta-Inovasi</div>
-      <div style="font-size:9pt;font-weight:bold;margin-bottom:1pt;">Universitas Muhammadiyah Surakarta</div>
-      <div style="font-size:7.5pt;color:#444;margin-bottom:0.5pt;">Jl. A. Yani No. 157, Pabelan, Kartasura, Sukoharjo, Jawa Tengah 57162</div>
-      <div style="font-size:7.5pt;color:#444;margin-bottom:0.5pt;">Telp. +62271717417 ext. 1130, Fax. 0271-715448</div>
-      <div style="font-size:7.5pt;color:#444;">Website: https://kemahasiswaan.ums.ac.id | E-mail: kemahasiswaan@ums.ac.id</div>
-    </td>
-  </tr>
-</table>
-<hr style="border:none;border-top:2pt solid #1a3a7a;margin:4pt 0 0 0;" />
-<hr style="border:none;border-top:0.5pt solid #000;margin:1.5pt 0 0 0;" />
-<div style="text-align:center;font-size:11pt;font-weight:bold;text-transform:uppercase;letter-spacing:0.8pt;margin-top:3pt;">Surat Rujukan</div>
-<div style="text-align:center;font-size:8.5pt;color:#555;">No: {$nomorSurat}</div>
-HTML;
-
-        $mpdf = new \Mpdf\Mpdf([
-            'mode'              => 'utf-8',
-            'format'            => 'A4',
-            'orientation'       => 'P',
-            'margin_left'       => 25,
-            'margin_right'      => 25,
-            'margin_top'        => 50,
-            'margin_bottom'     => 20,
-            'margin_header'     => 5,
-            'margin_footer'     => 0,
-            'default_font'      => 'dejavuserif',
-            'default_font_size' => 11,
-            'tempDir'            => WRITEPATH . 'mpdf_temp',
-        ]);
-
-        $mpdf->SetTitle('Surat Rujukan #' . str_pad($janji['id'], 5, '0', STR_PAD_LEFT));
-        $mpdf->SetAuthor('SMHWS UMS');
-        $mpdf->SetCreator('SMHWS UMS');
-        $mpdf->SetHTMLHeader($headerHtml);
-        $mpdf->WriteHTML($htmlContent);
-
-        $filename = 'surat-rujukan-' . str_pad($janji['id'], 5, '0', STR_PAD_LEFT) . '.pdf';
-        $mpdf->Output($filename, \Mpdf\Output\Destination::INLINE);
-        exit;
+        $this->outputSuratRujukan($janji, $hasil);
     }
 
     // ── Private helpers ─────────────────────────────────────────────────────
-
-    private function resolveInstansi(array $hasil, array $instansiList): array
-    {
-        $nama   = '—';
-        $alamat = '';
-        if (! empty($hasil['instansi_rujukan_id'])) {
-            foreach ($instansiList as $inst) {
-                if ($inst['id'] == $hasil['instansi_rujukan_id']) {
-                    $nama   = $inst['nama_instansi'];
-                    $alamat = $inst['alamat'] ?? '';
-                    break;
-                }
-            }
-        } elseif (! empty($hasil['instansi_rujukan'])) {
-            $nama = $hasil['instansi_rujukan'];
-        }
-        return [$nama, $alamat];
-    }
 
     private function uploadFotoKonselor(int $konselorId): ?string
     {

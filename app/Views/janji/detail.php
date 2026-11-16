@@ -7,6 +7,7 @@ $imu                 = $imu ?? null;
 $dass                = $dass ?? null;
 $safety              = $safety ?? null;
 $feedback            = $feedback ?? null;
+$penanganan          = $penanganan ?? null;
 ?>
 <?= $this->section('title') ?>Detail Janji #<?= str_pad($janji['id'], 5, '0', STR_PAD_LEFT) ?><?= $this->endSection() ?>
 
@@ -555,6 +556,60 @@ $currentStep = $janji['status'] === 'dibatalkan' ? -1 : array_search($janji['sta
     <?php endif ?>
 
     <?php if ($janji['status'] === 'selesai'): ?>
+    <!-- Status Penanganan (diisi psikolog) -->
+    <?php if ($penanganan):
+      $statusMeta = \App\Libraries\StatusPenanganan::STATUS[$penanganan['status']] ?? null;
+    ?>
+    <div class="card mb-4">
+      <div class="card-header py-3" style="border-bottom:1px solid #eee;">
+        <h6 class="fw-semibold mb-0" style="color:#1a2b40;font-size:.875rem;">
+          <i class="ti tabler-clipboard-heart me-2" style="color:#1a5f7a;"></i>Status Penanganan
+        </h6>
+      </div>
+      <div class="card-body">
+        <?php if ($statusMeta):
+          [$stLabel, $stKet, $stIcon, $stWarna] = $statusMeta;
+        ?>
+          <div class="d-flex gap-3 align-items-start p-3 rounded-3"
+               style="background:<?= $stWarna ?>0f;border-left:3px solid <?= $stWarna ?>;">
+            <i class="ti <?= $stIcon ?> flex-shrink-0" style="font-size:1.4rem;color:<?= $stWarna ?>;"></i>
+            <div>
+              <div class="fw-semibold mb-1" style="font-size:.88rem;color:<?= $stWarna ?>;"><?= esc($stLabel) ?></div>
+              <div style="font-size:.8rem;line-height:1.6;color:#444;">
+                <?php if ($penanganan['status'] === 'Rujukan' && ! $penanganan['ada_rujukan']): ?>
+                  Psikolog merujukmu ke layanan profesional lain agar kamu mendapat penanganan yang lebih sesuai. Surat rujukan akan diberikan oleh psikolog.
+                <?php else: ?>
+                  <?= esc($stKet) ?>
+                <?php endif ?>
+              </div>
+            </div>
+          </div>
+          <?php if ($penanganan['status'] === 'Follow-up'): ?>
+            <a href="<?= base_url('janji/buat') ?>" class="btn btn-sm btn-label-warning w-100 mt-3">
+              <i class="ti tabler-calendar-plus me-1"></i>Daftar Konseling Lanjutan
+            </a>
+          <?php endif ?>
+        <?php else: ?>
+          <p class="text-muted mb-0" style="font-size:.82rem;">Psikolog belum memperbarui status penangananmu.</p>
+        <?php endif ?>
+
+        <?php if ($penanganan['ada_rujukan']): ?>
+          <div class="mt-3 p-3 rounded-3" style="background:#f8f9fa;">
+            <div class="text-muted mb-1" style="font-size:.75rem;">Instansi Tujuan Rujukan</div>
+            <div class="fw-semibold" style="font-size:.88rem;color:#1a2b40;"><?= esc($penanganan['instansi'] ?? '—') ?></div>
+            <?php if (! empty($penanganan['instansi_alamat'])): ?>
+              <div class="text-muted" style="font-size:.78rem;"><?= esc($penanganan['instansi_alamat']) ?></div>
+            <?php endif ?>
+            <a href="<?= base_url('janji/' . $janji['id'] . '/surat-rujukan') ?>" target="_blank" rel="noopener"
+               class="btn btn-sm btn-danger w-100 mt-3">
+              <i class="ti tabler-file-download me-1"></i>Unduh Surat Rujukan
+            </a>
+          </div>
+        <?php endif ?>
+      </div>
+    </div>
+    <?php endif ?>
+
     <?php if ($feedback): ?>
     <!-- Feedback sudah diberikan -->
     <div class="card mb-4 border-success" style="border-left:4px solid #28c76f!important;">

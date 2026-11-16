@@ -7,6 +7,9 @@ use App\Libraries\InventoriMasalahUmum as IMU;
 use App\Models\DassAssessmentModel;
 use App\Models\ImuAssessmentModel;
 use App\Models\FeedbackKonselingModel;
+use App\Models\HasilKonselingModel;
+use App\Models\InstansiRujukanModel;
+use App\Libraries\StatusPenanganan;
 use App\Models\KonselorModel;
 use App\Models\UserModel;
 
@@ -308,6 +311,26 @@ class JanjiController extends BaseController
 
         return redirect()->to(base_url('janji/' . $id))
             ->with('success', 'Konseling #' . str_pad($id, 5, '0', STR_PAD_LEFT) . ' telah dibatalkan.');
+    }
+
+    /** GET /janji/:id/surat-rujukan — mahasiswa mengunduh surat rujukan miliknya */
+    public function suratRujukan(int $id): mixed
+    {
+        if ($r = $this->authCheck()) return $r;
+
+        $janji = (new JanjiModel())->withDetail()->where('janji.id', $id)->first();
+        if (! $janji || $janji['user_id'] != session()->get('user_id')) {
+            return redirect()->to(base_url('janji'))
+                ->with('error', 'Janji tidak ditemukan.');
+        }
+
+        $hasil = $janji['status'] === 'selesai' ? (new HasilKonselingModel())->byJanji($id) : null;
+        if (! $hasil || ! $hasil['ada_rujukan']) {
+            return redirect()->to(base_url('janji/' . $id))
+                ->with('error', 'Tidak ada surat rujukan untuk sesi ini.');
+        }
+
+        $this->outputSuratRujukan($janji, $hasil);
     }
 
     /** GET /janji/konselor-jadwal — API: jadwal tersedia berdasarkan konselor yang dipilih */
@@ -726,11 +749,26 @@ class JanjiController extends BaseController
             $janji['jadwal_pilihan'] = $jadwalPilihan;
         }
 
-        // Feedback (hanya untuk janji selesai)
-        $feedback = null;
+        // Feedback & status penanganan dari psikolog (hanya untuk janji selesai)
+        $feedback   = null;
+        $penanganan = null;
         if ($janji['status'] === 'selesai') {
             $feedbackModel = new FeedbackKonselingModel();
             $feedback = $feedbackModel->byJanji($id);
+
+            $hasil = (new HasilKonselingModel())->byJanji($id);
+            if ($hasil) {
+                [$namaInstansi, $alamatInstansi] = $hasil['ada_rujukan']
+                    ? $this->resolveInstansi($hasil, (new InstansiRujukanModel())->getAll())
+                    : [null, null];
+                // Catatan klinis psikolog (alasan rujukan, diagnosis, dll.) tidak ditampilkan ke mahasiswa
+                $penanganan = [
+                    'status'          => StatusPenanganan::dariHasil($hasil),
+                    'ada_rujukan'     => (bool) $hasil['ada_rujukan'],
+                    'instansi'        => $namaInstansi,
+                    'instansi_alamat' => $alamatInstansi,
+                ];
+            }
         }
 
         return view('janji/detail', [
@@ -741,6 +779,7 @@ class JanjiController extends BaseController
             'dass'                => $dass,
             'safety'              => $safety,
             'feedback'            => $feedback,
+            'penanganan'          => $penanganan,
         ]);
     }
 }
