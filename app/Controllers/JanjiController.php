@@ -149,9 +149,9 @@ class JanjiController extends BaseController
             $db->transRollback();
             $validationErrors = $janjiModel->errors();
             $dbError          = $db->error();
-            log_message('error', '[JanjiController::simpan] Validation failed: ' . json_encode($validationErrors));
+            // Jangan log isi form: berisi data kesehatan mental mahasiswa
+            log_message('error', '[JanjiController::simpan] Validation failed (user {uid}): ' . json_encode($validationErrors), ['uid' => $userId]);
             log_message('error', '[JanjiController::simpan] DB error: ' . json_encode($dbError));
-            log_message('error', '[JanjiController::simpan] POST data: ' . json_encode(array_diff_key($post, ['persetujuan' => ''])));
 
             // Tentukan step pertama yang ada error-nya
             $stepFields = [

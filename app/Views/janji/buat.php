@@ -1109,9 +1109,16 @@ $fieldLabels  = [
     const counterEl = document.getElementById('keluhanCounter');
     if (keluhanEl && counterEl) {
       keluhanEl.addEventListener('input', () => {
-        const len = keluhanEl.value.length;
-        counterEl.textContent = len + ' / 450';
-        counterEl.style.color = len >= 430 ? '#dc3545' : len >= 400 ? '#f0a500' : '';
+        const len    = keluhanEl.value.length;
+        const kurang = keluhanEl.minLength - keluhanEl.value.trim().length;
+        if (len > 0 && kurang > 0) {
+          counterEl.textContent = `Kurang ${kurang} karakter lagi · ${len} / 450`;
+          counterEl.style.color = '#dc3545';
+        } else {
+          counterEl.textContent = len + ' / 450';
+          counterEl.style.color = len >= 430 ? '#dc3545' : len >= 400 ? '#f0a500' : '';
+          keluhanEl.classList.remove('is-invalid');
+        }
       });
       keluhanEl.dispatchEvent(new Event('input'));
     }
@@ -1181,7 +1188,8 @@ $fieldLabels  = [
             el.classList.add('is-invalid');
           } else el.classList.remove('is-invalid');
         } else {
-          if (!el.value.trim()) {
+          const isi = el.value.trim();
+          if (!isi || (el.minLength > 0 && isi.length < el.minLength)) {
             valid = false;
             el.classList.add('is-invalid');
           } else el.classList.remove('is-invalid');
