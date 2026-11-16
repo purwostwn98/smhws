@@ -685,10 +685,12 @@ $currentStep = $janji['status'] === 'dibatalkan' ? -1 : array_search($janji['sta
           <div style="font-size:.82rem;">
             <div class="fw-semibold mb-1">Butuh Bantuan Segera?</div>
             <div class="text-muted mb-2">Hubungi hotline SMHWS:</div>
+            <?php /* Disembunyikan sampai nomor telepon hotline SMHWS yang benar tersedia
             <a href="tel:02712855" class="btn btn-sm btn-warning w-100 mb-1">
               <i class="ti tabler-phone me-1"></i>(0271) 2855 / Ext. 417
             </a>
-            <a href="https://wa.me/6282145678900" class="btn btn-sm btn-success w-100">
+            */ ?>
+            <a href="https://wa.me/6285159976608" class="btn btn-sm btn-success w-100">
               <i class="ti tabler-brand-whatsapp me-1"></i>WhatsApp Psikolog
             </a>
           </div>

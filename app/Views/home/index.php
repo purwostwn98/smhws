@@ -626,7 +626,7 @@ $prosedurKonseling = [
           <div class="badge bg-label-primary p-2"><i class="ti tabler-map-pin text-primary fs-5"></i></div>
           <div>
             <h6 class="fw-bold mb-1">Lokasi</h6>
-            <p class="text-muted small mb-0">Gedung Siti Walidah Lt. 2, UMS<br>Jl. Ahmad Yani, Pabelan, Surakarta 57162</p>
+            <p class="text-muted small mb-0">Gedung Siti Walidah Lt. 3, UMS<br>Jl. Ahmad Yani, Pabelan, Surakarta 57162</p>
           </div>
         </div>
 
@@ -642,7 +642,7 @@ $prosedurKonseling = [
           <div class="badge bg-label-primary p-2"><i class="ti tabler-brand-whatsapp text-primary fs-5"></i></div>
           <div>
             <h6 class="fw-bold mb-1">WhatsApp</h6>
-            <a href="https://wa.me/6208777770000" class="text-primary small" target="_blank">0877-7777-0000</a>
+            <a href="https://wa.me/6285159976608" class="text-primary small" target="_blank">0851-5997-6608</a>
           </div>
         </div>
 

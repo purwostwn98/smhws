@@ -22,7 +22,7 @@
           <!-- Emergency info -->
           <div class="smhws-emergency p-3 rounded">
             <p class="mb-1 fw-semibold text-dark"><i class="ti tabler-phone-call me-1 text-warning"></i>Darurat Mental Health</p>
-            <p class="mb-0 text-dark small">Hotline 24 Jam: <strong>119 ext 8</strong> &nbsp;|&nbsp; WA: <strong>0877-7777-0000</strong></p>
+            <p class="mb-0 text-dark small">Hotline 24 Jam: <strong>119 ext 8</strong> &nbsp;|&nbsp; WA: <strong>0851-5997-6608</strong></p>
           </div>
         </div>
 
@@ -56,7 +56,7 @@
           <ul class="list-unstyled">
             <li class="mb-3 d-flex gap-2">
               <i class="ti tabler-map-pin text-primary mt-1 flex-shrink-0"></i>
-              <span class="footer-text small">Gedung Siti Walidah, Lantai 2<br>Universitas Muhammadiyah Surakarta<br>Jl. Ahmad Yani, Surakarta</span>
+              <span class="footer-text small">Gedung Siti Walidah, Lantai 3<br>Universitas Muhammadiyah Surakarta<br>Jl. Ahmad Yani, Surakarta</span>
             </li>
             <li class="mb-3 d-flex gap-2">
               <i class="ti tabler-clock text-primary flex-shrink-0"></i>
