@@ -58,21 +58,42 @@ class AuthController extends BaseController
             $prodi    = null;
         }
 
-        $model    = new UserModel();
-        $existing = $model->where('uniid', $nimNip)->first();
+        $model = new UserModel();
+        // Ikutkan akun yang sudah dihapus: email/uniid-nya masih tercatat, jadi tidak boleh dibuat ulang
+        $existing = $model->withDeleted()->where('uniid', $nimNip)->first();
+
+        if ($existing && $existing['deleted_at'] !== null) {
+            return $this->tolakLoginCas('Akun Anda sudah dihapus dari SMHWS. Hubungi admin SMHWS.');
+        }
 
         if (! $existing) {
-            $insertId = $model->skipValidation(true)->insert([
-                'name'      => $name,
-                'email'     => $email,
-                'password'  => bin2hex("smhws@2026"),
-                'role'      => $role,
-                'uniid'   => $nimNip,
-                'fakultas'  => $fakultas,
-                'prodi'     => $prodi,
-                'is_active' => 1,
-            ]);
+            try {
+                $insertId = $model->skipValidation(true)->insert([
+                    'name'      => $name,
+                    'email'     => $email,
+                    'password'  => bin2hex("smhws@2026"),
+                    'role'      => $role,
+                    'uniid'   => $nimNip,
+                    'fakultas'  => $fakultas,
+                    'prodi'     => $prodi,
+                    'is_active' => 1,
+                ]);
+            } catch (\CodeIgniter\Database\Exceptions\DatabaseException $e) {
+                $insertId = false;
+            }
+
+            if (! $insertId) {
+                log_message('error', '[AuthController::loginWithCas] Gagal membuat akun untuk uniid {uniid}: {err}', [
+                    'uniid' => $nimNip,
+                    'err'   => isset($e) ? $e->getMessage() : json_encode(\Config\Database::connect()->error()),
+                ]);
+                return $this->tolakLoginCas('Akun Anda belum dapat dibuat otomatis. Hubungi admin SMHWS.');
+            }
             $existing = $model->find($insertId);
+        }
+
+        if (! $existing['is_active']) {
+            return $this->tolakLoginCas('Akun Anda tidak aktif. Hubungi admin SMHWS.');
         }
 
         $model->updateLastLogin($existing['id']);
@@ -91,6 +112,13 @@ class AuthController extends BaseController
         ]);
 
         return redirect()->to($this->ambilTujuan($existing) ?? $this->redirectAfterLogin($existing));
+    }
+
+    private function tolakLoginCas(string $pesan): \CodeIgniter\HTTP\RedirectResponse
+    {
+        session()->remove('redirect_after_login');
+
+        return redirect()->to(base_url('login'))->with('error', $pesan);
     }
 
     public function login(): \CodeIgniter\HTTP\RedirectResponse
