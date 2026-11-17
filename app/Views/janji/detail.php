@@ -584,7 +584,7 @@ $currentStep = $janji['status'] === 'dibatalkan' ? -1 : array_search($janji['sta
               </div>
             </div>
           </div>
-          <?php if ($penanganan['status'] === 'Follow-up'): ?>
+          <?php if ($penanganan['status'] === 'Konseling Lanjutan'): ?>
             <a href="<?= base_url('janji/buat') ?>" class="btn btn-sm btn-label-warning w-100 mt-3">
               <i class="ti tabler-calendar-plus me-1"></i>Daftar Konseling Lanjutan
             </a>

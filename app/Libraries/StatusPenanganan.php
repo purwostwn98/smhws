@@ -15,13 +15,8 @@ class StatusPenanganan
             'Proses konselingmu telah selesai. Jika suatu saat kamu membutuhkan bantuan lagi, kamu dapat mendaftar konseling kembali.',
             'tabler-circle-check', '#2d9b6e',
         ],
-        'Monitoring' => [
-            'Monitoring',
-            'Psikolog akan memantau perkembangan kondisimu. Terus terapkan saran yang diberikan, dan hubungi SMHWS bila kondisimu memburuk.',
-            'tabler-eye-check', '#1a5f7a',
-        ],
-        'Follow-up' => [
-            'Follow-up / Konseling Lanjutan',
+        'Konseling Lanjutan' => [
+            'Konseling Lanjutan',
             'Psikolog menyarankan kamu mengikuti sesi konseling lanjutan. Silakan daftar konseling kembali untuk melanjutkan prosesnya.',
             'tabler-calendar-repeat', '#d48f00',
         ],
@@ -34,6 +29,17 @@ class StatusPenanganan
             'Terminasi atas Kesepakatan Bersama',
             'Konseling diakhiri atas kesepakatan bersama antara kamu dan psikolog. Kamu dapat mendaftar konseling kembali kapan pun kamu membutuhkan.',
             'tabler-heart-handshake', '#696cff',
+        ],
+        'Lainnya' => [
+            'Lainnya',
+            'Psikolog telah mencatat tindak lanjut khusus untuk konselingmu. Hubungi SMHWS bila kamu memiliki pertanyaan tentang langkah berikutnya.',
+            'tabler-dots-circle-horizontal', '#6c757d',
+        ],
+        // Tidak lagi dapat dipilih; tetap dikenali untuk data lama
+        'Monitoring' => [
+            'Monitoring',
+            'Psikolog akan memantau perkembangan kondisimu. Terus terapkan saran yang diberikan, dan hubungi SMHWS bila kondisimu memburuk.',
+            'tabler-eye-check', '#1a5f7a',
         ],
     ];
 

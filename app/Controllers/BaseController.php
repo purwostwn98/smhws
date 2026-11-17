@@ -365,7 +365,7 @@ abstract class BaseController extends Controller
                 $statusKons[$statusVal]++;
             }
             if ($statusVal === 'Selesai')   $totalSelesai++;
-            if ($statusVal === 'Follow-up') $totalFollowup++;
+            if ($statusVal === 'Konseling Lanjutan') $totalFollowup++;
             if ($statusVal === 'Rujukan')   $totalDirujuk++;
 
             $inv     = json_decode($row['intervensi'] ?? '{}', true) ?: [];

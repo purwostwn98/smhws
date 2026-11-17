@@ -145,7 +145,7 @@ $hasilColors = ['#28a745','#20c997','#f0a500','#fd7e14','#dc3545'];
     ['label'=>'Total Sesi','value'=>$totalSesi,'icon'=>'tabler-calendar-stats','color'=>'#1a5f7a','bg'=>'rgba(26,95,122,.12)'],
     ['label'=>'Mahasiswa Konseling','value'=>$stats['mahasiswa_unik'],'icon'=>'tabler-users','color'=>'#0d6efd','bg'=>'rgba(13,110,253,.12)'],
     ['label'=>'Sesi Selesai','value'=>$selesaiJanji,'icon'=>'tabler-circle-check','color'=>'#28a745','bg'=>'rgba(40,167,69,.12)'],
-    ['label'=>'Follow-up','value'=>$stats['total_followup'],'icon'=>'tabler-repeat','color'=>'#f0a500','bg'=>'rgba(240,165,0,.12)'],
+    ['label'=>'Konseling Lanjutan','value'=>$stats['total_followup'],'icon'=>'tabler-repeat','color'=>'#f0a500','bg'=>'rgba(240,165,0,.12)'],
     ['label'=>'Dirujuk','value'=>$stats['total_dirujuk'],'icon'=>'tabler-external-link','color'=>'#dc3545','bg'=>'rgba(220,53,69,.12)'],
   ];
   ?>

@@ -248,10 +248,10 @@ class ChecklistSeederVItoIX extends Seeder
                     'type'   => 'radio',
                     'items'  => [
                         'Selesai',
-                        'Monitoring',
-                        'Follow-up',
+                        'Konseling Lanjutan',
                         'Rujukan',
                         'Terminasi atas kesepakatan bersama',
+                        'Lainnya',
                     ],
                 ],
             ],

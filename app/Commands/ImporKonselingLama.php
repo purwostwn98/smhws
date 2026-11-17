@@ -61,7 +61,7 @@ class ImporKonselingLama extends BaseCommand
         'kunjungan layanan kesehatan lainnya untuk konseling dan pemberian nasihat medis' => 'Kunjungan layanan kesehatan untuk konseling atau pemberian nasihat medis',
     ];
 
-    private const STATUS_PENANGANAN = ['Selesai', 'Monitoring', 'Follow-up', 'Rujukan', 'Terminasi atas kesepakatan bersama'];
+    private const STATUS_PENANGANAN = ['Selesai', 'Monitoring', 'Konseling Lanjutan', 'Rujukan', 'Terminasi atas kesepakatan bersama', 'Lainnya'];
 
     private BaseConnection $db;
     private string $batch = '';
@@ -401,13 +401,15 @@ class ImporKonselingLama extends BaseCommand
             $fokus[] = $f;
         }
 
-        $status = in_array($r['status'], self::STATUS_PENANGANAN, true) ? $r['status'] : null;
+        // Sistem lama memakai "Follow-up" untuk yang kini bernama "Konseling Lanjutan"
+        $status = $r['status'] === 'Follow-up' ? 'Konseling Lanjutan' : $r['status'];
+        $status = in_array($status, self::STATUS_PENANGANAN, true) ? $status : null;
         $waktu  = $r['tanggal'] . ' 08:00:00';
 
         $this->db->table('hasil_konseling')->insert([
             'janji_id' => $janjiId, 'konselor_id' => $konselorId,
             'ada_rujukan' => $status === 'Rujukan' ? 1 : 0,
-            'sesi_lanjutan' => $status === 'Follow-up' ? 1 : 0,
+            'sesi_lanjutan' => $status === 'Konseling Lanjutan' ? 1 : 0,
             'diagnosis' => json_encode(['dsm5' => array_values(array_unique($dsm5)), 'dsm5_lainnya' => implode(', ', array_unique($lain))], JSON_UNESCAPED_UNICODE),
             'intervensi' => json_encode(['fokus' => array_values(array_unique($fokus)), 'fokus_lainnya' => $fokusLain], JSON_UNESCAPED_UNICODE),
             'rekomendasi' => json_encode(['status' => $status], JSON_UNESCAPED_UNICODE),
