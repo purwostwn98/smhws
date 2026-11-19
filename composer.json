@@ -13,6 +13,7 @@
         "php": "^8.2",
         "apereo/phpcas": "^1.6",
         "codeigniter4/framework": "^4.7",
+        "jumbojett/openid-connect-php": "^1.0",
         "mpdf/mpdf": "^8.3",
         "phpoffice/phpspreadsheet": "^5.9",
         "tecnickcom/tcpdf": "^6.11"

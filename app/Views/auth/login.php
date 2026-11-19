@@ -100,7 +100,7 @@
         </p>
 
         <!-- SSO UMS -->
-        <a href="<?= base_url('cas') ?><?= !empty($redirect) ? '?redirect=' . esc($redirect) : '' ?>"
+        <a href="<?= base_url('oidc') ?><?= !empty($redirect) ? '?redirect=' . esc($redirect) : '' ?>"
           class="btn d-flex align-items-center justify-content-center gap-2 w-100 mb-2 fw-semibold"
           style="background:#1a5f7a;color:#fff;border-radius:8px;padding:.65rem 1rem;">
           <img src="<?= base_url('myimg/logo_ums.png') ?>" alt="UMS"

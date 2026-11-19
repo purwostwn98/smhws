@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Models\UserModel;
 use App\Libraries\Lib_Cas;
+use App\Libraries\Lib_Oidc;
 
 class AuthController extends BaseController
 {
@@ -17,10 +18,9 @@ class AuthController extends BaseController
         return view('auth/login', ['redirect' => $redirect]);
     }
 
+    /** Login SSO lama (CAS). Masih tersedia di /cas, tetapi tombol login kini memakai OIDC. */
     public function loginWithCas(): \CodeIgniter\HTTP\RedirectResponse
     {
-        helper(['star', 'sihrd']);
-
         // Start CI4's session BEFORE phpCAS initialises.
         // phpCAS::client() checks session_id() === "" and skips session_start()
         // when a session is already open — so phpCAS reuses CI4's session instead
@@ -36,7 +36,45 @@ class AuthController extends BaseController
         $cas->forceAuth();
         $casUser = $cas->user();
 
-        $uniid        = $casUser->userlogin;
+        return $this->masukSso($casUser->userlogin, 'cas');
+    }
+
+    /**
+     * Login SSO UMS via OpenID Connect (Keycloak). Dipakai untuk /oidc (mulai) dan /oidc/callback
+     * (Keycloak mengembalikan kode otorisasi ke sini; library menukarnya menjadi token).
+     */
+    public function loginWithOidc(): \CodeIgniter\HTTP\RedirectResponse
+    {
+        // Library OIDC menyimpan state/nonce di $_SESSION: buka sesi CI4 dulu agar dipakai bersama
+        session()->start();
+
+        // ?redirect hanya ada di permintaan pertama; callback dari Keycloak tidak membawanya
+        $this->simpanTujuan($this->request->getGet('redirect'));
+
+        try {
+            $oidc = new Lib_Oidc;
+            $oidc->forceAuth();
+            $user = $oidc->user();
+        } catch (\Jumbojett\OpenIDConnectClientException $e) {
+            log_message('error', '[AuthController::loginWithOidc] {err}', ['err' => $e->getMessage()]);
+            return $this->tolakLoginSso('Login SSO UMS gagal. Silakan coba lagi.');
+        }
+
+        // Mahasiswa: NIM (10 karakter) dari employeeNumber; selain mahasiswa: username SSO
+        $nim   = (string) ($user->attributes['employeeNumber'] ?? '');
+        $uniid = strlen($nim) === 10 ? $nim : (string) $user->userlogin;
+
+        return $this->masukSso($uniid, 'oidc');
+    }
+
+    /**
+     * Logika bersama login SSO (CAS & OIDC): profil dari STAR/SIHRD, cari atau buat akun,
+     * tolak akun terhapus/nonaktif, isi sesi, lalu arahkan ke halaman tujuan.
+     */
+    private function masukSso(string $uniid, string $metode): \CodeIgniter\HTTP\RedirectResponse
+    {
+        helper(['star', 'sihrd']);
+
         $isMahasiswa  = strlen($uniid) === 10;
 
         if ($isMahasiswa) {
@@ -63,7 +101,7 @@ class AuthController extends BaseController
         $existing = $model->withDeleted()->where('uniid', $nimNip)->first();
 
         if ($existing && $existing['deleted_at'] !== null) {
-            return $this->tolakLoginCas('Akun Anda sudah dihapus dari SMHWS. Hubungi admin SMHWS.');
+            return $this->tolakLoginSso('Akun Anda sudah dihapus dari SMHWS. Hubungi admin SMHWS.');
         }
 
         if (! $existing) {
@@ -83,17 +121,17 @@ class AuthController extends BaseController
             }
 
             if (! $insertId) {
-                log_message('error', '[AuthController::loginWithCas] Gagal membuat akun untuk uniid {uniid}: {err}', [
+                log_message('error', '[AuthController::masukSso] Gagal membuat akun untuk uniid {uniid}: {err}', [
                     'uniid' => $nimNip,
                     'err'   => isset($e) ? $e->getMessage() : json_encode(\Config\Database::connect()->error()),
                 ]);
-                return $this->tolakLoginCas('Akun Anda belum dapat dibuat otomatis. Hubungi admin SMHWS.');
+                return $this->tolakLoginSso('Akun Anda belum dapat dibuat otomatis. Hubungi admin SMHWS.');
             }
             $existing = $model->find($insertId);
         }
 
         if (! $existing['is_active']) {
-            return $this->tolakLoginCas('Akun Anda tidak aktif. Hubungi admin SMHWS.');
+            return $this->tolakLoginSso('Akun Anda tidak aktif. Hubungi admin SMHWS.');
         }
 
         $model->updateLastLogin($existing['id']);
@@ -108,13 +146,14 @@ class AuthController extends BaseController
             'is_admin_fakultas' => (bool) $existing['is_admin_fakultas'],
             'is_pimpinan_univ'  => (bool) $existing['is_pimpinan_univ'],
             'is_logged_in'      => true,
-            'auth_via_cas'      => true,
+            'auth_via'          => $metode,           // cas | oidc (dipakai saat logout)
+            'auth_via_cas'      => $metode === 'cas', // kompatibilitas kode lama
         ]);
 
         return redirect()->to($this->ambilTujuan($existing) ?? $this->redirectAfterLogin($existing));
     }
 
-    private function tolakLoginCas(string $pesan): \CodeIgniter\HTTP\RedirectResponse
+    private function tolakLoginSso(string $pesan): \CodeIgniter\HTTP\RedirectResponse
     {
         session()->remove('redirect_after_login');
 
@@ -167,11 +206,17 @@ class AuthController extends BaseController
 
     public function logout(): \CodeIgniter\HTTP\RedirectResponse
     {
-        $isCasUser = (bool) session()->get('auth_via_cas');
+        $metode  = session()->get('auth_via') ?? (session()->get('auth_via_cas') ? 'cas' : null);
+        // Ambil id token sebelum sesi dihapus: dibutuhkan untuk mengakhiri sesi di Keycloak
+        $idToken = $_SESSION['oidc_id_token'] ?? null;
 
         session()->destroy();
 
-        if ($isCasUser) {
+        if ($metode === 'oidc') {
+            (new Lib_Oidc)->keluar(base_url('login'), $idToken); // redirect ke Keycloak lalu kembali ke /login
+        }
+
+        if ($metode === 'cas') {
             $service = urlencode(base_url('login'));
             return redirect()->to('https://auth.ums.ac.id/cas/logout?service=' . $service);
         }
@@ -215,7 +260,7 @@ class AuthController extends BaseController
         return base_url($path);
     }
 
-    private function redirectAfterLogin(array $user = null): string
+    private function redirectAfterLogin(?array $user = null): string
     {
         if ($user === null) {
             $user = [

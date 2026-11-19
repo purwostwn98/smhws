@@ -39,6 +39,8 @@ $routes->get('logout', 'AuthController::logout');
 
 // Auth CAS
 $routes->get('cas', 'AuthController::loginWithCas');
+$routes->get('oidc',          'AuthController::loginWithOidc'); // login SSO UMS (OpenID Connect)
+$routes->get('oidc/callback', 'AuthController::loginWithOidc'); // redirect URI terdaftar di Keycloak
 
 // Dashboard
 $routes->get('dashboard',            'DashboardController::index');
