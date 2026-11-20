@@ -15,8 +15,8 @@ class Assessment extends BaseConfig
      */
     public array $jenis = [
         'dass' => [
-            'nama'        => 'Depression Anxiety Stress Scales',
-            'singkatan'   => 'DASS-21',
+            'nama'        => 'Depresi, kecemasan, dan stres',
+            'singkatan'   => 'Tekanan Psikologis',
             'deskripsi'   => 'Mengukur tingkat depresi, kecemasan, dan stres yang kamu rasakan dalam 1 minggu terakhir.',
             'icon'        => 'tabler-brain',
             'color'       => '#1a5f7a',

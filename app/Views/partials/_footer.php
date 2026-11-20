@@ -33,7 +33,7 @@
             <li class="mb-3"><a href="#layanan" class="footer-link">Konseling Individual</a></li>
             <li class="mb-3"><a href="#layanan" class="footer-link">Konseling Kelompok</a></li>
             <li class="mb-3"><a href="#layanan" class="footer-link">Tes Psikologi</a></li>
-            <li class="mb-3"><a href="#layanan" class="footer-link">Psikoeduasi</a></li>
+            <li class="mb-3"><a href="#layanan" class="footer-link">Psikoedukasi</a></li>
             <li class="mb-3"><a href="#layanan" class="footer-link">Rujukan Psikiater</a></li>
           </ul>
         </div>

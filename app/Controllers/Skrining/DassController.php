@@ -86,6 +86,6 @@ class DassController extends BaseSkriningController
             'desk'  => DassDeskripsi::susun($hasil),
         ]);
 
-        $this->kirimPdf('Hasil Mental Health Check (DASS-21)', $html, 'hasil-dass-21.pdf');
+        $this->kirimPdf('Hasil Mental Health Check (Tekanan Psikologis)', $html, 'hasil-tekanan-psikologis.pdf');
     }
 }

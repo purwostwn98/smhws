@@ -14,7 +14,7 @@ $rm = $desk['meta'];
     <div class="col-lg-9">
       <div class="text-center mb-5">
         <h2 class="fw-bold mb-2" style="color:var(--smhws-dark);">Hasil Mental Health Check</h2>
-        <p class="text-muted mb-0">Terima kasih sudah mengisi skrining DASS-21.</p>
+        <p class="text-muted mb-0">Terima kasih sudah mengisi skrining tekanan psikologis.</p>
       </div>
 
       <div class="card mb-4 shadow-sm">

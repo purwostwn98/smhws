@@ -2,7 +2,7 @@
 
 <?= $this->section('title') ?>Mental Health Check<?= $this->endSection() ?>
 
-<?= $this->section('meta_description') ?>Skrining kesehatan mental DASS-21 secara online tanpa login untuk mahasiswa.<?= $this->endSection() ?>
+<?= $this->section('meta_description') ?>Skrining tekanan psikologis secara online tanpa login untuk mahasiswa.<?= $this->endSection() ?>
 
 <?= $this->section('extra_css') ?>
 <style>
@@ -75,7 +75,7 @@ if ($e = session()->getFlashdata('error')) $errors[] = $e;
       <div class="text-center mb-5">
         <h2 class="fw-bold mb-2" style="color:var(--smhws-dark);">Mental Health Check</h2>
         <p class="text-muted mb-0">
-          Skrining DASS-21 untuk mengenali tingkat depresi, kecemasan, dan stres. Tanpa login, jawabanmu bersifat anonim.
+          Skrining tekanan psikologis untuk mengenali tingkat depresi, kecemasan, dan stres. Tanpa login, jawabanmu bersifat anonim.
         </p>
       </div>
 
@@ -96,7 +96,7 @@ if ($e = session()->getFlashdata('error')) $errors[] = $e;
           <div class="card-header">
             <div class="d-flex align-items-start justify-content-between flex-wrap gap-2">
               <div>
-                <h5 class="card-title mb-0"><i class="ti tabler-brain me-2"></i>Pernyataan DASS-21</h5>
+                <h5 class="card-title mb-0"><i class="ti tabler-brain me-2"></i>Pernyataan Skrining Tekanan Psikologis</h5>
                 <p class="text-muted mb-0 mt-1" style="font-size:.82rem;">
                   Pilih jawaban yang paling sesuai dengan kondisimu <strong>dalam 1 minggu terakhir</strong>.
                 </p>
