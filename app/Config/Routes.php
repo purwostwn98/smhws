@@ -6,7 +6,7 @@ use CodeIgniter\Router\RouteCollection;
  * @var RouteCollection $routes
  */
 $routes->get('/', 'Home::index');
-$routes->get('landing', 'Home::landing');
+$routes->addRedirect('landing', '/', 301);
 
 // SMHWS Learn (publik)
 $routes->get('learn',             'LearnController::index');
